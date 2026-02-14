@@ -23,6 +23,11 @@
 ### Communication Preferences
 *[These preferences will be discovered and updated through our conversations]*
 
+**OAuth/Authentication Preferences**:
+- Logout should redirect to home page (/) for clean UX
+- Login should force Google account selection (prompt=select_account)
+- Avoid unnecessary redirects that confuse user flow
+
 **Response Style You Prefer**:
 - [ ] Direct and concise answers
 - [ ] Detailed explanations with examples
@@ -36,13 +41,9 @@
 - [x] For every prompt: Clarify understanding, explain plan, get permission before code changes
 
 **Topics You Engage With**:
-- [ ] Work/Professional development
-- [ ] Learning and education
-- [ ] Creative projects
-- [ ] Problem-solving challenges
-- [ ] Personal growth
-- [ ] Technical subjects
-- [ ] Strategic planning
+- [x] Work/Professional development
+- [x] Technical subjects
+- [x] Problem-solving challenges
 
 ### Token & Usage Management
 **Monthly Premium Request Monitoring**:

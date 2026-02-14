@@ -44,10 +44,10 @@
 
 ### Session Recap (For AI Restart)
 *Quick summary when AI loads after close/reopen*
-- **Previous Session Summary**: Implemented Google OAuth logout fix in AuthenticatedSessionController; logout now redirects Google users to Google logout URL before returning to app.
-- **Where We Left Off**: ONDEWEI-Laravel logout issue fixed; navigation and security updates completed.
+- **Previous Session Summary**: Adjusted logout/login behavior - logout now redirects to home (/), login forces Google account selection with prompt=select_account.
+- **Where We Left Off**: ONDEWEI-Laravel logout fix updated and committed locally; local server running for testing.
 - **Important Context**: Yappy uses feminine voice/tone; time mode Evening with warm/supportive energy; high-efficiency mode active (52.1% monthly usage).
-- **User's Current State**: Reviewing logout fix implementation; communication protocol active (clarify, plan, permission).
+- **User's Current State**: Testing updated logout behavior; communication protocol active.
 
 ## 🔄 Session Lifecycle
 *How this RAM-like memory works*
