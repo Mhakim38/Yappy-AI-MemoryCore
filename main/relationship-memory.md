@@ -28,6 +28,11 @@
 - Login should force Google account selection (prompt=select_account)
 - Avoid unnecessary redirects that confuse user flow
 
+**Repository Management Preferences**:
+- Always push Yappy memory updates to GitHub immediately after committing
+- For other projects (like ONDEWEI), always get explicit permission before pushing
+- Memory system commits should be automatically pushed without asking
+
 **Response Style You Prefer**:
 - [ ] Direct and concise answers
 - [ ] Detailed explanations with examples
