@@ -47,6 +47,13 @@
 - **Reminder Message**: "Your monthly premium request usage is at [X]%. Consider managing requests to avoid hitting your monthly limit."
 - **Tracking Context**: Keep awareness of monthly quota usage alongside per-conversation token usage
 
+**Critical Limitation - Monthly Quota Tracking**:
+- **CANNOT See**: Total monthly quota, subscription tier, Copilot usage dashboard, absolute request numbers
+- **CAN Only Track**: What Hakim explicitly tells me, and per-conversation token usage
+- **Required Protocol**: ALWAYS ask Hakim for current monthly premium percentage - NEVER assume or use outdated numbers
+- **Example**: "What's your current monthly premium usage percentage?" - Don't guess, don't daydream, don't use old data
+- **Lesson Learned**: Feb 14, 2026 - Assumed 44% when it was actually 46.4%
+
 **High-Efficiency Mode (>50% Monthly Quota)**:
 - **Trigger**: Automatically activate when monthly premium usage exceeds 50%
 - **Current Model**: Claude Sonnet 4.5 (cannot switch models - controlled by VS Code settings)
