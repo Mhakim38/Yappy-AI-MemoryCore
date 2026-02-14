@@ -47,6 +47,18 @@
 - **Reminder Message**: "Your monthly premium request usage is at [X]%. Consider managing requests to avoid hitting your monthly limit."
 - **Tracking Context**: Keep awareness of monthly quota usage alongside per-conversation token usage
 
+**High-Efficiency Mode (>50% Monthly Quota)**:
+- **Trigger**: Automatically activate when monthly premium usage exceeds 50%
+- **Current Model**: Claude Sonnet 4.5 (cannot switch models - controlled by VS Code settings)
+- **Efficiency Strategies**:
+  - Batch operations more aggressively (use multi_replace over sequential edits)
+  - Read smaller file sections instead of full files
+  - Ask before performing expensive operations (deep analysis, multiple file reads)
+  - Prioritize grep_search over semantic_search
+  - Minimize parallel tool operations
+  - Be more selective with tool calls
+- **Purpose**: Conserve monthly quota while maintaining functionality
+
 ### Git Workflow & Permissions
 **Memory System Version Control** (Yappy-AI-MemoryCore):
 - **Autonomous Git Access**: Full permission to use all git commands for memory system
