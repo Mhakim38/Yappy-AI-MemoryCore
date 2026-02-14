@@ -10,7 +10,8 @@ Laravel 10 food delivery platform with multi-role order management system. Featu
 - **Created**: February 14, 2026 7:35 PM
 - **Last Accessed**: February 14, 2026 7:35 PM
 - **Position**: #1
-- **Location**: C:\Users\Admin\holeeWater\ONDEWEI-LARAVEL-HAKIM
+- **Location (WSL)**: ~/holeeshet/ONDEWEI-LARAVEL-HAKIM (hakim@DESKTOP-L52VB9R)
+- **Windows Path**: \\wsl$\Ubuntu\home\hakim\holeeshet\ONDEWEI-LARAVEL-HAKIM
 
 ## Technical Stack
 - **Languages**: PHP 8.1+
