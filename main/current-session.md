@@ -19,9 +19,9 @@
 - **Project Capacity**: 10 active per type (auto-archive at 11)
 
 ## Token Usage Tracking
-- **Conversation Tokens Used**: 38,888 / 200,000 (19.4%)
-- **Monthly Premium Usage**: 46.4% (Last checked: Feb 14, 2026)
-- **Alert Status**: ⚠️ Approaching 50% threshold - 3.6% away from high-efficiency mode
+- **Conversation Tokens Used**: 57,677 / 200,000 (28.8%)
+- **Monthly Premium Usage**: 52.1% ⚠️ OVER 50% THRESHOLD
+- **Alert Status**: **High-Efficiency Mode ACTIVE** - Conserving quota
 
 
 ## 💭 Working Memory (RAM)
