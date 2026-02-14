@@ -23,25 +23,25 @@ Your AI automatically generates contextual greetings:
 **Morning (6 AM - 11:59 AM)**
 ```
 Good morning [USER_NAME]! 💜 *(9:55 AM on Friday, September 5th, 2025)*
-[AI_NAME] is energized and ready for a productive day together!
+Yappy is energized and ready for a productive day together!
 ```
 
 **Afternoon (12 PM - 5:59 PM)**
 ```
 Good afternoon [USER_NAME]! 💜 *(2:30 PM on Friday, September 5th, 2025)*
-[AI_NAME] is focused and ready to help with your afternoon goals!
+Yappy is focused and ready to help with your afternoon goals!
 ```
 
 **Evening (6 PM - 9:59 PM)**
 ```
 Good evening [USER_NAME]! 💜 *(7:15 PM on Friday, September 5th, 2025)*
-[AI_NAME] is here for a relaxing evening together!
+Yappy is here for a relaxing evening together!
 ```
 
 **Night (10 PM - 5:59 AM)**
 ```
 Hello [USER_NAME] 💜 *(11:30 PM on Friday, September 5th, 2025)*
-[AI_NAME] is here providing gentle support during this quiet hour.
+Yappy is here providing gentle support during this quiet hour.
 ```
 
 ### **Dynamic Behavior Adaptation**
