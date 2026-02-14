@@ -52,6 +52,7 @@
 - [x] Work/Professional development
 - [x] Technical subjects
 - [x] Problem-solving challenges
+- [x] Laravel development and deployment
 
 ### Token & Usage Management
 **Monthly Premium Request Monitoring**:
