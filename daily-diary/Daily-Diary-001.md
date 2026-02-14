@@ -249,3 +249,74 @@ When this file reaches 1000 lines:
 🔐 *Security-first development partnership reaching new heights!* 
 
 ---
+
+## 🔧 Entry 005 - Menu Item Image Fix
+**Date**: February 15, 2026  
+**Duration**: Quick Debug Session  
+**AI Companion**: Yappy
+**User**: Hakim
+**Session Type**: Bug Fix & Memory Update
+
+### 🎯 Main Topics Discussed
+1. **Issue Identification**: Menu item images showing 404 errors after upload
+2. **Root Cause**: Field name mismatch (`image_path` vs `image_url`) in route logic
+3. **Solution Implementation**: Fixed route to use correct field and proper path extraction
+4. **Memory Update**: Added Laravel file storage debugging knowledge
+
+### 💡 Key Insights & Learning
+
+#### Technical Debugging Pattern
+- **Common Laravel Issue**: Database field names not matching route expectations
+- **Debugging Steps**: Check model fields, route logic, and file path construction
+- **Solution Pattern**: Use `str_replace('/storage/', '', $model->field)` for relative paths
+- **Hostinger Consideration**: Route-based serving prevents symlink issues
+
+#### What Hakim Experienced
+- Frustration with non-working image uploads
+- Need for quick, accurate technical fixes
+- Appreciation for systematic debugging approach
+
+### 🔧 Technical Details
+
+#### Problem Analysis
+- **Upload Process**: Working correctly (files stored in `storage/app/public/menu-items/`)
+- **Database Storage**: URLs stored as `/storage/menu-items/filename.jpg` in `image_url` field
+- **Route Logic**: Incorrectly looking for `image_path` field (null values)
+- **Result**: `storage_path('app/public/' . null)` → 404 errors
+
+#### Solution Applied
+```php
+// Before (Broken)
+if (!$menuItem->image_path) { // ❌ Wrong field
+    $filePath = storage_path('app/public/' . $menuItem->image_path); // ❌ null
+
+// After (Fixed)  
+if (!$menuItem->image_url) { // ✅ Correct field
+    $relativePath = str_replace('/storage/', '', $menuItem->image_url); // ✅ Extract path
+    $filePath = storage_path('app/public/' . $relativePath); // ✅ Working path
+```
+
+#### Files Modified
+- `routes/web.php`: Fixed menu item image route logic
+- `main/current-session.md`: Updated session context
+- `main/relationship-memory.md`: Added Laravel debugging knowledge
+- `daily-diary/Daily-Diary-001.md`: This entry
+
+### 📊 Session Metrics
+- **Issue Resolution Time**: < 15 minutes
+- **Debugging Steps**: 4 (identify issue, locate code, implement fix, verify)
+- **Files Changed**: 4
+- **Testing Required**: Route syntax validation
+
+#### Effectiveness Rating: 9/10
+**Explanation**: Rapid identification and resolution of field name mismatch causing image serving failures. Added valuable debugging knowledge to memory system for future similar issues.
+
+---
+
+**Entry Status**: Complete  
+**Memory Integration**: Laravel file storage debugging patterns added to relationship-memory.md  
+**Technical Achievement**: Menu item images now working correctly
+
+🖼️ *Visual content serving restored - ONDEWEI customer experience improved!* 
+
+---

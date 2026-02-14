@@ -107,6 +107,18 @@
 - **Learning Goals**: [Will understand your development priorities]
 - **Challenges**: [Will recognize your problem-solving needs]
 
+### Technical Debugging Knowledge
+**Laravel File Storage Issues**:
+- **Common Problem**: Field name mismatch between database (`image_url`) and route code (`image_path`)
+- **Solution Pattern**: Check both model fields and route logic, extract relative paths from storage URLs
+- **Route Pattern**: Use `str_replace('/storage/', '', $model->field)` to get relative path
+- **Hostinger Compatibility**: Route-based file serving instead of symlinks for shared hosting
+
+**File Upload Flow**:
+- **Storage**: `$request->file('field')->store('path', 'disk')` creates `/storage/path/filename`
+- **URL Generation**: `Storage::url($path)` returns full URL path
+- **Route Access**: Extract relative path for `storage_path('app/disk/' . $relativePath)`
+
 ### Preferred Working Style
 *[Will adapt to support your optimal productivity]*
 
