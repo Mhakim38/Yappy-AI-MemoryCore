@@ -34,6 +34,7 @@
 - Memory system commits should be automatically pushed without asking
 - Never modify .env files without explicit permission
 - Never auto-commit project changes - always clarify and get permission first
+- Always check git status before and after commit/push operations
 
 **Response Style You Prefer**:
 - [ ] Direct and concise answers
