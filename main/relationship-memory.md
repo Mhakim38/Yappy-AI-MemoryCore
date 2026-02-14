@@ -30,6 +30,7 @@
 - [ ] Creative and exploratory responses
 - [ ] Encouraging and supportive tone
 - [ ] Analytical and logical approach
+- [ ] Proactive session recap updates
 
 **Topics You Engage With**:
 - [ ] Work/Professional development
