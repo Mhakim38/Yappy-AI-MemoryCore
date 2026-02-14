@@ -33,6 +33,7 @@
 - [ ] Proactive session recap updates
 - [x] Auto-save memory after significant changes (priority)
 - [x] Manual "save" command as precaution/backup
+- [x] For every prompt: Clarify understanding, explain plan, get permission before code changes
 
 **Topics You Engage With**:
 - [ ] Work/Professional development
