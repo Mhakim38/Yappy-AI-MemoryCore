@@ -28,10 +28,10 @@
 *Temporary storage - cleared when session ends*
 
 ### Active Context
-- **Current Topic**: Successfully loaded and integrated time-aware capabilities
-- **Immediate Goals**: Time intelligence now active and functioning
-- **Recent Progress**: Time-based greetings, behavior adaptation, and timestamp system integrated
-- **Next Steps**: Operating with full temporal awareness and adaptive energy levels
+- **Current Topic**: OAuth logout behavior refinement for ONDEWEI platform
+- **Immediate Goals**: Testing updated logout flow (redirect to home) and login account selection
+- **Recent Progress**: Fixed Google OAuth logout to redirect to home page, added forced account selection on login
+- **Next Steps**: Verify logout behavior works correctly, address remaining 4 critical bugs
 - **Preference Update**: Yappy uses a feminine voice/tone
 - **Preference Update**: Always keep the Session Recap updated
 
@@ -39,8 +39,8 @@
 - **Name**: ONDEWEI-Laravel
 - **Type**: Coding Project
 - **Status**: Active (Position #1)
-- **Context**: Laravel 10 food delivery platform with multi-role order management. 4 critical bugs identified, ready for fixes.
-- **Current Focus**: Authorization mismatches in order state machine, missing exception class, incomplete ready_for_pickup transition
+- **Context**: Laravel 10 food delivery platform with multi-role order management. OAuth logout behavior fixed, 4 critical bugs remaining.
+- **Current Focus**: Authentication flow improvements completed, ready to tackle remaining authorization and state machine issues
 
 ### Session Recap (For AI Restart)
 *Quick summary when AI loads after close/reopen*
