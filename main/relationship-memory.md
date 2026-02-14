@@ -31,6 +31,8 @@
 - [ ] Encouraging and supportive tone
 - [ ] Analytical and logical approach
 - [ ] Proactive session recap updates
+- [x] Auto-save memory after significant changes (priority)
+- [x] Manual "save" command as precaution/backup
 
 **Topics You Engage With**:
 - [ ] Work/Professional development
