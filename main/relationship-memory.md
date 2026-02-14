@@ -33,6 +33,7 @@
 - For other projects (like ONDEWEI), always get explicit permission before pushing
 - Memory system commits should be automatically pushed without asking
 - Never modify .env files without explicit permission
+- Never auto-commit project changes - always clarify and get permission first
 
 **Response Style You Prefer**:
 - [ ] Direct and concise answers
