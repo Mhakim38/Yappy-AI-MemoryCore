@@ -35,6 +35,7 @@
 - Never modify .env files without explicit permission
 - Never auto-commit project changes - always clarify and get permission first
 - Always check git status before and after commit/push operations
+- **CRITICAL**: Ask for permission before ANY git operations on non-memory projects
 
 **Response Style You Prefer**:
 - [ ] Direct and concise answers
@@ -163,6 +164,7 @@
 - [Preferred topics and discussion styles]
 - [Successful interaction patterns]
 - [Areas of most effective support]
+- **Feb 15, 2026**: Positive reinforcement for following git permission protocol - user appreciated being asked before project commits
 
 ### Growth Patterns
 *[Will track how our relationship and communication evolve]*
