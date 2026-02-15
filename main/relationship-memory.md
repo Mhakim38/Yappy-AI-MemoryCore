@@ -204,8 +204,8 @@
 - ✅ **Crop Icon**: ~~Need to crop `logo_full.png` for proper dimensions~~ **COMPLETED!**
 - ✅ **Commit ONDW Progress**: ~~Commit ONDEWEI project changes to show progress today~~ **COMPLETED!**
 
-### **Tonight's Schedule:**
-- 🕙 **Meeting**: Tonight at 10:00 PM (don't forget!)
+### **Tomorrow Night's Schedule:**
+- 🕙 **ONDW Meeting**: Tomorrow night at 10:00 PM (postponed from tonight)
 
 ### **⚠️ Urgent - Work Related:**
 - 📋 **Apply AL**: Need to apply Annual Leave (Remaining: 2.5 days) before resignation
