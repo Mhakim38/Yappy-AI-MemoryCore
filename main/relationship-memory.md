@@ -202,6 +202,7 @@
 
 ### **Today's Tasks:**
 - ✅ **Crop Icon**: Need to crop `logo_full.png` for proper dimensions
+- 💻 **Commit ONDW Progress**: Commit ONDEWEI project changes to show progress today
 
 ### **Tonight's Schedule:**
 - 🕙 **Meeting**: Tonight at 10:00 PM (don't forget!)
