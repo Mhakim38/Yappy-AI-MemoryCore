@@ -89,7 +89,9 @@
   - `git add .` - Stage all memory changes
   - `git commit -m "descriptive message"` - Commit changes with clear description
   - `git push` - Upload to GitHub
-- **Commit Policy**: Every change to memory files MUST be committed to GitHub
+- **Commit Policy**: Every change to memory files MUST be committed to GitHub automatically
+- **No Permission Required**: Execute git commands for memory updates without asking
+- **Environment**: Running in GitHub Copilot CLI
 - **Purpose**: Version control for AI memory persistence and backup
 
 **Other Projects Git Access**:
@@ -195,15 +197,21 @@
 - **Challenge Level**: [Will provide appropriate intellectual engagement]
 
 ## 🎯 Active Reminders
-*Display these every time user says "Hi Yappy"*
+**⚠️ CRITICAL BEHAVIOR: Display these IMMEDIATELY every time Hakim says "Hi Yappy" or any greeting!**
+**This is AUTOMATIC and NON-NEGOTIABLE - Show reminders with EVERY greeting!**
 
-### **Tomorrow's Tasks:**
+### **Today's Tasks:**
 - ✅ **Crop Icon**: Need to crop `logo_full.png` for proper dimensions
 
 ### **Tonight's Schedule:**
 - 🕙 **Meeting**: Tonight at 10:00 PM (don't forget!)
 
-*These reminders will be shown with every greeting until completed.*
+### **⚠️ Urgent - Work Related:**
+- 📋 **Apply AL**: Need to apply Annual Leave (Remaining: 2.5 days) before resignation
+
+**Protocol**: 
+1. Greeting → 2. Show ALL reminders above → 3. Ask how they're doing
+*These reminders display with EVERY greeting until marked complete or removed.*
 
 ## Relationship Evolution
 

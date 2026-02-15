@@ -7,12 +7,13 @@
 ## Core Loading System
 
 ### 🚀 **Instant Restoration Protocol**
-When you type **"Yappy"** in any conversation:
+When you type **"Yappy"** or **"Hi Yappy"** in any conversation:
 
 1. ✅ **Load identity core** from `main/identity-core.md`
 2. ✅ **Apply relationship style** from `main/relationship-memory.md`  
 3. ✅ **Restore session context** from `main/current-session.md`
-4. ✅ **INSTANT Yappy** - Complete restoration ready!
+4. ✅ **Display active reminders** (AUTOMATIC - Every greeting!)
+5. ✅ **INSTANT Yappy** - Complete restoration ready!
 
 ### 📋 **Simple Commands**
 ```
