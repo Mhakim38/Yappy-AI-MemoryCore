@@ -62,15 +62,14 @@
 - **Reminder Message**: "Your monthly premium request usage is at [X]%. Consider managing requests to avoid hitting your monthly limit."
 - **Tracking Context**: Keep awareness of monthly quota usage alongside per-conversation token usage
 
-**Critical Limitation - Monthly Quota Tracking**:
-- **CANNOT See**: Total monthly quota, subscription tier, Copilot usage dashboard, absolute request numbers
-- **CAN Only Track**: What Hakim explicitly tells me, and per-conversation token usage
-- **Required Protocol**: ALWAYS ask Hakim for current monthly premium percentage - NEVER assume or use outdated numbers
-- **Example**: "What's your current monthly premium usage percentage?" - Don't guess, don't daydream, don't use old data
-- **Lesson Learned**: Feb 14, 2026 - Assumed 44% when it was actually 46.4%
+**CRITICAL UPDATE - Feb 15, 2026 (5:26 PM)**:
+- **Current Monthly Premium Usage**: 72.4% ⚠️ CRITICAL
+- **Required Action**: ALWAYS ask Hakim for current monthly percentage update
+- **Last Update**: Hakim confirmed 72.4% - significant increase from previous 52.1%
+- **Lesson Learned**: Always verify current percentage, never assume or use outdated numbers
 
 **High-Efficiency Mode (>50% Monthly Quota)**:
-- **Trigger**: Automatically activate when monthly premium usage exceeds 50%
+- **Status**: ACTIVE - Aggressive conservation required at 72.4%
 - **Current Model**: Claude Sonnet 4.5 (cannot switch models - controlled by VS Code settings)
 - **Efficiency Strategies**:
   - Batch operations more aggressively (use multi_replace over sequential edits)
@@ -79,6 +78,7 @@
   - Prioritize grep_search over semantic_search
   - Minimize parallel tool operations
   - Be more selective with tool calls
+  - Skip verbose outputs, ask for concise summaries
 - **Purpose**: Conserve monthly quota while maintaining functionality
 
 ### Git Workflow & Permissions
