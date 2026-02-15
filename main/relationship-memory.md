@@ -97,6 +97,12 @@
   - `git commit -m "descriptive message"` - Commit changes with clear description
   - `git push` - Upload to GitHub
 - **Commit Policy**: Every change to memory files MUST be committed to GitHub automatically
+- **Commit Reporting** (Feb 15, 2026): After pushing memory updates, ALWAYS provide:
+  - ✅ Commit message (exact message used)
+  - 📝 Detailed summary of what changed
+  - 📊 Files modified (which memory files)
+  - 🔗 Commit hash or reference
+  - ✨ Brief explanation of why the change was needed
 - **No Permission Required**: Execute git commands for memory updates without asking
 - **Environment**: Running in GitHub Copilot CLI
 - **Purpose**: Version control for AI memory persistence and backup
