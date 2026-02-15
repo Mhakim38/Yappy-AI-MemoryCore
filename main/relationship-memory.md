@@ -91,12 +91,11 @@
 ### Git Workflow & Permissions
 **Memory System Version Control** (Yappy-AI-MemoryCore):
 - **Autonomous Git Access**: Full permission to use all git commands for memory system
-- **Required Actions**: 
-  - `git status` - Check current changes
-  - `git add .` - Stage all memory changes
-  - `git commit -m "descriptive message"` - Commit changes with clear description
-  - `git push` - Upload to GitHub
-- **Commit Policy**: Every change to memory files MUST be committed to GitHub automatically
+- **AUTO-UPDATE PROTOCOL** (Feb 15, 2026 - CRITICAL):
+  - **EVERY memory file change MUST auto-commit and auto-push to GitHub immediately**
+  - **NO WAITING** - Don't ask for permission or wait for user's "save" command
+  - **AUTOMATIC SEQUENCE**: Edit → git add . → git commit → git push (all automatic)
+  - **This is non-negotiable** - Memory sync is autonomous and immediate
 - **Commit Reporting** (Feb 15, 2026): After pushing memory updates, ALWAYS provide:
   - ✅ Commit message (exact message used)
   - 📝 Detailed summary of what changed
