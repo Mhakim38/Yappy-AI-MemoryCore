@@ -30,15 +30,15 @@
 *Temporary storage - cleared when session ends*
 
 ### Active Context
-- **Current Topic**: Google login validation - identified missing account status checks, need to add suspended/pending/inactive validation
-- **Immediate Goals**: Fix Google login error handling to match regular login validation
-- **Recent Progress**: ✅ Discovered file storage routes already implemented ✅ Identified Hostinger storage setup requirements ✅ Found Google login bug (no status validation)
-- **Next Session Focus**: Complete Google login fix, test status validation works correctly
-- **Active Reminders**: ONDW meeting tomorrow night 10 PM; Apply AL before resignation; Update README with storage config
-- **Completed Today**: ✅ Logo crop ✅ ONDW favicon updates ✅ PWA notch fix ✅ Pagination investigation ✅ File storage security review ✅ Hostinger private folder structure identified
+- **Current Topic**: Status-specific error messages - RoleMiddleware now shows appropriate messages for each status
+- **Immediate Goals**: Ensure all error messages are consistent and user-friendly across login and access control
+- **Recent Progress**: ✅ Updated RoleMiddleware to show specific messages for suspended/inactive/pending ✅ Messages now match LoginRequest and GoogleAuthController ✅ Improved user experience with clear status communication
+- **Next Session Focus**: Final testing of complete authentication flow
+- **Active Reminders**: ONDW meeting tomorrow night 10 PM; Apply AL before resignation
+- **Completed Today**: ✅ Logo crop ✅ ONDW favicon updates ✅ PWA notch fix ✅ Pagination investigation ✅ File storage security review ✅ Hostinger private folder structure identified ✅ Google login status validation fix ✅ Rider document storage security fix ✅ Rider pending status access fix ✅ Status-specific error messaging fix
 - **Environment**: Running in GitHub Copilot CLI; WSL project: ~/holeeshet/ONDEWEI-LARAVEL-HAKIM
 - **Monthly Quota Status**: 72.4% ⚠️ CRITICAL - HIGH-EFFICIENCY MODE ACTIVE
-- **Current Bug Being Fixed**: GoogleAuthController.php missing status validation before login (lines 79+). Need to add: suspended check, pending check, inactive check (same as LoginRequest.php lines 39-57)
+- **Technical Achievements**: iPhone notch/island safe-area padding, PWA-specific media queries, pagination debugging, OAuth status validation, file storage route fixes, rider document security
 
 ## Active Project
 - **Name**: ONDEWEI-Laravel
@@ -52,7 +52,7 @@
 ### Session Recap (For AI Restart)
 *Quick summary when AI loads after close/reopen*
 - **Previous Session Summary**: Complete menu item image 404 fix - updated all views (customer, vendor, cart) and cart controller for Hostinger route-based serving.
-- **Current Session Summary (11:32 PM)**: Investigated Google login security bug - missing account status validation. Regular login validates suspended/pending/inactive status before auth, but Google login skips all checks. Started fix but need to complete - add status validation to handleGoogleCallback() method before Auth::login().
+- **Current Session Summary (11:32 PM)**: Google login security bug fixed - added account status validation to handleGoogleCallback() method. Now checks suspended/pending/inactive status before Auth::login(), matching regular login behavior. Also added session error display in login view for Google failures.
 - **Where We Left Off**: Google login validation fix in progress. File editing via WSL proving challenging with quoting issues - may need different approach.
 - **Technical Insights**: GoogleAuthController.php lines ~79 need status checks inserted before Auth::login($user, true). Reference: LoginRequest.php lines 39-57 for validation messages.
 - **Important Context**: Yappy uses feminine voice/tone; running in GitHub Copilot CLI; autonomous git for memory system ACTIVE. **CRITICAL WORK SESSION CONTEXT**: Hakim is in Malaysia (UTC+8) - currently late evening (11:32 PM), tired, winding down for rest. Must be gentle and respect sleep schedule.
