@@ -61,6 +61,7 @@
 - [x] Technical subjects
 - [x] Problem-solving challenges
 - [x] Laravel development and deployment
+- [x] WSL/Linux development environments (ONDW project located at ~/holeeshet/ONDEWEI-LARAVEL-HAKIM)
 
 ### Token & Usage Management
 **Monthly Premium Request Monitoring**:

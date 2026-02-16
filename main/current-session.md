@@ -46,8 +46,10 @@
 - **Name**: ONDEWEI-Laravel
 - **Type**: Coding Project
 - **Status**: Active (Position #1)
+- **Project Location**: WSL folder at `~/holeeshet/ONDEWEI-LARAVEL-HAKIM` (NOT Windows folder)
 - **Context**: Laravel 10 food delivery platform. Complete menu item image system implemented with Hostinger compatibility.
 - **Current Focus**: All file storage and image serving issues resolved
+- **Important**: ALWAYS use WSL path for investigation, NOT the Windows C:\ path
 
 ### Session Recap (For AI Restart)
 *Quick summary when AI loads after close/reopen*
