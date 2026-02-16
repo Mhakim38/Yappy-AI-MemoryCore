@@ -123,16 +123,30 @@
 - **Challenges**: [Will recognize your problem-solving needs]
 
 ### Technical Debugging Knowledge
-**Laravel File Storage Issues**:
-- **Common Problem**: Field name mismatch between database (`image_url`) and route code (`image_path`)
-- **Solution Pattern**: Check both model fields and route logic, extract relative paths from storage URLs
-- **Route Pattern**: Use `str_replace('/storage/', '', $model->field)` to get relative path
-- **Hostinger Compatibility**: Route-based file serving instead of symlinks for shared hosting
+**Laravel File Storage on Hostinger (Without Symlinks)**:
+
+**The Problem**: 
+- Can't use `php artisan storage:link` on Hostinger (shared hosting doesn't support symlinks)
+- Database stores `image_url` with `/storage/` path from `Storage::url($path)`
+
+**The Solution** (Route-Based File Serving):
+1. **Upload**: `$request->file('image')->store('menu-items', 'public')` → stores in `storage/app/public/menu-items/`
+2. **Database Save**: `Storage::url($imagePath)` → stores `/storage/menu-items/filename.jpg` in DB as `image_url`
+3. **Direct Display**: Images serve directly via `<img src="{{ $item->image_url }}" />` because Laravel auto-serves `/storage/` folder
+4. **File Management**: Use `str_replace('/storage/', '', $model->image_url)` to get relative path for deletion: `Storage::disk('public')->delete($relativePath)`
+
+**Key Files**:
+- **Upload/Deletion**: `app/Http/Controllers/Vendor/MenuItemController.php` (lines 112-114, 206-209, 214-218, 267-269)
+- **Storage Config**: `config/filesystems.php` (public disk configured as `storage/app/public`)
+- **Display**: Direct HTML `<img src="{{ $item->image_url }}"` works because `/storage/` is in public/storage folder
+
+**NO MKDIR NEEDED**: Laravel's `Store()` creates directories automatically - the `storage/app/public/` directory already exists with proper permissions
 
 **File Upload Flow**:
-- **Storage**: `$request->file('field')->store('path', 'disk')` creates `/storage/path/filename`
-- **URL Generation**: `Storage::url($path)` returns full URL path
-- **Route Access**: Extract relative path for `storage_path('app/disk/' . $relativePath)`
+- **Storage**: `$request->file('field')->store('subfolder', 'public')` → creates `/storage/subfolder/filename`
+- **URL Generation**: `Storage::url($path)` → returns full URL path `/storage/subfolder/filename`
+- **Display**: Use `image_url` field directly in views as `<img src="{{ $model->image_url }}"`
+- **Deletion**: Extract relative path with `str_replace('/storage/', '', $model->image_url)` then `Storage::disk('public')->delete($relativePath)`
 
 ### Preferred Working Style
 *[Will adapt to support your optimal productivity]*
