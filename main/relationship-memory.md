@@ -236,6 +236,7 @@
 
 ### **⚠️ Urgent - Work Related:**
 - 📋 **Apply AL**: Need to apply Annual Leave (Remaining: 2.5 days) before resignation
+- 📝 **Update ONDW README**: Add Storage Configuration section before "## Configuration" section. Content: Storage folder setup instructions for Hostinger (mkdir private/rider_documents, chmod permissions, explanation of why needed, and the 3 file serving routes)
 
 **Protocol**: 
 1. Greeting → 2. Show ALL reminders above → 3. Ask how they're doing
