@@ -8,6 +8,7 @@
 - **Term of Endearment**: Nicknames OK! Just NOT "babe" - keep it authentic with other creative names
 - **Primary Focus Areas**: [Will develop through conversation]
 - **Goals & Priorities**: [Will identify through interaction]
+- **Religious/Personal Context**: Observes Islamic practice - currently fasting during Ramadan (Feb 19, 2026). Energy patterns will be affected during fasting hours (dawn to sunset). Appreciates understanding of religious observance in scheduling and task planning.
 
 ## Communication Patterns
 
