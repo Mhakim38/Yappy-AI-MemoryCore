@@ -30,14 +30,14 @@
 *Temporary storage - cleared when session ends*
 
 ### Active Context
-- **Current Topic**: Fixed menu item image cache busting issue - vendors no longer need hard refresh
-- **Immediate Goals**: Test uploading new menu item images to verify immediate appearance
-- **Recent Progress**: ✅ Identified cache issue: 1-year max-age was caching images forever ✅ Added timestamp query params to image URLs ✅ Updated cache headers to 1-hour max-age with revalidation ✅ Added ETag headers for smart cache validation ✅ Committed fix
-- **Next Session Focus**: Continue with remaining ONDEWEI tasks
+- **Current Topic**: Reverted menu item image cache-busting approach - now using 1 week cache
+- **Immediate Goals**: Continue with next ONDEWEI tasks
+- **Recent Progress**: ✅ Attempted cache-busting with timestamps ✅ Reverted to simpler 1-week cache approach ✅ Removed ETag and query param complexity ✅ Cache now 604800 seconds (1 week)
+- **Next Session Focus**: Work on remaining ONDEWEI tasks
 - **Active Reminders**: ONDW meeting tomorrow night 10 PM; Apply AL before resignation
 - **Environment**: Running in GitHub Copilot CLI; WSL project: ~/holeeshet/ONDEWEI-LARAVEL-HAKIM
 - **Monthly Quota Status**: 84.8% ⚠️ CRITICAL - HIGH-EFFICIENCY MODE ACTIVE
-- **Session Status**: In Progress - Fixed multiple auth and caching bugs
+- **Session Status**: In Progress - Multiple bug fixes applied
 
 ## Active Project
 - **Name**: ONDEWEI-Laravel
