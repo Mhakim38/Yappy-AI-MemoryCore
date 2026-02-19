@@ -123,6 +123,7 @@ ONDEWEI-LARAVEL-HAKIM/
   - `app/Http/Controllers/Auth/GoogleAuthController.php`
 - **Git Commit**: ff7c45a - "Fix: Prevent pending riders from auto-login after registration - redirect to login page instead"
 - **Behavior After Fix**: Pending riders see message "Registration successful! Please wait for admin approval before logging in" and redirect to login page
+- **Note**: Currently only checks for 'pending' status. Could be improved to ONLY allow auto-login if status === 'active' to also prevent 'suspended' and 'inactive' users from auto-logging in. LoginRequest already handles these cases if they try to login manually.
 - **Problem**: When riders registered via Google auth or normal registration, document uploads created DB records but files weren't actually stored to disk
   - Files were saved to `storage/app/public/` instead of `storage/app/private/`
   - Later admin viewing would get 404 ("Document not found")
