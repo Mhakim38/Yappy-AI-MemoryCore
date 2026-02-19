@@ -111,7 +111,19 @@ ONDEWEI-LARAVEL-HAKIM/
 
 ### Resolved Issues (Feb 19, 2026)
 
-**Pending Rider Auto-Login Bug**
+**Menu Item Image Cache Issue - Hard Refresh Required**
+- **Problem**: When vendors uploaded new menu item images, the images wouldn't update without a hard refresh (Ctrl+F5)
+- **Root Cause**: Image route was setting `Cache-Control: public, max-age=31536000` (1 YEAR cache!). Browser cached old image forever
+- **Solution Applied** (Feb 19, 2026):
+  - Added cache-busting timestamp query parameter (`?v=1708340400`) to image URLs when uploaded/updated
+  - Updated image route cache headers: Changed to `max-age=3600, must-revalidate` (1 hour max, then revalidate)
+  - Added ETag headers for weak cache validation - server revalidates if file changed
+  - Image URLs now include `?v={timestamp}` so browser sees it as new file
+- **Files Modified**:
+  - `app/Http/Controllers/Vendor/MenuItemController.php` - Added timestamp to image URLs in store() and update() methods
+  - `routes/web.php` - Updated menu item image serving route with proper cache headers and ETag validation
+- **Git Commit**: d65d4b8 - "Fix: Menu item image cache busting - add timestamp query param and ETag validation"
+- **Behavior After Fix**: New images appear immediately without hard refresh
 - **Problem**: After registration, pending riders were auto-logged in and redirected to `/rider/dashboard` even though they should wait for admin approval
 - **Root Cause**: RegisteredUserController and GoogleAuthController auto-logged in ALL new riders without checking status
 - **Solution Applied** (Feb 19, 2026):

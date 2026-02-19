@@ -30,14 +30,14 @@
 *Temporary storage - cleared when session ends*
 
 ### Active Context
-- **Current Topic**: Fixed Rider pending approval login bug - pending riders no longer auto-login after registration
-- **Immediate Goals**: Verify the fix works with test riders
-- **Recent Progress**: ✅ Identified root cause: RegisteredUserController and GoogleAuthController auto-logged in pending riders ✅ Updated both controllers to NOT auto-login pending riders ✅ Redirect to login page with message instead ✅ LoginRequest already has status checks to prevent blocked login ✅ Committed fix
-- **Next Session Focus**: Test rider registration flow to verify pending riders can't login
+- **Current Topic**: Fixed menu item image cache busting issue - vendors no longer need hard refresh
+- **Immediate Goals**: Test uploading new menu item images to verify immediate appearance
+- **Recent Progress**: ✅ Identified cache issue: 1-year max-age was caching images forever ✅ Added timestamp query params to image URLs ✅ Updated cache headers to 1-hour max-age with revalidation ✅ Added ETag headers for smart cache validation ✅ Committed fix
+- **Next Session Focus**: Continue with remaining ONDEWEI tasks
 - **Active Reminders**: ONDW meeting tomorrow night 10 PM; Apply AL before resignation
 - **Environment**: Running in GitHub Copilot CLI; WSL project: ~/holeeshet/ONDEWEI-LARAVEL-HAKIM
 - **Monthly Quota Status**: 84.8% ⚠️ CRITICAL - HIGH-EFFICIENCY MODE ACTIVE
-- **Session Status**: In Progress - Fixed pending rider auto-login bug
+- **Session Status**: In Progress - Fixed multiple auth and caching bugs
 
 ## Active Project
 - **Name**: ONDEWEI-Laravel
