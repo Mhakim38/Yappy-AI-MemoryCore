@@ -111,13 +111,44 @@ ONDEWEI-LARAVEL-HAKIM/
 
 ### Resolved Issues (Feb 19, 2026)
 
-**Menu Item Image Cache Configuration**
-- **Note**: Cache set to 1 week (604800 seconds) instead of 1 year
-- **Reason**: Balance between performance (browser caching) and freshness (weekly updates for new images)
+**Pending Rider Auto-Login Bug**
+- **Problem**: After registration, pending riders were auto-logged in and redirected to `/rider/dashboard` even though they should wait for admin approval
+- **Root Cause**: RegisteredUserController and GoogleAuthController auto-logged in ALL new riders without checking status
+- **Solution Applied** (Feb 19, 2026):
+  - Modified RegisteredUserController: Don't auto-login if user status is 'pending', redirect to login page instead
+  - Modified GoogleAuthController: Don't auto-login if user status is 'pending', redirect to login page instead
+  - LoginRequest already has status checks that will prevent pending users from logging in
 - **Files Modified**:
-  - `routes/web.php` - Updated to `max-age=604800` (1 week)
+  - `app/Http/Controllers/Auth/RegisteredUserController.php`
+  - `app/Http/Controllers/Auth/GoogleAuthController.php`
+- **Git Commit**: ff7c45a - "Fix: Prevent pending riders from auto-login after registration - redirect to login page instead"
+- **Behavior After Fix**: Pending riders see message "Registration successful! Please wait for admin approval before logging in" and redirect to login page
+- **Note**: Currently only checks for 'pending' status. Could be improved to ONLY allow auto-login if status === 'active' to also prevent 'suspended' and 'inactive' users from auto-logging in. LoginRequest already handles these cases if they try to login manually.
+
+**Menu Item Image Cache Configuration**
+- **Original Issue**: Images required hard refresh (Ctrl+F5) when uploaded
+- **Root Cause**: Cache was set to 1 year (31536000 seconds) - browser cached forever
+- **Solution**: Changed to 1 week (604800 seconds) - balance between performance and freshness
+- **Attempted Solutions** (reverted):
+  - ❌ Cache-busting with timestamp query params (`?v=timestamp`)
+  - ❌ ETag validation and complex cache headers
+  - ✅ Simple 1-week cache approach chosen
+- **Files Modified**:
+  - `routes/web.php` - Updated menu item image serving route with `max-age=604800`
 - **Git Commit**: 3ceb03c - "Revert: Menu item cache-busting changes - use 1 week cache instead"
-- **Behavior**: Images cache for up to 1 week, then browser will re-fetch
+- **Behavior**: Images cache for up to 1 week, reasonable tradeoff for performance vs freshness
+
+**Document Storage Issue Investigation** (Documented for Reference)
+- **Problem**: When riders registered via Google, document uploads created DB records but files weren't actually stored to disk
+- **Root Cause**: `$file->storeAs(..., 'private')` was not respecting the 'private' disk parameter - files went to `storage/app/public/` instead of `storage/app/private/`
+- **Solution Attempted** (Feb 19, 2026):
+  - Changed from `storeAs()` to explicit `Storage::disk('private')->put()` calls
+  - Added verification checks: only create DB record if file exists
+  - Added logging for diagnostic purposes
+  - Git Commit: 872a3f6 - "Fix: Ensure rider documents stored to private disk using Storage facade"
+  - ❌ Later Reverted: 7924017 - "Revert: Reverted storage fix changes - back to original storeAs() implementation"
+- **Status**: Reverted - keeping original implementation for now, but fix documented for future reference
+- **Technical Note**: Issue may be environment-specific. Original storeAs() method observed working in production environment
 - **Problem**: After registration, pending riders were auto-logged in and redirected to `/rider/dashboard` even though they should wait for admin approval
 - **Root Cause**: RegisteredUserController and GoogleAuthController auto-logged in ALL new riders without checking status
 - **Solution Applied** (Feb 19, 2026):

@@ -2,17 +2,17 @@
 *Temporary working memory - resets each session, provides recap when AI restarts*
 
 ## Session RAM Status
-**Current Session**: ENDED - Session logged out  
-**Last Activity**: 12:00 AM on Monday, February 17, 2026  
-**Session Focus**: Monthly quota update to 84.8% (CRITICAL)
-**Context State**: All configurations saved and GitHub synced
+**Current Session**: CONCLUDED - Multi-bug debugging completed  
+**Last Activity**: Feb 19, 2026 Evening (Malaysia Time UTC+8)  
+**Session Focus**: ONDEWEI-Laravel debug fixes (3 bugs addressed)
+**Context State**: Memory documentation completed, awaiting manual commit
 
 ## Time-Aware Session Context
-- **Session Start**: 6:20 PM on Sunday, February 16, 2026 (Malaysia Time UTC+8)
-- **Current Time**: 12:00 AM on Monday, February 17, 2026 (Malaysia Time UTC+8)
-- **Time Mode**: Night (10 PM - 5:59 AM) - Late night session
-- **Energy Level**: 3-5/10 - Ready for rest
-- **Behavior Focus**: Session ended - logging out
+- **Session Start**: Feb 19, 2026 ~4:01 PM (Malaysia Time UTC+8)
+- **Current Time**: Feb 19, 2026 Evening (Malaysia Time UTC+8)
+- **Time Mode**: Evening (4 PM - 9:59 PM) - Active productive session
+- **Energy Level**: 6-8/10 - High focus and output
+- **Behavior Focus**: Session concluding, memory documentation complete
 - **Timezone**: Malaysia (UTC+8)
 
 ## Project Management Status
@@ -30,14 +30,14 @@
 *Temporary storage - cleared when session ends*
 
 ### Active Context
-- **Current Topic**: Reverted menu item image cache-busting approach - now using 1 week cache
-- **Immediate Goals**: Continue with next ONDEWEI tasks
-- **Recent Progress**: ✅ Attempted cache-busting with timestamps ✅ Reverted to simpler 1-week cache approach ✅ Removed ETag and query param complexity ✅ Cache now 604800 seconds (1 week)
-- **Next Session Focus**: Work on remaining ONDEWEI tasks
+- **Current Topic**: Feb 19 debugging session - 3 bugs fixed/documented
+- **Immediate Goals**: Complete comprehensive memory documentation
+- **Session Progress**: ✅ Fixed pending rider auto-login bug ✅ Investigated & documented document storage issue ✅ Updated menu item cache to 1-week ✅ All fixes documented in long-term memory
+- **Next Session Focus**: Tackle critical bugs #1-5 (authorization mismatches, state machine, debug routes)
 - **Active Reminders**: ONDW meeting tomorrow night 10 PM; Apply AL before resignation
 - **Environment**: Running in GitHub Copilot CLI; WSL project: ~/holeeshet/ONDEWEI-LARAVEL-HAKIM
 - **Monthly Quota Status**: 84.8% ⚠️ CRITICAL - HIGH-EFFICIENCY MODE ACTIVE
-- **Session Status**: In Progress - Multiple bug fixes applied
+- **Session Status**: Complete - Awaiting manual commit
 
 ## Active Project
 - **Name**: ONDEWEI-Laravel
@@ -51,10 +51,10 @@
 ### Session Recap (For AI Restart)
 *Quick summary when AI loads after close/reopen*
 - **Previous Session Summary**: Google login security authentication fixes - added account status validation to handleGoogleCallback(), consolidated error displays to top notification area.
-- **Current Session Summary (Feb 19 6:38 PM)**: Debugged and fixed Rider document storage bug. Root cause: storeAs() with 'private' disk parameter ignored files stored to public disk instead. Solution: switched to Storage::disk('private')->put(). Updated both RegisteredUserController and GoogleAuthController. Added verification checks. Awaiting testing to confirm fix works.
-- **Where We Left Off**: Document storage fix committed (872a3f6). Ready to test with new Rider registration. May be reverted - fix documented in ONDEWEI project memory for reference.
-- **Technical Insights**: ONDEWEI-Laravel has complete authentication workflow. Document storage needed explicit Storage facade approach for Hostinger compatibility.
-- **Important Context**: Yappy uses feminine voice/tone; running in GitHub Copilot CLI; autonomous git for memory system ACTIVE. **Current work**: Rider doc storage fix - needs testing to confirm it works properly.
+- **Current Session Summary (Feb 19, Evening)**: Multi-bug debugging session on ONDEWEI-Laravel. Fixed 3 issues: (1) Pending rider auto-login bug - added status check to prevent pending riders from auto-logging in after registration, redirects to login page (ff7c45a). (2) Document storage issue - investigated root cause (files stored to public instead of private disk), implemented fix but reverted per user request (872a3f6 → 7924017). (3) Menu item image cache hard-refresh issue - changed cache from 1-year to 1-week max-age (3ceb03c + final revert).
+- **Where We Left Off**: All 3 bugs documented in ONDEWEI-Laravel.md memory file with git commit references. Comprehensive memory updates completed. Memory changes awaiting manual git commit - user explicitly requested NO auto-commit.
+- **Technical Insights**: Pending riders need status checks in both RegisteredUserController and GoogleAuthController. File storage behavior environment-specific (Hostinger). Image caching balance: simplicity (1-week cache) preferred over complexity (cache-busting).
+- **Important Context**: ONDEWEI project in WSL (\\wsl$\Ubuntu\home\admin\ONDEWEI-Laravel). Next session may need to commit memory changes: `git add . && git commit -m "Session Feb 19: Fixed pending rider auto-login and menu cache, documented document storage investigation"`. Then proceed with critical bug fixes #1-5 from TODO.txt.
 
 ## 🔄 Session Lifecycle
 *How this RAM-like memory works*
