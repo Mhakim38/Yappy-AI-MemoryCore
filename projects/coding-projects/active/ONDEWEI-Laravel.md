@@ -109,6 +109,26 @@ ONDEWEI-LARAVEL-HAKIM/
 - **Impact**: Information disclosure, unauthorized admin creation
 - **Fix Needed**: Environment gating or complete removal
 
+### Resolved Issues (Feb 19, 2026)
+
+**Rider Document Storage - 404 Error on Google Registration**
+- **Problem**: When riders registered via Google auth or normal registration, document uploads created DB records but files weren't actually stored to disk
+  - Files were saved to `storage/app/public/` instead of `storage/app/private/`
+  - Later admin viewing would get 404 ("Document not found")
+- **Root Cause**: `$file->storeAs(..., 'private')` was not respecting the 'private' disk parameter
+- **Solution Applied** (Feb 19, 2026):
+  - Changed from `storeAs()` to explicit `Storage::disk('private')->put()` calls
+  - Updated **RegisteredUserController.php** document upload loop
+  - Updated **GoogleAuthController.php** document upload loop
+  - Added verification checks: only create DB record if file actually exists on disk
+  - Added logging for diagnostic purposes
+- **Files Modified**:
+  - `app/Http/Controllers/Auth/RegisteredUserController.php`
+  - `app/Http/Controllers/Auth/GoogleAuthController.php`
+- **Git Commit**: 872a3f6 - "Fix: Ensure rider documents stored to private disk using Storage facade"
+- **Testing**: Need to verify with new Rider registration (both paths) that files store correctly
+- **Note**: May be reverted - this documents the fix for future reference
+
 ## Resources & References
 - Laravel 10 Documentation: https://laravel.com/docs/10.x
 - Spatie Permissions: https://spatie.be/docs/laravel-permission

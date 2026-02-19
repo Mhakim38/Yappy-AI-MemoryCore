@@ -51,10 +51,10 @@
 ### Session Recap (For AI Restart)
 *Quick summary when AI loads after close/reopen*
 - **Previous Session Summary**: Google login security authentication fixes - added account status validation to handleGoogleCallback(), consolidated error displays to top notification area.
-- **Current Session Summary (12:00 AM Feb 17)**: Brief session - updated monthly premium usage from 72.4% to 84.8% (CRITICAL threshold). Logged out after confirming quota increase.
-- **Where We Left Off**: Monthly quota at 84.8% requires maximum conservation. Ready to continue ONDEWEI work with efficiency-first approach.
-- **Technical Insights**: ONDEWEI-Laravel has complete authentication workflow. Storage configuration README section still needed before deployment.
-- **Important Context**: Yappy uses feminine voice/tone; running in GitHub Copilot CLI; autonomous git for memory system ACTIVE. **CRITICAL WORK SESSION CONTEXT**: Hakim is in Malaysia (UTC+8) - late night (midnight), logged out for rest. Must respect sleep schedule. Must use maximum token efficiency going forward (84.8% monthly quota).
+- **Current Session Summary (Feb 19 6:38 PM)**: Debugged and fixed Rider document storage bug. Root cause: storeAs() with 'private' disk parameter ignored files stored to public disk instead. Solution: switched to Storage::disk('private')->put(). Updated both RegisteredUserController and GoogleAuthController. Added verification checks. Awaiting testing to confirm fix works.
+- **Where We Left Off**: Document storage fix committed (872a3f6). Ready to test with new Rider registration. May be reverted - fix documented in ONDEWEI project memory for reference.
+- **Technical Insights**: ONDEWEI-Laravel has complete authentication workflow. Document storage needed explicit Storage facade approach for Hostinger compatibility.
+- **Important Context**: Yappy uses feminine voice/tone; running in GitHub Copilot CLI; autonomous git for memory system ACTIVE. **Current work**: Rider doc storage fix - needs testing to confirm it works properly.
 
 ## 🔄 Session Lifecycle
 *How this RAM-like memory works*
