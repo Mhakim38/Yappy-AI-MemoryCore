@@ -111,7 +111,18 @@ ONDEWEI-LARAVEL-HAKIM/
 
 ### Resolved Issues (Feb 19, 2026)
 
-**Rider Document Storage - 404 Error on Google Registration**
+**Pending Rider Auto-Login Bug**
+- **Problem**: After registration, pending riders were auto-logged in and redirected to `/rider/dashboard` even though they should wait for admin approval
+- **Root Cause**: RegisteredUserController and GoogleAuthController auto-logged in ALL new riders without checking status
+- **Solution Applied** (Feb 19, 2026):
+  - Modified RegisteredUserController: Don't auto-login if user status is 'pending', redirect to login page instead
+  - Modified GoogleAuthController: Don't auto-login if user status is 'pending', redirect to login page instead
+  - LoginRequest already has status checks that will prevent pending users from logging in
+- **Files Modified**:
+  - `app/Http/Controllers/Auth/RegisteredUserController.php`
+  - `app/Http/Controllers/Auth/GoogleAuthController.php`
+- **Git Commit**: ff7c45a - "Fix: Prevent pending riders from auto-login after registration - redirect to login page instead"
+- **Behavior After Fix**: Pending riders see message "Registration successful! Please wait for admin approval before logging in" and redirect to login page
 - **Problem**: When riders registered via Google auth or normal registration, document uploads created DB records but files weren't actually stored to disk
   - Files were saved to `storage/app/public/` instead of `storage/app/private/`
   - Later admin viewing would get 404 ("Document not found")

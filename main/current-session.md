@@ -30,14 +30,14 @@
 *Temporary storage - cleared when session ends*
 
 ### Active Context
-- **Current Topic**: Fixed Rider document storage bug - files were stored to public disk instead of private
-- **Immediate Goals**: Test the fix with actual Google registration
-- **Recent Progress**: ✅ Identified root cause: storeAs() with 'private' disk wasn't working ✅ Updated to use Storage::disk('private')->put() explicitly ✅ Added verification checks ✅ Committed changes to ONDEWEI
-- **Next Session Focus**: Test Google auth registration with documents to verify fix works
+- **Current Topic**: Fixed Rider pending approval login bug - pending riders no longer auto-login after registration
+- **Immediate Goals**: Verify the fix works with test riders
+- **Recent Progress**: ✅ Identified root cause: RegisteredUserController and GoogleAuthController auto-logged in pending riders ✅ Updated both controllers to NOT auto-login pending riders ✅ Redirect to login page with message instead ✅ LoginRequest already has status checks to prevent blocked login ✅ Committed fix
+- **Next Session Focus**: Test rider registration flow to verify pending riders can't login
 - **Active Reminders**: ONDW meeting tomorrow night 10 PM; Apply AL before resignation
 - **Environment**: Running in GitHub Copilot CLI; WSL project: ~/holeeshet/ONDEWEI-LARAVEL-HAKIM
 - **Monthly Quota Status**: 84.8% ⚠️ CRITICAL - HIGH-EFFICIENCY MODE ACTIVE
-- **Session Status**: In Progress - Debugging Rider document storage issue
+- **Session Status**: In Progress - Fixed pending rider auto-login bug
 
 ## Active Project
 - **Name**: ONDEWEI-Laravel
