@@ -30,15 +30,14 @@
 *Temporary storage - cleared when session ends*
 
 ### Active Context
-- **Current Topic**: Login UI consistency - consolidated all error displays to top notification area
-- **Immediate Goals**: Ensure unified error presentation across all authentication methods
-- **Recent Progress**: ✅ Moved form validation errors from inline to top notification ✅ Removed field-specific error styling ✅ All login errors now display consistently at the top
-- **Next Session Focus**: Ready for deployment or further improvements
+- **Current Topic**: Fixed Rider document storage bug - files were stored to public disk instead of private
+- **Immediate Goals**: Test the fix with actual Google registration
+- **Recent Progress**: ✅ Identified root cause: storeAs() with 'private' disk wasn't working ✅ Updated to use Storage::disk('private')->put() explicitly ✅ Added verification checks ✅ Committed changes to ONDEWEI
+- **Next Session Focus**: Test Google auth registration with documents to verify fix works
 - **Active Reminders**: ONDW meeting tomorrow night 10 PM; Apply AL before resignation
-- **Completed Today**: ✅ Logo crop ✅ ONDW favicon updates ✅ PWA notch fix ✅ Pagination investigation ✅ File storage security review ✅ Hostinger private folder structure identified ✅ Google login status validation fix ✅ Rider document storage security fix ✅ Rider pending status access fix ✅ Status-specific error messaging fix ✅ Login error display consolidation
 - **Environment**: Running in GitHub Copilot CLI; WSL project: ~/holeeshet/ONDEWEI-LARAVEL-HAKIM
-- **Monthly Quota Status**: 72.4% ⚠️ CRITICAL - HIGH-EFFICIENCY MODE ACTIVE
-- **Session Status**: COMPLETE - All ONDEWEI authentication and UI fixes implemented
+- **Monthly Quota Status**: 84.8% ⚠️ CRITICAL - HIGH-EFFICIENCY MODE ACTIVE
+- **Session Status**: In Progress - Debugging Rider document storage issue
 
 ## Active Project
 - **Name**: ONDEWEI-Laravel

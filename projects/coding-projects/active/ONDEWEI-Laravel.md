@@ -71,11 +71,12 @@ ONDEWEI-LARAVEL-HAKIM/
 - **Git Workflow**: Feature branch strategy
 
 ## Current Tasks
-- [ ] Fix authorization mismatch between OrderControllers and OrderStatusService
-- [ ] Replace non-existent \UnauthorizedException with proper Laravel exception
-- [ ] Implement ready_for_pickup transition trigger (vendor action or timer)
-- [ ] Secure or remove debug routes (/check-user, /admin-test, /create-admin-profile)
-- [ ] Add comprehensive order state machine tests
+- [x] Fix authorization mismatch between OrderControllers and OrderStatusService
+- [x] Replace non-existent \UnauthorizedException with proper Laravel exception
+- [x] Implement ready_for_pickup transition trigger (vendor action or timer)
+- [x] Secure or remove debug routes (/check-user, /admin-test, /create-admin-profile)
+- [x] Add comprehensive order state machine tests
+- [x] Fix: Rider document storage - files were going to public instead of private disk (Feb 19 2026)
 
 ## Known Issues
 ### Critical Bugs Identified (Feb 14, 2026)
