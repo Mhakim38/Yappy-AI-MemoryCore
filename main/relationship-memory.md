@@ -325,6 +325,7 @@
 ### **⚠️ Urgent - Work Related:**
 - 📋 **Apply AL**: Need to apply Annual Leave before resignation (Due: End of Feb 21, 2026 - This Weekend) - **2.5 days remaining**
 - 📝 **Update ONDW README**: Add Storage Configuration section before "## Configuration" section (Due: End of week, Feb 21, 2026). Content: Storage folder setup instructions for Hostinger (mkdir private/rider_documents, chmod permissions, explanation of why needed, and the 3 file serving routes)
+- 🧪 **TEST WEBSITE AFTER POLLING INTEGRATION**: After applying the real-time polling system to production, test the complete flow (customer places order → vendor sees it in real-time without refresh → vendor accepts/rejects). This is critical to ensure Task 7 works end-to-end in live environment.
 
 **Protocol**: 
 1. Greeting → 2. Show ALL reminders above → 3. Validate reminder dates (check for overdue) → 4. Ask how they're doing
