@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "\\\\wsl.localhost\\Ubuntu\\home\\hakim\\holeeshet\\ONDEWEI-LARAVEL-HAKIM"
+		}
+	],
+	"settings": {
+		"chat.tools.terminal.autoApprove": {
+			"wsl": true
+		}
+	}
+}
