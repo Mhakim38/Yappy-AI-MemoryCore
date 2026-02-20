@@ -167,6 +167,74 @@
 - **Display**: Use `image_url` field directly in views as `<img src="{{ $model->image_url }}"`
 - **Deletion**: Extract relative path with `str_replace('/storage/', '', $model->image_url)` then `Storage::disk('public')->delete($relativePath)`
 
+### ONDEWEI-Laravel Project Architecture
+**Status**: Active, branch: SSE-testing for real-time order updates feature
+
+**Project Stack**:
+- Framework: Laravel 10.10
+- Hosting: Hostinger shared hosting (PWA deployed)
+- Database: MySQL (custom schema)
+- Frontend: Blade templates + Tailwind CSS + Alpine.js
+
+**Core Features Implemented**:
+- ✅ Multi-role authentication (Customer, Vendor, Rider, Admin)
+- ✅ Order placement & management system
+- ✅ Menu item upload with image storage
+- ✅ Order status tracking with history
+- ✅ Delivery management system
+- ✅ Chat system for orders
+- ✅ Google OAuth integration
+
+**Key Order Lifecycle** (For SSE Implementation):
+1. Customer places order → OrderService::createOrder() → **OrderPlaced Event fired**
+2. Rider accepts order → Status → rider_accepted → **OrderStatusChanged Event fired**
+3. **VENDOR SEES ORDER** (Currently needs manual refresh) → /vendor/orders page shows pending orders
+4. Vendor accepts → Status → accepted → auto-transitions → preparing
+5. Vendor finishes → Status → ready_for_pickup
+6. Rider picks up → Status → on_delivery
+7. Delivery complete → Status → delivered
+
+**Database Core Tables**:
+- `orders`: order_id (PK), customer_id, vendor_id, rider_id, status (enum), delivery_location_type, delivery_date, delivery_time, delivery_fee, total_amount, timestamps
+- `order_items`: order_id, item_id, quantity, unit_price, subtotal
+- `order_status_history`: order_id, old_status, new_status, changed_by, comments
+- `vendors`: vendor_id (PK), user_id (FK), is_online, is_active, etc.
+- `users`: user_id (PK), email, user_type (enum: customer/vendor/rider/admin), status
+
+**Events Already in Place**:
+- `OrderPlaced` Event: Fired when order created, carries Order object
+- `OrderStatusChanged` Event: Fired on status update, carries Order + User
+
+**Vendor Orders Page**:
+- Route: `/vendor/orders` → `VendorOrderController::index()`
+- View: `resources/views/vendor/orders/index.blade.php` (Pending orders + Other orders)
+- Current issue: **REQUIRES PAGE REFRESH** to see new orders (no real-time update)
+
+**Controllers Being Used**:
+- `VendorOrderController`: index(), show(), accept(), cancel()
+- `CustomerOrderController`: checkout(), placeOrder(), index(), show()
+- `RiderOrderController`: available(), active(), history(), accept(), pickup(), deliver()
+
+**Key Services**:
+- `OrderService`: Creates orders, handles cart validation, calculates fees, fires events
+- `OrderStatusService`: Updates order status, transitions states, fires status events
+
+**Why SSE is Perfect for Task 7**:
+- ✅ Vendor page stays open 24/7 (PWA) = long-lived connection ideal
+- ✅ Hostinger compatibility = no Redis/external services needed
+- ✅ One-way communication = vendor RECEIVES orders only (perfect for SSE)
+- ✅ Already using Laravel Events = minimal code changes
+- ✅ Can scale to many vendors = simple connections per vendor
+- ✅ Can upgrade to Redis/WebSockets later = same event structure
+
+**Implementation Requirements** (For Hakim):
+1. Create SSE endpoint: `/api/vendor/orders/stream` (authenticated, vendor-scoped)
+2. Vendor browser connects to this stream on page load
+3. When OrderPlaced event fires for vendor's restaurant → broadcast to stream
+4. JavaScript receives update and appends order card without full page refresh
+5. Optional: Show notification badge with new order count
+6. Optional: Sound/vibration notification for new orders
+
 ### Preferred Working Style
 *[Will adapt to support your optimal productivity]*
 

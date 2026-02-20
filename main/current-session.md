@@ -45,10 +45,103 @@
 - **Name**: ONDEWEI-Laravel
 - **Type**: Coding Project
 - **Status**: Active (Position #1)
-- **Project Location**: WSL folder at `~/holeeshet/ONDEWEI-LARAVEL-HAKIM` (NOT Windows folder)
+- **Project Location**: WSL folder at `~/holeeshet/ONDEWEI-LARAVEL-HAKIM`
+- **Current Focus**: SSE (Server-Sent Events) implementation for real-time vendor order updates
+- **Branch**: SSE-testing (feature branch for testing before merge to main)
 - **Context**: Laravel 10 food delivery platform. Complete menu item image system implemented with Hostinger compatibility.
-- **Current Focus**: All file storage and image serving issues resolved
 - **Important**: ALWAYS use WSL path for investigation, NOT the Windows C:\ path
+
+### ONDW Architecture Documentation (Complete)
+
+#### Order Lifecycle Flow
+1. **Customer places order** → Calls `customer/order/place` endpoint
+   - OrderService::createOrder() fires `OrderPlaced` event
+   - Order created with status: `pending`
+   
+2. **Rider accepts order** → Rider picks order from available orders
+   - Order status → `rider_accepted`
+   - OrderStatusChanged event fires
+   
+3. **Vendor sees order** → Vendor checks `/vendor/orders` to see new orders
+   - Two sections: "Pending Orders" (rider_accepted + preparing) and "Other"
+   - Currently needs manual refresh to see new orders (THIS IS THE SSE TASK)
+   
+4. **Vendor accepts order** → Vendor clicks "Accept" button
+   - Order status → `accepted` → auto-transitions → `preparing`
+   - Vendor starts making food
+   
+5. **Order marked ready** → Vendor finishes cooking
+   - Status → `ready_for_pickup`
+   
+6. **Rider picks up** → Rider arrives and collects food
+   - Status → `on_delivery`
+   
+7. **Order delivered** → Rider delivers to customer
+   - Status → `delivered`
+
+#### Database Schema
+- **Orders Table**: order_id (PK), customer_id (FK), vendor_id (FK), rider_id (FK), status (enum), delivery_location_type, delivery_date, delivery_time, special_instructions, delivery_fee, total_amount, timestamps
+- **OrderItems Table**: order_id (FK), item_id (FK), quantity, unit_price, subtotal
+- **OrderStatusHistory Table**: order_id (FK), old_status, new_status, changed_by_user, comments, timestamp
+
+#### Event System Already In Place
+- **OrderPlaced Event** (`app/Events/OrderPlaced.php`): Fired when order created, has Order object
+- **OrderStatusChanged Event** (`app/Events/OrderStatusChanged.php`): Fired when status changes, has Order + User
+
+#### Models & Relationships
+- **Order Model** (`app/Models/Order.php`): Has relationships to Customer, Vendor, Rider, OrderItems, StatusHistory
+- **Vendor Model** (`app/Models/Vendor.php`): Has is_online, is_active flags
+- **Customer Model** (`app/Models/Customer.php`): User who placed order
+- **Rider Model** (`app/Models/Rider.php`): User accepting/delivering order
+
+#### Current Vendor Orders Page
+- **Route**: `/vendor/orders` → `VendorOrder::index()`
+- **View**: `resources/views/vendor/orders/index.blade.php`
+- **Logic**: Shows pending orders (rider_accepted + preparing) and other orders in two-column layout
+- **Pagination**: 10 orders per page
+- **Status**: REQUIRES REFRESH to see new orders (NO real-time update)
+
+#### Key Controllers & Services
+- **VendorOrderController** (`app/Http/Controllers/Vendor/OrderController.php`):
+  - index() - shows vendor's orders with filters
+  - accept() - vendor accepts order
+  - cancel() - vendor cancels order
+  
+- **OrderService** (`app/Services/OrderService.php`):
+  - createOrder() - creates order from cart, fires OrderPlaced event
+  
+- **OrderStatusService** (`app/Services/OrderStatusService.php`):
+  - updateStatus() - updates order status, fires OrderStatusChanged event
+
+#### Technology Stack
+- Laravel 10.10
+- Database: Custom (MySQL likely)
+- Hosting: Hostinger shared hosting (NO external services like Pusher/Redis available)
+- PWA: Active (vendors keep page open 24/7)
+- Already using: Events, Services, Relationships
+
+#### SSE Implementation Plan (Task 7)
+**Tech Choice**: SSE (Server-Sent Events) - BEST for this scenario
+- ✅ One-way server→client (vendor only receives)
+- ✅ Works on Hostinger (no external services)
+- ✅ Perfect for PWA that stays open
+- ✅ Automatic browser reconnection
+- ✅ Can scale to hundreds of vendors
+- ✅ Uses Laravel Events already in place
+
+**Implementation Steps:**
+1. Create SSE stream endpoint: `/api/vendor/orders/stream` that vendor connects to
+2. Vendor listens on this stream for OrderPlaced + OrderStatusChanged events (filtered for their vendor_id)
+3. When event fires, Laravel broadcasts order data to stream
+4. JavaScript on page receives update and appends new order without refresh
+5. Can later upgrade to Redis if scale requires
+
+#### Current Codebase Stats
+- Controllers: Customer, Rider, Vendor, Admin (with Order management in each)
+- Models: 15+ models with relationships
+- Views: Blade templates for each role
+- Services: OrderService, OrderStatusService, PaymentService
+- Events: OrderPlaced, OrderStatusChanged
 
 ### Session Recap (For AI Restart)
 *Quick summary when AI loads after close/reopen*
