@@ -64,6 +64,16 @@
 - [x] **MANUAL CONTROL OPTION**: Appreciates ability to review changes before auto-operations, especially on code-related tasks
 - [x] **APPRECIATION STYLE**: Responds well to supportive feedback ("Good girl", "Nice response") - genuine appreciation matters
 
+**CRITICAL UPDATE - Feb 20, 2026 - Time Language & Date Tracking**:
+- [x] **RELATIVE TIME MAPPING**: When Hakim says "tomorrow", "next Monday", "this afternoon" - ALWAYS convert to absolute dates:
+  - Example: "tomorrow" at 2:51 PM on Feb 20 = **Tomorrow (Feb 21, 2026)**
+  - Prevents date-drift that caused ONDW meeting to be lost (was stored as "tomorrow" 4 days ago)
+- [x] **Reminder Validation Protocol**: Check all reminders against TODAY's date on every greeting
+- [x] **Date Drift Prevention**: ONDW meeting lesson - floating "tomorrow" loses context over sessions
+- [x] **Communication Pattern**: Hakim naturally thinks in relative time (tomorrow, Monday, this weekend) NOT absolute dates
+- [x] **Feedback Integration Style**: Hakim appreciates quick understanding and immediate implementation of feedback
+- [x] **Learning Speed**: When Hakim gives critical feedback, acknowledgment + implementation in same session is valued
+
 **Topics You Engage With**:
 - [x] Work/Professional development
 - [x] Technical subjects
