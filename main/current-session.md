@@ -61,23 +61,26 @@
 2. **Rider accepts order** → Rider picks order from available orders
    - Order status → `rider_accepted`
    - OrderStatusChanged event fires
+   - **THIS IS WHEN VENDOR NEEDS TO SEE IT (REAL-TIME)**
    
-3. **Vendor sees order** → Vendor checks `/vendor/orders` to see new orders
-   - Two sections: "Pending Orders" (rider_accepted + preparing) and "Other"
-   - Currently needs manual refresh to see new orders (THIS IS THE SSE TASK)
-   
-4. **Vendor accepts order** → Vendor clicks "Accept" button
+3. **Vendor sees order & accepts** → Vendor checks `/vendor/orders` to see new orders
+   - Vendor clicks "Accept" button to start preparing
    - Order status → `accepted` → auto-transitions → `preparing`
    - Vendor starts making food
+   - **VENDOR DOES NOT CONTROL WHEN RIDER PICKS UP** ← KEY POINT
    
-5. **Order marked ready** → Vendor finishes cooking
+4. **Vendor marks ready** → When food is prepared
    - Status → `ready_for_pickup`
+   - Rider will arrive whenever they decide (could be before/after ready)
    
-6. **Rider picks up** → Rider arrives and collects food
+5. **Rider picks up** → Rider arrives and collects food (timing is rider's choice)
    - Status → `on_delivery`
+   - Vendor doesn't need real-time updates for this
    
-7. **Order delivered** → Rider delivers to customer
+6. **Order delivered** → Rider delivers to customer
    - Status → `delivered`
+
+**SSE FOCUS FOR TASK 7**: Real-time notification when new orders become available (rider_accepted status) so vendor knows to check page and start preparing
 
 #### Database Schema
 - **Orders Table**: order_id (PK), customer_id (FK), vendor_id (FK), rider_id (FK), status (enum), delivery_location_type, delivery_date, delivery_time, special_instructions, delivery_fee, total_amount, timestamps

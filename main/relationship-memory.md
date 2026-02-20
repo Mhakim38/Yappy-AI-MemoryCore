@@ -188,11 +188,14 @@
 **Key Order Lifecycle** (For SSE Implementation):
 1. Customer places order → OrderService::createOrder() → **OrderPlaced Event fired**
 2. Rider accepts order → Status → rider_accepted → **OrderStatusChanged Event fired**
-3. **VENDOR SEES ORDER** (Currently needs manual refresh) → /vendor/orders page shows pending orders
-4. Vendor accepts → Status → accepted → auto-transitions → preparing
-5. Vendor finishes → Status → ready_for_pickup
-6. Rider picks up → Status → on_delivery
-7. Delivery complete → Status → delivered
+3. **★ VENDOR SEES ALERT/NEW ORDER (THIS IS SSE TASK)** → /vendor/orders shows new order that's rider_accepted
+4. **Vendor clicks "Accept" button** → Status → accepted → auto-transitions → preparing (vendor starts cooking)
+5. **CRITICAL**: Vendor does NOT control when rider picks up food - rider picks up on their own schedule (could be before or after food is ready)
+6. Vendor marks ready → Status → ready_for_pickup
+7. Rider picks up whenever ready (independent of vendor) → Status → on_delivery
+8. Delivery complete → Status → delivered
+
+**SSE Focus**: Real-time notification to vendor when new orders become rider_accepted, so vendor knows to check page and start preparing immediately
 
 **Database Core Tables**:
 - `orders`: order_id (PK), customer_id, vendor_id, rider_id, status (enum), delivery_location_type, delivery_date, delivery_time, delivery_fee, total_amount, timestamps
