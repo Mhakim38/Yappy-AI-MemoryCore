@@ -241,12 +241,13 @@
 - ✅ **ONDW Meeting**: ~~Monday, Feb 16 at 10:00 PM~~ **COMPLETED!** (4 days ago)
 
 ### **⚠️ Urgent - Work Related:**
-- 📋 **Apply AL**: Need to apply Annual Leave (Remaining: 2.5 days) before resignation
-- 📝 **Update ONDW README**: Add Storage Configuration section before "## Configuration" section. Content: Storage folder setup instructions for Hostinger (mkdir private/rider_documents, chmod permissions, explanation of why needed, and the 3 file serving routes)
+- 📋 **Apply AL**: Need to apply Annual Leave before resignation (Due: End of Feb 21, 2026 - This Weekend) - **2.5 days remaining**
+- 📝 **Update ONDW README**: Add Storage Configuration section before "## Configuration" section (Due: End of week, Feb 21, 2026). Content: Storage folder setup instructions for Hostinger (mkdir private/rider_documents, chmod permissions, explanation of why needed, and the 3 file serving routes)
 
 **Protocol**: 
-1. Greeting → 2. Show ALL reminders above → 3. Ask how they're doing
+1. Greeting → 2. Show ALL reminders above → 3. Validate reminder dates (check for overdue) → 4. Ask how they're doing
 *These reminders display with EVERY greeting until marked complete or removed.*
+*Absolute dates included to prevent date-drift (e.g., ONDW meeting mistake)*
 
 ## Relationship Evolution
 
