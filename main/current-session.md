@@ -142,46 +142,97 @@
 
 **SSE FOCUS FOR TASK 7**: Real-time notification when new orders become available (rider_accepted status) so vendor knows to check page and start preparing
 
-#### Database Schema
-- **Orders Table**: order_id (PK), customer_id (FK), vendor_id (FK), rider_id (FK), status (enum), delivery_location_type, delivery_date, delivery_time, special_instructions, delivery_fee, total_amount, timestamps
-- **OrderItems Table**: order_id (FK), item_id (FK), quantity, unit_price, subtotal
-- **OrderStatusHistory Table**: order_id (FK), old_status, new_status, changed_by_user, comments, timestamp
+#### Complete Data Models (16 Total)
+**User Role Models**:
+- `User.php` - Base authentication entity
+- `Customer.php` - Customer profile + orders
+- `Vendor.php` - Vendor profile + menus + is_online/is_active flags
+- `Rider.php` - Rider profile + deliveries + document submissions
+- `Admin.php` - Admin profile + system management
+
+**Order & Menu System**:
+- `Order.php` - Master order record (PK: order_id, fields: customer_id, vendor_id, rider_id, status, delivery_location_type/number, delivery_date/time, special_instructions, delivery_fee, total_amount)
+- `OrderItem.php` - Line items (order_id FK, item_id FK, quantity, unit_price snapshot, subtotal)
+- `MenuItem.php` - Menu items offered by vendors (price, name, description, image paths)
+- `MenuCategory.php` - Organizes menu items by category
+- `OrderStatusHistory.php` - Audit trail of all status transitions
+
+**Rider Onboarding & Support**:
+- `RiderApproval.php` - Tracks rider verification workflow (status: pending/approved/rejected)
+- `RiderDocument.php` - Document uploads (license, verification, etc.)
+
+**Communication & Notifications**:
+- `OrderChat.php` - Multi-party conversations (customer, vendor, rider)
+- `ChatReadStatus.php` - Tracks read receipts per user per conversation
+- `Notification.php` - System notifications + timestamps
+
+**Account Management**:
+- `PasswordReset.php` - Password recovery tokens
+
+#### Database Schema Overview (25 Migrations)
+**Core Tables**:
+- `users` - Base auth (all roles)
+- `customer_profiles`, `vendor_profiles`, `rider_profiles`, `admin_profiles` - Role-specific data
+- `orders` - Master orders (with delivery fields updated Feb 2026)
+- `order_items` - Line items with price snapshots
+- `menu_categories`, `menu_items` - Vendor menus with image support
+- `order_status_history` - Audit trail (status changes, timestamps)
+- `order_chat`, `chat_read_status` - Multi-party messaging
+- `rider_approvals`, `rider_documents` - Rider verification workflow
+- `notifications` - System notifications
+- `password_resets` - Account recovery
+
+#### Controller Architecture - Role-Based
+```
+app/Http/Controllers/
+├── Customer/        # Order placement, menu browsing, cart, tracking
+├── Vendor/          # Order acceptance, menu management, statistics
+├── Rider/           # Available orders, delivery management, confirmations
+├── Admin/           # User management, rider approval, analytics
+├── Auth/            # Google OAuth + authentication
+└── ProfileController.php
+```
+
+#### Business Logic Layer - Services (2 Total)
+
+**OrderService** (`app/Services/OrderService.php`) - 242 lines
+- `createOrder(array $data, int $customerId): Order` - Core order creation
+  - Validates delivery dates/times
+  - Extracts vendor ID from cart items
+  - Calculates subtotal from current menu prices
+  - Computes delivery fees (by location)
+  - Creates Order + OrderItems in DB transaction
+  - Fires `OrderPlaced` event
+  - Returns loaded order with relationships
+
+**OrderStatusService** (`app/Services/OrderStatusService.php`)
+- `updateStatus()` - Handles state transitions
+- Fires `OrderStatusChanged` event
+- Creates audit trail records
 
 #### Event System Already In Place
-- **OrderPlaced Event** (`app/Events/OrderPlaced.php`): Fired when order created, has Order object
-- **OrderStatusChanged Event** (`app/Events/OrderStatusChanged.php`): Fired when status changes, has Order + User
-
-#### Models & Relationships
-- **Order Model** (`app/Models/Order.php`): Has relationships to Customer, Vendor, Rider, OrderItems, StatusHistory
-- **Vendor Model** (`app/Models/Vendor.php`): Has is_online, is_active flags
-- **Customer Model** (`app/Models/Customer.php`): User who placed order
-- **Rider Model** (`app/Models/Rider.php`): User accepting/delivering order
+- **OrderPlaced Event** - Fired when customer places order
+- **OrderStatusChanged Event** - Fired on any order status transition
+  - Both have Order object + timestamps
 
 #### Current Vendor Orders Page
-- **Route**: `/vendor/orders` → `VendorOrder::index()`
+- **Route**: `/vendor/orders` → `app/Http/Controllers/Vendor/OrderController.php::index()`
 - **View**: `resources/views/vendor/orders/index.blade.php`
-- **Logic**: Shows pending orders (rider_accepted + preparing) and other orders in two-column layout
+- **Logic**: Two-column layout - Pending orders (rider_accepted + preparing) | Other orders
 - **Pagination**: 10 orders per page
-- **Status**: REQUIRES REFRESH to see new orders (NO real-time update)
+- **Status**: REQUIRES PAGE REFRESH to see new orders (NO real-time before Task 7)
 
-#### Key Controllers & Services
-- **VendorOrderController** (`app/Http/Controllers/Vendor/OrderController.php`):
-  - index() - shows vendor's orders with filters
-  - accept() - vendor accepts order
-  - cancel() - vendor cancels order
-  
-- **OrderService** (`app/Services/OrderService.php`):
-  - createOrder() - creates order from cart, fires OrderPlaced event
-  
-- **OrderStatusService** (`app/Services/OrderStatusService.php`):
-  - updateStatus() - updates order status, fires OrderStatusChanged event
-
-#### Technology Stack
-- Laravel 10.10
-- Database: Custom (MySQL likely)
-- Hosting: Hostinger shared hosting (NO external services like Pusher/Redis available)
-- PWA: Active (vendors keep page open 24/7)
-- Already using: Events, Services, Relationships
+#### Technology Stack (Updated Feb 24)
+- **Framework**: Laravel 10.x (specifically 10.10)
+- **Database**: MySQL 8.0+ via Eloquent ORM
+- **Frontend**: Blade Templates + Tailwind CSS + jQuery
+- **Authentication**: Google OAuth + Laravel Sanctum + Session-based auth
+- **Image Uploads**: Direct filesystem (Hostinger compatible - `public/images/` paths)
+- **Hosting**: Hostinger shared hosting (⚠️ NO external services: No Redis, No Pusher)
+- **PWA**: Active - vendors keep page open 24/7 for order notifications
+- **Real-time Strategy**: SSE/AJAX polling (no dependency on external services)
+- **Testing Framework**: PHPUnit + Laravel Dusk
+- **Build Tools**: NPM, Vite, TailwindCSS compilation
 
 #### SSE Implementation Plan (Task 7)
 **Tech Choice**: SSE (Server-Sent Events) - BEST for this scenario

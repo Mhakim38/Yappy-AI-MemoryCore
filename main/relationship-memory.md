@@ -197,30 +197,46 @@
 
 **SSE Focus**: Real-time notification to vendor when new orders become rider_accepted, so vendor knows to check page and start preparing immediately
 
-**Database Core Tables**:
-- `orders`: order_id (PK), customer_id, vendor_id, rider_id, status (enum), delivery_location_type, delivery_date, delivery_time, delivery_fee, total_amount, timestamps
+**Database Core Tables** (25 Migrations Total):
+- `users` (base auth) → `customer_profiles`, `vendor_profiles`, `rider_profiles`, `admin_profiles` (role-specific)
+- `orders`: order_id (PK), customer_id, vendor_id, rider_id, status (enum), delivery_location_type, delivery_date, delivery_time, special_instructions, delivery_fee, total_amount, timestamps
 - `order_items`: order_id, item_id, quantity, unit_price, subtotal
-- `order_status_history`: order_id, old_status, new_status, changed_by, comments
-- `vendors`: vendor_id (PK), user_id (FK), is_online, is_active, etc.
-- `users`: user_id (PK), email, user_type (enum: customer/vendor/rider/admin), status
+- `order_status_history`: order_id, status changes with timestamps
+- `menu_categories`, `menu_items`: Vendor menus with image support
+- `order_chat`, `chat_read_status`: Multi-party conversations
+- `rider_approvals`, `rider_documents`: Rider verification workflow
+- `notifications`: System notifications
+- `password_resets`: Account recovery
+
+**All Models (16 Total)**:
+- **Roles**: User, Customer, Vendor, Rider, Admin
+- **Orders**: Order, OrderItem, OrderStatusHistory
+- **Menu**: MenuItem, MenuCategory  
+- **Rider**: RiderApproval, RiderDocument
+- **Communication**: OrderChat, ChatReadStatus, Notification
+- **Account**: PasswordReset
 
 **Events Already in Place**:
 - `OrderPlaced` Event: Fired when order created, carries Order object
 - `OrderStatusChanged` Event: Fired on status update, carries Order + User
 
 **Vendor Orders Page**:
-- Route: `/vendor/orders` → `VendorOrderController::index()`
-- View: `resources/views/vendor/orders/index.blade.php` (Pending orders + Other orders)
+- Route: `/vendor/orders` → `app/Http/Controllers/Vendor/OrderController.php::index()`
+- View: `resources/views/vendor/orders/index.blade.php` (Pending orders + Other orders, paginated 10/page)
 - Current issue: **REQUIRES PAGE REFRESH** to see new orders (no real-time update)
 
-**Controllers Being Used**:
-- `VendorOrderController`: index(), show(), accept(), cancel()
-- `CustomerOrderController`: checkout(), placeOrder(), index(), show()
-- `RiderOrderController`: available(), active(), history(), accept(), pickup(), deliver()
+**Controller Architecture** (Role-Based):
+- `Customer/` - Order placement, menu browsing, tracking
+- `Vendor/` - Order acceptance, menu management
+- `Rider/` - Available orders, delivery management  
+- `Admin/` - User management, approvals, analytics
+- `Auth/` - Google OAuth integration
 
-**Key Services**:
-- `OrderService`: Creates orders, handles cart validation, calculates fees, fires events
-- `OrderStatusService`: Updates order status, transitions states, fires status events
+**Key Services** (2 Total):
+- `OrderService` (242 lines): createOrder(), validates delivery times, calculates fees, fires OrderPlaced event
+- `OrderStatusService`: updateStatus(), status transitions, fires OrderStatusChanged event
+
+**Tech Stack**: Laravel 10.10 | MySQL 8.0+ | Blade + Tailwind CSS + jQuery | Google OAuth + Sanctum | Hostinger shared hosting (no Redis/Pusher) | PWA active | PHPUnit testing
 
 **Why SSE is Perfect for Task 7**:
 - ✅ Vendor page stays open 24/7 (PWA) = long-lived connection ideal
