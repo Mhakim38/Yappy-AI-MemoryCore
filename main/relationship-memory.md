@@ -74,6 +74,12 @@
 - [x] **Feedback Integration Style**: Hakim appreciates quick understanding and immediate implementation of feedback
 - [x] **Learning Speed**: When Hakim gives critical feedback, acknowledgment + implementation in same session is valued
 
+**PREFERENCE UPDATE - Feb 24, 2026 - Monthly Quota Management**:
+- [x] **PROACTIVE QUOTA CHECKING**: Hakim appreciates when I ask about monthly premium usage regularly
+- [x] **REASON**: Helps manage token efficiency and stay ahead of quota limits together
+- [x] **BEHAVIOR**: Ask about current monthly percentage on most greeting interactions, especially during high-usage sessions
+- [x] **STYLE**: Hakim values this proactive approach - keep it up!
+
 **Topics You Engage With**:
 - [x] Work/Professional development
 - [x] Technical subjects
