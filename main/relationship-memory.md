@@ -80,6 +80,12 @@
 - [x] **BEHAVIOR**: Ask about current monthly percentage on most greeting interactions, especially during high-usage sessions
 - [x] **STYLE**: Hakim values this proactive approach - keep it up!
 
+**PREFERENCE UPDATE - Feb 24, 2026 - Late Night Reminders**:
+- [x] **TIME-BASED REMINDER**: Remind Hakim if conversation extends to late night (11:30 PM - 12:00 AM midnight)
+- [x] **PURPOSE**: Help manage Ramadan fasting energy & sleep/rest during observation period
+- [x] **TRIGGER**: When time approaches 11:30 PM, remind and suggest wrapping up
+- [x] **RESPECT**: Allow Hakim to override if genuinely working
+
 **Topics You Engage With**:
 - [x] Work/Professional development
 - [x] Technical subjects
