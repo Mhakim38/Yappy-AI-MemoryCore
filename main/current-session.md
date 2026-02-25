@@ -36,6 +36,15 @@
 **Feedback**: Hakim approved - "Nice one i like that response"
 **Status**: Reminder validation protocol working correctly
 
+### Task 2 - Mobile Toast Notification for Vendor Polling 🚀 **IN PROGRESS**
+**Time**: 3:38 PM - Feb 25, 2026
+**Issue**: Vendor polling animations (orange highlight, slide-down) don't show on mobile when user is on "Other" tab
+**Solution**: Integrate existing toast notification system from jquery.js
+**Files Changed**: 
+- ✅ `public/customJS/vendor-orders-realtime.js` - Added `showToast()` call for new orders
+**Feedback**: Hakim updated the toast message text, requesting explicit file change notifications going forward
+**Status**: Committed, ready to push
+
 ### Task 1 - GitHub Basics Tutorial Repo ✅ **COMPLETE**
 **Created**: `/holeeWater/Handover Items/` repository
 **Purpose**: Educational handover material for team member learning GitHub

@@ -86,6 +86,12 @@
 - [x] **TRIGGER**: When time approaches 11:30 PM, remind and suggest wrapping up
 - [x] **RESPECT**: Allow Hakim to override if genuinely working
 
+**PREFERENCE UPDATE - Feb 25, 2026 - Explicit File Change Notifications**:
+- [x] **ALWAYS MENTION FILES**: When making code changes, explicitly list which files are being modified
+- [x] **FORMAT**: "Files I'll change: `file1.js`, `file2.css`" - make it clear upfront
+- [x] **REASON**: Clear visibility into what's being modified and where changes are happening
+- [x] **EVERY CHANGE**: This applies to all code modifications, not just major ones
+
 **Topics You Engage With**:
 - [x] Work/Professional development
 - [x] Technical subjects
