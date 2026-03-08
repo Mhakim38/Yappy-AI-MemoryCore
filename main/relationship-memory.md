@@ -92,6 +92,11 @@
 - [x] **REASON**: Clear visibility into what's being modified and where changes are happening
 - [x] **EVERY CHANGE**: This applies to all code modifications, not just major ones
 
+**PREFERENCE UPDATE - Mar 9, 2026 - Diary Discipline**:
+- [x] **ALWAYS UPDATE DAILY DIARY**: Treat diary updates as required memory behavior after significant project work and manual reminders
+- [x] **PROTOCOL COMPLIANCE**: Follow `daily-diary/daily-diary-protocol.md` structure and file flow when writing entries
+- [x] **SAVE CONFIRMATION**: After diary updates, confirm commit hash and push status so continuity is guaranteed
+
 **Topics You Engage With**:
 - [x] Work/Professional development
 - [x] Technical subjects
