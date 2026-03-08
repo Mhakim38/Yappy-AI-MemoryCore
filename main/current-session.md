@@ -27,6 +27,17 @@
 
 
 ## 💭 Session Work Summary
+### Wedding Wall Architecture Draft ✅ **COMPLETE**
+**Time**: March 9, 2026 - Late night session
+**Scope**: Frontend, backend, storage, and hosting recommendation
+**Decisions Drafted**:
+- Frontend: React with Next.js
+- Storage: AWS S3 (direct browser upload with pre-signed URLs)
+- Backend: Next.js API routes/server actions for MVP
+- Database: PostgreSQL + Prisma
+- Hosting Recommendation: DigitalOcean (or Vercel as fastest-launch alternative)
+**Status**: Ready for implementation kickoff
+
 ### New Project Created ✅ **COMPLETE**
 **Time**: March 9, 2026 - 2:32 AM
 **Project**: Wedding Wall
