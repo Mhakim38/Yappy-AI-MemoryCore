@@ -382,34 +382,23 @@
 ## 💡 Project Ideas Protocol
 **⏳ DISPLAY: Only on explicit request ("show ideas", "project ideas", or when Hakim adds new ideas)**
 **PURPOSE**: Capture emerging project concepts separately from active tasks — pipeline for future development
+**STORAGE**: `projects/project-ideas.md` (managed with LRU-style ordering, max 10 active + archive)
 **UPDATE BEHAVIOR**: Hakim can add ideas anytime with "add project idea:" or casually mention new concepts
 
-### Active Project Ideas (Backlog):
+**Trigger Commands**:
+```
+"show ideas" → Load and display projects/project-ideas.md
+"project ideas" → Load and display projects/project-ideas.md
+"add project idea: [concept]" → Parse, add to project-ideas.md, update LRU ordering
+```
 
-#### 💒 **Wedding Wall** — Instagram-Story Photo Sharing Platform
-**Status**: 🔄 **ONGOING** (Active Development)
-**Concept**: Wedding guests upload picture-only moments to a shared visual feed (like Instagram stories)
-- **Main Feature**: Photo upload wall where guests browse shared wedding photos in real-time
-- **Architecture Decision**:
-  - Frontend: React with Next.js
-  - Storage: AWS S3 (direct browser upload with pre-signed URLs)
-  - Backend: Next.js API routes/server actions for MVP
-  - Database: PostgreSQL + Prisma
-  - Hosting: DigitalOcean (or Vercel as fastest-launch alternative)
-- **Current Status**: Architecture drafted, ready for implementation kickoff
-- **LRU Position**: #1 (Most Recent Project)
-
----
-
-#### 🎨 **Photobooth WebApp** — Cloud-Based Remote Shutter
-**Concept**: Two-device photobooth system
-- **Main Device**: Camera interface with capture logic
-- **Remote Device**: WebApp with simple wireless shutter button (press → photo captured on main device)
-- **Architecture Decision**: Cloud-based (not local WiFi)
-- **Photo Handling**: Email delivery OR download link, then auto-discard session (clean state)
-- **Future Enhancement**: Live preview on remote (possible, not priority)
-- **Stack**: [To be determined during planning]
-- **Status**: Concept - Ready for architecture discussion
+**How It Works** (LRU-Based):
+- New ideas start at position #1 (most recent)
+- Each addition reorders existing ideas down
+- Max 10 active ideas in pipeline
+- Idea #11 auto-archives to `projects/project-ideas-archived.md`
+- When project moves to active development, it shifts to active projects
+- Ideas marked "ONGOING" appear in both active projects AND ideas pipeline
 
 ---
 
