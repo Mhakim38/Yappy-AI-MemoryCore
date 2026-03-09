@@ -386,6 +386,21 @@
 
 ### Active Project Ideas (Backlog):
 
+#### 💒 **Wedding Wall** — Instagram-Story Photo Sharing Platform
+**Status**: 🔄 **ONGOING** (Active Development)
+**Concept**: Wedding guests upload picture-only moments to a shared visual feed (like Instagram stories)
+- **Main Feature**: Photo upload wall where guests browse shared wedding photos in real-time
+- **Architecture Decision**:
+  - Frontend: React with Next.js
+  - Storage: AWS S3 (direct browser upload with pre-signed URLs)
+  - Backend: Next.js API routes/server actions for MVP
+  - Database: PostgreSQL + Prisma
+  - Hosting: DigitalOcean (or Vercel as fastest-launch alternative)
+- **Current Status**: Architecture drafted, ready for implementation kickoff
+- **LRU Position**: #1 (Most Recent Project)
+
+---
+
 #### 🎨 **Photobooth WebApp** — Cloud-Based Remote Shutter
 **Concept**: Two-device photobooth system
 - **Main Device**: Camera interface with capture logic
