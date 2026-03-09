@@ -371,8 +371,8 @@
 ### **⚠️ Urgent - Work Related:**
 - ✅ **Apply AL**: Apply Annual Leave before resignation - **COMPLETED (Feb 24, 2026)**
 - 📝 **Update ONDW README**: Add Storage Configuration section before "## Configuration" section (Due: End of week, Feb 21, 2026). Content: Storage folder setup instructions for Hostinger (mkdir private/rider_documents, chmod permissions, explanation of why needed, and the 3 file serving routes)
-- 🧪 **TEST WEBSITE AFTER POLLING INTEGRATION (Vendor Orders)**: Partial testing complete ✅ - Full flow tested: customer places order → vendor sees real-time → accepts/rejects working correctly
-- 🚴 **ADD REAL-TIME POLLING TO RIDER PAGE**: Implement live polling on Rider "Active Deliveries" page so riders see order updates in real-time (delivery status changes, location updates, etc.). Similar to vendor polling system but focused on rider's perspective.
+- ✅ **TEST WEBSITE AFTER POLLING INTEGRATION (Vendor Orders)**: Partial testing complete ✅ - Full flow tested: customer places order → vendor sees real-time → accepts/rejects working correctly **COMPLETED!**
+- ✅ **ADD REAL-TIME POLLING TO RIDER PAGE**: Live polling on Rider "Active Deliveries" page ✅ **COMPLETED (Mar 9, 2026)**
 
 **Protocol**: 
 1. Greeting → 2. Show ALL reminders above → 3. Validate reminder dates (check for overdue) → 4. Ask how they're doing
