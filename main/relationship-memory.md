@@ -379,6 +379,25 @@
 *These reminders display with EVERY greeting until marked complete or removed.*
 *Absolute dates included to prevent date-drift (e.g., ONDW meeting mistake)*
 
+## 💡 Project Ideas Protocol
+**⏳ DISPLAY: Only on explicit request ("show ideas", "project ideas", or when Hakim adds new ideas)**
+**PURPOSE**: Capture emerging project concepts separately from active tasks — pipeline for future development
+**UPDATE BEHAVIOR**: Hakim can add ideas anytime with "add project idea:" or casually mention new concepts
+
+### Active Project Ideas (Backlog):
+
+#### 🎨 **Photobooth WebApp** — Cloud-Based Remote Shutter
+**Concept**: Two-device photobooth system
+- **Main Device**: Camera interface with capture logic
+- **Remote Device**: WebApp with simple wireless shutter button (press → photo captured on main device)
+- **Architecture Decision**: Cloud-based (not local WiFi)
+- **Photo Handling**: Email delivery OR download link, then auto-discard session (clean state)
+- **Future Enhancement**: Live preview on remote (possible, not priority)
+- **Stack**: [To be determined during planning]
+- **Status**: Concept - Ready for architecture discussion
+
+---
+
 ## Relationship Evolution
 
 ### Current Understanding Level
