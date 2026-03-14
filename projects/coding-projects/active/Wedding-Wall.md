@@ -14,11 +14,12 @@ Web app for wedding photo stories where users upload image-only moments and gues
 ## Technical Stack
 - **Languages**: TypeScript (frontend + backend)
 - **Frameworks**: React + Next.js (App Router), Tailwind CSS
-- **Database**: PostgreSQL (managed)
+- **Database**: Supabase (PostgreSQL managed) + Prisma ORM
 - **Storage**: AWS S3 (image originals), optional CloudFront CDN
 - **Auth**: NextAuth/Auth.js (Google + email magic link)
-- **Backend**: Next.js API routes for MVP, optional NestJS service later if scale grows
-- **Tools**: Prisma ORM, Zod validation, React Query, Sentry, GitHub Actions
+- **Backend**: Next.js API routes
+- **UI**: shadcn/ui + Radix UI components
+- **Tools**: ESLint, npm/node
 
 ## Project Structure
 ```
@@ -96,19 +97,29 @@ Wedding-Wall/
 - Added to LRU project list at position #1
 - Architecture draft completed (frontend, backend, storage, hosting)
 
+### March 10, 2026
+- ✅ Phase 1: Next.js + PWA Foundation scaffolded
+- ✅ Phase 2: Database setup with Supabase + shadcn/ui + FontAwesome landing page
+- ✅ Phase 3-5: API routes, pages, and styling completed
+- ✅ Database schema with Photo and UploadToken fields implemented
+- ✅ Route restructuring and error handling improvements
+- **Last commit**: "Fix: Remove route groups and restructure to correct URLs" (Mar 10, 23:00)
+
 ## Code Standards
-- **Style Guide**: [Project style]
-- **Testing**: [Testing approach]
-- **Documentation**: [Doc standards]
-- **Git Workflow**: [Branch strategy]
+- **Style Guide**: ESLint configured
+- **Testing**: [In progress]
+- **Documentation**: [To be added]
+- **Git Workflow**: Feature-based commits with descriptive messages
 
 ## Current Tasks
 - [x] Define MVP feature scope and user flow
 - [x] Choose technical stack and hosting approach
 - [x] Draft initial database schema for users, events, and photos
-- [ ] Finalize deployment target: DigitalOcean or Vercel
-- [ ] Scaffold Next.js app with auth, Prisma, and upload API
-- [ ] Create first event + upload + gallery end-to-end flow
+- [x] Scaffold Next.js app with auth, Prisma, and upload API
+- [x] Create end-to-end flow (events, uploads, gallery)
+- [ ] Fix remaining bugs and UI refinements
+- [ ] Complete testing coverage
+- [ ] Finalize deployment (Supabase + hosting target)
 
 ## Known Issues
 - None yet
