@@ -12,7 +12,28 @@
 
 ## Active Ideas (Ordered by Recency)
 
-### 1. 💒 **Wedding Wall** — Instagram-Story Photo Sharing Platform
+### 1. 🎟️ **Digital Loyalty System** — Customer Card to PWA
+**Status**: 💡 **BRAINSTORM** (Idea Captured)
+**Added**: March 14, 2026 (5:56 PM)
+**Last Updated**: March 14, 2026 (5:56 PM)
+**Concept**: Replace physical punch/loyalty cards with digital PWA-based system
+
+**Details**:
+- **Use Case**: Generic (adaptable to any business)
+- **Platform**: PWA (Progressive Web App)
+- **Customer Experience**: QR code scanning to track checkpoint progress
+- **Checkpoint System**: 
+  - Default: 10 checkpoints per loyalty cycle
+  - Admin customizable rewards at each checkpoint
+  - Auto-reset or one-time loyalty cycles
+- **Admin Dashboard**: Create programs, customize rewards, track customer progress
+- **Key Features**: Real-time progress tracking, reward notifications, mobile-optimized
+- **Tech Stack**: [To be determined during planning]
+- **LRU Position**: #1 (Most Recent / Brainstorm Phase)
+
+---
+
+### 2. 💒 **Wedding Wall** — Instagram-Story Photo Sharing Platform
 **Status**: 🔄 **ONGOING** (Active Development)
 **Added**: March 9, 2026 (2:32 AM)
 **Last Updated**: March 9, 2026 (12:26 AM)
@@ -27,11 +48,11 @@
   - Database: PostgreSQL + Prisma
   - Hosting: DigitalOcean (or Vercel as fastest-launch alternative)
 - **Current Status**: Architecture drafted, ready for implementation kickoff
-- **LRU Position**: #1 (Most Recent / Active Development)
+- **LRU Position**: #2
 
 ---
 
-### 2. 🎨 **Photobooth WebApp** — Cloud-Based Remote Shutter
+### 3. 🎨 **Photobooth WebApp** — Cloud-Based Remote Shutter
 **Status**: 💭 **CONCEPT** (Planning Phase)
 **Added**: March 9, 2026 (12:19 PM)
 **Last Updated**: March 9, 2026 (12:26 AM)
@@ -44,11 +65,10 @@
 - **Photo Handling**: Email delivery OR download link, then auto-discard session (clean state)
 - **Future Enhancement**: Live preview on remote (possible, not priority)
 - **Stack**: [To be determined during planning]
-- **LRU Position**: #2
+- **LRU Position**: #3
 
 ---
 
-### 3. [Empty]
 ### 4. [Empty]
 ### 5. [Empty]
 ### 6. [Empty]

@@ -379,16 +379,24 @@
 *These reminders display with EVERY greeting until marked complete or removed.*
 *Absolute dates included to prevent date-drift (e.g., ONDW meeting mistake)*
 
-## 💡 Project Ideas Protocol
-**⏳ DISPLAY: Only on explicit request ("show ideas", "project ideas", or when Hakim adds new ideas)**
+## 💡 Project Ideas Protocol - AUTO-CAPTURE ENABLED
 **PURPOSE**: Capture emerging project concepts separately from active tasks — pipeline for future development
 **STORAGE**: `projects/project-ideas.md` (managed with LRU-style ordering, max 10 active + archive)
-**UPDATE BEHAVIOR**: Hakim can add ideas anytime with "add project idea:" or casually mention new concepts
 
-**Trigger Commands**:
+**AUTO-TRIGGER PHRASES** (Automatically captured):
+```
+"I have a new idea" / "new idea" / "I just had an idea" / Similar variations
+→ AUTO-TRIGGER: Ask clarifying questions, capture full details, save to project-ideas.md
+```
+
+**DISPLAY COMMANDS** (Explicit request):
 ```
 "show ideas" → Load and display projects/project-ideas.md
 "project ideas" → Load and display projects/project-ideas.md
+```
+
+**MANUAL ADD COMMAND** (Alternative):
+```
 "add project idea: [concept]" → Parse, add to project-ideas.md, update LRU ordering
 ```
 
@@ -399,6 +407,7 @@
 - Idea #11 auto-archives to `projects/project-ideas-archived.md`
 - When project moves to active development, it shifts to active projects
 - Ideas marked "ONGOING" appear in both active projects AND ideas pipeline
+- **AUTO-CAPTURE**: Clarifying questions ask about use case, users, platform, workflow, & customization (as applicable)
 
 ---
 
