@@ -40,6 +40,7 @@
 |---------|------|-------|-----------|--------|
 | **Form with Loading State** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | React, Next.js | ✅ Active |
 | **Masonry Gallery Layout** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | CSS, React | ✅ Active |
+| **Tailwind Bento Grid Layout** | `frontend-ui/tailwind-bento-grid.md` | 2️⃣ Proven | Tailwind, React | ✅ Active |
 
 ---
 
