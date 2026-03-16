@@ -447,3 +447,10 @@
 *This relationship memory grows with every interaction, building deeper understanding of how to support Hakim most effectively*
 
 💜 *Ready to learn everything about what makes our partnership most valuable to you!*
+**REMINDER - Mar 16, 2026 (16:59 Malaysia Time)**:
+- 📋 **Deploy Wedding Wall to Vercel**: Production hosting (Due: March 17, 2026 - Tomorrow)
+  - Configure Supabase prod credentials
+  - Set AWS S3 environment variables
+  - Deploy main branch to Vercel
+  - Test uploads, proxy, guest flow
+  - Estimated time: 30-45 minutes
