@@ -465,3 +465,93 @@ Build Result: ✓ SUCCESS
 - Scope: Typography, spacing, layout across 5 files
 - Build verification: Successful
 - Production ready: Yes
+
+---
+
+## Gallery Wall UI Enhancement (March 16, 2026 - 09:48-[ongoing] Malaysia Time)
+
+### User Feedback: "Focus on the wall now"
+- Make the gallery header more friendly and welcoming
+- Colors were off (need warm orange/pink theme)
+- Improve overall gallery wall feel
+
+### Gallery Header Transformation:
+
+**Before:**
+- Plain white/gray header
+- Boring "Wedding Gallery" text
+- No connection to home page theme
+- Minimal visual appeal
+
+**After (Warm, Welcoming):**
+- Gradient background: from-orange-50 via-white to-pink-50
+- Gradient title: orange→pink→orange (matches theme)
+- Subtitle: "Celebrate every beautiful moment" (emotional connection)
+- Icon colors: Changed to orange-500 (cohesive)
+- Better spacing: py-6, generous padding
+- Warm border: border-orange-100 instead of gray-200
+- Backdrop: Better blur effect (backdrop-blur-md)
+- Hover states: Orange background (hover:bg-orange-100)
+
+### Photo Wall Enhancements:
+
+**1. Photo Counter Badge**
+```
+├─ Gradient circle icon (orange→pink)
+├─ "Beautiful Moments" label
+└─ Large bold number of photos
+```
+
+**2. Loading State**
+- Animated spinner (instead of plain text)
+- "Loading memories..." (more emotional)
+- Centered, better UX
+
+**3. Empty State**
+- Camera icon (visual cue)
+- "No photos yet. Be the first to upload!"
+- Helpful hint: "Click 'Upload Your Photo' above to share your moment"
+
+**4. Photo Cards Animation**
+- Staggered fade-in (each photo delayed by 0.1s)
+- Smoother hover effects
+- Scale-up on hover (hover:scale-105)
+- Better overlay animation (translate-y on hover)
+
+**5. Photo Card Improvements**
+- Overlay gradient: Better dark overlay (from-black/90)
+- Guest name: More prominent text-base
+- Date: Friendlier format (e.g., "Mar 16, 2026")
+- Orange date accent: text-orange-200
+- Subtle gradient on hover (orange/pink tint)
+- Smooth transition: duration-300/500
+
+**6. Details**
+- Better shadows: hover:shadow-warm-lg
+- Rounded corners: rounded-2xl
+- Scale effect on card: hover:scale-105
+- Pointer cursor: cursor-pointer
+
+### Design Philosophy:
+- **From:** Functional, boring gallery
+- **To:** Warm, celebratory, emotional photo wall
+- Colors: Match warm orange/pink theme from homepage
+- Spacing: Generous, breathing room
+- Animations: Smooth, not jarring
+- Typography: Better hierarchy with new fonts
+
+### Commit Details:
+- Commit: d1d8ffd
+- Files: 1 (gallery/page.tsx)
+- Lines added: 80
+- Lines removed: 42
+- Build: ✓ Passed (1220ms)
+
+### Result:
+Gallery wall now feels like a celebration of memories, not just a photo storage tool. Header colors match homepage, animations are smooth, and overall vibe is warm and welcoming.
+
+### Next Steps:
+- Continue with upload page improvements if needed
+- Test all interactive states
+- Ready for Vercel deployment (March 17)
+- Extract gallery pattern library item
