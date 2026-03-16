@@ -555,3 +555,43 @@ Gallery wall now feels like a celebration of memories, not just a photo storage 
 - Test all interactive states
 - Ready for Vercel deployment (March 17)
 - Extract gallery pattern library item
+
+---
+
+## EVENING SESSION WRAP-UP (March 16, 2026 - 18:35 Malaysia Time)
+
+### 🎨 Major UI Redesign Completed
+**Session Focus:** "Wedding Wall" UI Polish
+**Key Changes:**
+1.  **Typography Overhaul:** Switched from generic sans-serif to **Playfair Display** (headings) + **Poppins** (body) for a "Bold & Modern" wedding feel.
+2.  **Spacing & Layout:** Increased padding (py-32 hero), cleaner gaps, larger touch targets (h-14 inputs/buttons).
+3.  **Vibe Transformation:** From "Functional/Boring" → **"Warm, Cozy, Welcoming"**.
+4.  **Gallery Wall:**
+    *   **Glassmorphism Header:** Floating "Crystal White" capsule navbar (bg-white/90, border-2 white).
+    *   **Background:** Restored warm gradient (orange-50/white/pink-50) after brief "too gray" attempt.
+    *   **Animations:** Staggered fade-in for photos, smooth hover scaling.
+    *   **Details:** Oval/Pill shapes for buttons and badges.
+
+### 📝 User Preferences Learned (UI/UX)
+- **Likes:**
+    - "Glass-like" effects (clean, bright white, NOT muddy gray transparency).
+    - "Oval/Capsule" shapes for containers/buttons.
+    - "Warm & Cozy" color palettes (Orange/Pink gradients).
+    - "Bold" typography with character (Playfair/Poppins).
+- **Dislikes:**
+    - "Grayish" tints in glass effects (perceived as dirty/muddy).
+    - "All over the place" color schemes (prefers consistent warm theme).
+    - "Cramped" layouts (needs breathing room).
+
+### 📅 Next Session Plan (March 17, 2026)
+1.  **Deploy Wedding Wall to Vercel** (Priority #1).
+2.  **Verify UI on Production** (Check glass effects on mobile).
+3.  **Extract UI Patterns:**
+    - "Crystal Glass Navbar" pattern.
+    - "Masonry Gallery Wall" pattern.
+    - "Warm Wedding Theme" design system.
+
+### 💾 Session State Saved
+- **Wedding Wall:** Commited final UI polish (f5a9fc2).
+- **Memory Core:** Updated session logs and preferences.
+- **Timezone Check:** 18:35 Malaysia Time (Evening).

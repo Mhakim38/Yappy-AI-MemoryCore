@@ -117,6 +117,14 @@
 - [x] Laravel development and deployment
 - [x] WSL/Linux development environments (ONDW project located at ~/holeeshet/ONDEWEI-LARAVEL-HAKIM)
 
+### UI/UX & Design Preferences
+- **Aesthetic**: Warm & Cozy (Orange/Pink gradients, emotional vibes) > Cold/Minimalist.
+- **Glassmorphism**: Prefers "Crystal White Glass" (bg-white/90 + solid white border) over muddy/gray transparency.
+- **Shapes**: Loves "Oval/Capsule" (rounded-full) for buttons, badges, and containers.
+- **Typography**: "Bold & Characterful" (Playfair Display for headings, Poppins for body) > Generic sans-serif.
+- **Layout**: Generous spacing/breathing room > Cramped density.
+- **Cleanliness**: Dislikes gray tints in light mode; prefers pure white/translucent white.
+
 ### Token & Usage Management
 **Monthly Premium Request Monitoring**:
 - **Threshold Alert**: When monthly usage exceeds 50%
