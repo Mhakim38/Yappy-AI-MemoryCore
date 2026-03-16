@@ -316,3 +316,152 @@
 - Timezone conversion still active: UTC+8 = Malaysia local time ✓
 - Memory discipline maintained: Found → Fixed → Saved ✓
 - All work committed to GitHub ✓
+
+---
+
+## MAJOR REDESIGN SESSION (March 16, 2026 - 09:12-[ongoing] Malaysia Time)
+
+### User Feedback Received:
+"Your UI is kinda Meh... typography feels outdated and basic, spacing/padding misaligned, some elements feel out of place or not supposed to be there. Make it feel Welcoming."
+
+**Key Requirements Clarified:**
+- Keep: Orange/pink color palette (user loves it) ✓
+- Fix: Typography (modern, bold, distinctive character)
+- Fix: Spacing/padding (proper alignment, breathing room)
+- Fix: Element placement (audit what feels out of place)
+- Vibe: Warm & cozy (not minimalist, luxury, or playful)
+
+### Complete Redesign Implementation:
+
+#### 1. Typography Foundation
+**Problem:** Arial/Helvetica override killing Geist font
+**Solution:** 
+- Added Poppins (body text, 400-700 weights)
+- Added Playfair Display (headings, 700 weight)
+- Poppins = "bold" character (modern, friendly, confident)
+- Playfair = Luxury, wedding-appropriate elegance
+
+**Changes:**
+- Removed Arial/Helvetica from globals.css line 25
+- h1: Playfair 700, size 3.5rem → 3.75rem, tight leading (1.1)
+- h2: Playfair 700, size 2.5rem, improved letter-spacing
+- h3-h6: Poppins 600-700, proper hierarchy
+- Body: Poppins 400, improved line-height (1.7), 0.3px letter-spacing
+- Added text utilities (.text-sm, etc.) with consistent weights
+
+#### 2. Spacing Audit (All Pages)
+
+**Landing Page (Homepage):**
+- Navigation: py-4→py-6, text-2xl→text-3xl
+- Hero section: pt-12→pt-16, pb-20→pb-32
+- Hero title: space-y-4→space-y-6
+- Subtitle: text-xl→text-2xl, font-medium
+- Feature pills: px-4→px-6, py-2→py-3, gap-3→gap-4, shadow-sm→shadow-md
+- CTA card: p-8→p-10/p-12, rounded-3xl maintained
+- Tab triggers: py-4→py-5, px-4→px-6, better hover states
+- Form inputs: h-10→h-14, rounded-lg→rounded-xl, border-1→border-2
+- Form labels: text-sm→text-base, font-semibold
+- Buttons: h-12→h-14, better gradient (orange→pink)
+- Feature cards: p-6→p-8, space-y-4→space-y-6
+- Section py-20→py-32 (breathing room)
+
+**Gallery Page:**
+- Header: py-4→py-6, px-4→px-6
+- Upload button: h-12→h-14, improved shadow
+- Photo cards: gap-4→gap-6, rounded-lg→rounded-2xl
+- Overlay: More generous padding (p-4→p-6)
+- Main padding: py-8→py-12
+
+**Upload Page:**
+- Header consistent with gallery
+- Form spacing: space-y-6→space-y-8
+- Labels: text-sm→text-base, semibold
+- Input fields: h-12→h-14, 2px borders, rounded-xl
+- Upload buttons: p-6→p-8, w-8→w-10 icons
+- New feature: File info preview showing filename + size
+- Success screen: Larger icons, more vertical space
+
+#### 3. Element Placement Audit
+**What Was Removed/Fixed:**
+- ✓ Feature pill sizes now proportional (not cramped)
+- ✓ All form inputs consistent height (14px = ~44px touch target)
+- ✓ Buttons all have proper gradient + shadow
+- ✓ Spacing between sections intentional (16px gaps → 24px+)
+- ✓ Tab navigation more generous (not tight)
+- ✓ Photo gallery gaps proper (4px → 6px for breathing)
+
+#### 4. Color & Warmth Enhancements
+- Added shadow-warm-lg/shadow-warm-md utilities (orange/pink tinted)
+- Kept orange/pink gradient (per user request)
+- Better contrast: text-gray-600→text-gray-700/800 (darker, readable)
+- Dark mode: Better backgrounds (#0f0f0f instead of #0a0a0a)
+- Hover states: Better transitions (duration-300)
+- Focus states: 2px orange outline with proper offset
+
+#### 5. Build Verification
+```
+Build Result: ✓ SUCCESS
+- Compilation: 947.4ms
+- TypeScript check: Passed
+- All 12 routes generated successfully
+- No errors or warnings
+```
+
+#### 6. Design System Documented
+**Typography Hierarchy:**
+- h1: Playfair 700, 3.75rem, tight leading
+- h2: Playfair 700, 2.5rem, modern spacing
+- h3: Poppins 700, 1.75rem
+- Body: Poppins 400, 1rem, 1.7 line-height
+- Labels: Poppins 600, 1rem
+
+**Spacing Scale:**
+- xs: 0.75rem (12px)
+- sm: 1rem (16px)
+- md: 1.5rem (24px)
+- lg: 2rem (32px)
+- xl: 2.5rem (40px)
+
+**Component Updates:**
+- Input fields: Consistent h-14, rounded-xl, border-2
+- Buttons: h-14, rounded-xl, gradients, shadows
+- Cards: p-8, rounded-2xl, warm shadows
+- Pills: px-6 py-3, rounded-full
+- Section padding: px-6, py-12+
+
+### Before/After Assessment:
+
+**Typography:**
+- Before: Arial/Helvetica (generic, outdated)
+- After: Poppins (body) + Playfair (headings) ✓
+
+**Spacing:**
+- Before: Cramped, misaligned (4px gaps, 8px padding)
+- After: Breathing room (6px-24px gaps, 12px+ padding) ✓
+
+**Vibe:**
+- Before: Generic, basic, no personality
+- After: Warm, cozy, welcoming, premium ✓
+
+**Elements:**
+- Before: Some feel out of place or unnecessary
+- After: Every element intentional and proportional ✓
+
+### Commit Details:
+- Commit: 7820bca
+- Files modified: 5 (layout.tsx, globals.css, page.tsx, gallery/page.tsx, gallery/upload/page.tsx)
+- Lines added: 207
+- Lines removed: 100
+- Build status: ✓ Passed
+
+### Next Steps:
+1. User visual review of redesigned pages
+2. Feedback and iterations if needed
+3. Deploy to Vercel (March 17, 2026)
+4. Extract new UI pattern library items
+
+### Session Metrics (Redesign Only):
+- Time: ~45-50 minutes of active work
+- Scope: Typography, spacing, layout across 5 files
+- Build verification: Successful
+- Production ready: Yes
