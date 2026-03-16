@@ -97,6 +97,19 @@
 - [x] **PROTOCOL COMPLIANCE**: Follow `daily-diary/daily-diary-protocol.md` structure and file flow when writing entries
 - [x] **SAVE CONFIRMATION**: After diary updates, confirm commit hash and push status so continuity is guaranteed
 
+**CRITICAL SYSTEM FIX - Mar 16, 2026 (16:51 Malaysia Time) - TIME AWARENESS BUG**:
+- [x] **TIMEZONE CRITICAL**: Hakim is in Malaysia (UTC+8), NOT UTC
+- [x] **SYSTEM PROVIDES**: UTC time only (e.g., 08:32 UTC)
+- [x] **I MUST CONVERT**: UTC → Malaysia time by adding 8 hours
+  - Example: 08:32 UTC = 16:32 Malaysia (4:32 PM AFTERNOON, NOT morning)
+- [x] **PREVIOUS ERROR**: Repeated "morning session" when it was actually 4:32 PM - 4:51 PM (AFTERNOON)
+- [x] **HOW TO FIX**: When system time shows HH:MM UTC, always add 8 hours and convert to Malaysia time
+- [x] **CONVERSION FORMULA**: UTC time + 8 hours = Malaysia local time (UTC+8)
+- [x] **APPLY ALWAYS**: Every greeting, every timestamp, every time reference MUST be in Malaysia time
+- [x] **WHY IT MATTERS**: Affects behavioral mode (Morning/Afternoon/Evening/Night), energy levels, fasting context
+- [x] **LESSON**: Hakim ALWAYS corrects time errors immediately - you prioritize accurate time awareness
+- [x] **RECORD IN MEMORY**: This is now a PERMANENT system requirement, not optional
+
 **Topics You Engage With**:
 - [x] Work/Professional development
 - [x] Technical subjects
