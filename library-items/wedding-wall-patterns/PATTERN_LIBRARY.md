@@ -554,28 +554,6 @@ Tailwind works best when the "base" styles are minimal and unopinionated. Forcin
 
 ---
 
-### Pattern: Smooth Mobile Menu Transition (No Gap)
-
-**Problem**: 
-Mobile menus often appear suddenly ("pop") or have awkward gaps between the header and the list.
-
-**Solution**: 
-Use CSS transitions on `max-height` and `opacity` instead of conditional rendering. Tighten margins (`mt-2`) and padding (`pt-1`) to keep the menu visually connected to the header.
-
-**Implementation**:
-```tsx
-<div 
-  className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-    mobileMenuOpen 
-      ? 'max-h-96 opacity-100 mt-2 border-t border-gray-100 dark:border-white/10 pt-1' 
-      : 'max-h-0 opacity-0 mt-0 pt-0 border-transparent'
-  }`}
->
-  {/* Menu Items */}
-</div>
-```
-
----
 
 ### Pattern: Robust Clipboard Copy (PWA/Mobile Support)
 
@@ -758,21 +736,27 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* 3. Mobile Menu Dropdown */}
-          {mobileMenuOpen && (
-            <div className="md:hidden mt-4 pt-2 border-t border-gray-100 dark:border-white/10 animate-fade-in-up">
+          {/* 3. Mobile Menu Dropdown (Smooth Transition) */}
+          <div 
+            className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+              mobileMenuOpen 
+                ? 'max-h-96 opacity-100 mt-2 border-t border-gray-100 dark:border-white/10 pt-1' 
+                : 'max-h-0 opacity-0 mt-0 pt-0 border-transparent'
+            }`}
+          >
+            <div className="space-y-1">
               {navItems.map(item => (
                 <Link 
                   key={item.name}
                   href={item.href}
-                  className="block px-4 py-3 rounded-xl hover:bg-orange-50 dark:hover:bg-white/10"
+                  className="block px-4 py-3 rounded-xl hover:bg-orange-50 dark:hover:bg-white/10 transition-all duration-300"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.name}
                 </Link>
               ))}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </nav>
@@ -783,6 +767,7 @@ export default function Navbar() {
 **Key Features:**
 - ✅ **Glass Effect**: `backdrop-blur-xl` + semi-transparent `bg-white/60`.
 - ✅ **Scroll Awareness**: Shrinks padding and increases opacity on scroll.
+- ✅ **Smooth Mobile Transition**: Uses `max-height` and `opacity` to animate the menu open/closed instead of sudden DOM removal.
 - ✅ **Floating Pill Design**: Uses `rounded-3xl` and `margin` instead of full-width.
 - ✅ **Mobile Responsive**: Hides desktop menu, shows hamburger on mobile.
 

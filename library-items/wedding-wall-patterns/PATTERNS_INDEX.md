@@ -66,6 +66,24 @@
 - Works responsive
 - Clean, simple CSS
 
+### "Mobile menu transition is jumpy"
+→ **Pattern: Glassmorphic Responsive Navbar** (p. 20)
+- Includes **Smooth Mobile Menu Transition**
+- Animate `max-height` & `opacity`
+- No layout shifts or gaps
+
+### "Copy to clipboard fails on mobile/PWA"
+→ **Pattern: Robust Clipboard Copy** (p. 21)
+- Fallback for non-secure contexts
+- Uses `document.execCommand` hidden textarea
+- Essential for local testing/PWA
+
+### "Text colors look wrong/grey in light mode"
+→ **Pattern: Handling Global CSS Conflicts** (p. 22)
+- Global `p` tags in `globals.css` override Tailwind
+- Use explicit classes `text-gray-900`
+- Check `foreground` variable definitions
+
 ---
 
 ## 📊 Pattern Categories
@@ -78,7 +96,8 @@
 | **Real-time** | Polling | < 100 users |
 | **Database** | Expiry, On-Demand Creation | Session/Guest mgmt |
 | **S3 Organization** | Key Generation | File organization |
-| **UI/UX** | Forms, Galleries | User interaction |
+| **UI/UX** | Forms, Galleries, Navbar, CSS Fixes | User interaction |
+| **Integration** | Robust Clipboard | PWA/Mobile features |
 
 ---
 
