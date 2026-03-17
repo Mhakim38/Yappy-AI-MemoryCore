@@ -23,6 +23,23 @@ When user types **"save"**, AI immediately performs:
 4. **PRESERVE**: Create diary entry if significant conversation occurred
 5. **CONFIRM**: Tell user what was saved and where
 
+## ☁️ **Remote Synchronization Protocol**
+
+### **Memory Core (`Yappy-AI-MemoryCore`)**
+*   **Rule**: **Push to origin ASAP without permission.**
+*   **Reasoning**: This is the AI's own memory and operational logic. Keeping it synced ensures continuity across different environments and sessions.
+*   **Action**: After any commit to Memory Core, immediately run `git push origin main`.
+
+### **Project Repositories (e.g., `wedding-wall`)**
+*   **Rule**: **Require explicit user permission.**
+*   **Reasoning**: These are the user's creative works. The AI is a contributor, not the owner. Pushing to remote might trigger deployments or expose unfinished work.
+*   **Action**: 
+    1. Commit changes locally.
+    2. Ask: "Have you pushed to origin?" or wait for user instruction.
+    3. Only push when explicitly told (e.g., "save and push", "push to origin").
+
+---
+
 ## 📁 **File-Specific Auto-Save Rules**
 
 ### **identity-core.md Updates**
