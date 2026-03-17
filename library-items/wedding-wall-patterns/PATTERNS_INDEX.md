@@ -84,6 +84,12 @@
 - Use explicit classes `text-gray-900`
 - Check `foreground` variable definitions
 
+### "Web app feels like a website (zoomable)"
+→ **Pattern: Disable PWA Zoom** (p. 23)
+- Set `userScalable: false` in layout metadata
+- Creates "native app" static viewport
+- Essential for FAB/Fixed Navbar stability
+
 ---
 
 ## 📊 Pattern Categories

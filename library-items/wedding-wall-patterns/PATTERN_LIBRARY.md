@@ -881,3 +881,30 @@ app/auth/join/page.tsx        # Auto-join component
 **Last Updated**: March 16, 2026  
 **Source Project**: Wedding Wall  
 **Applicable To**: Any file-upload, gallery, or join-flow app
+
+### Pattern: Disable PWA Zoom (App-Like Feel)
+*Source: holeeMonth/APB_LandingPage/index.html*
+
+**Problem**: 
+Standard web pages allow pinch-to-zoom, which breaks the "native app" illusion of a PWA and can mess up fixed layouts like FABs or Navbars.
+
+**Solution**: 
+Lock the viewport scaling in `layout.tsx` metadata using the specific configuration verified in APB Landing Page.
+
+**Implementation**:
+```tsx
+// app/layout.tsx
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1.0,
+  maximumScale: 1.0,
+  userScalable: false,
+  // Optional: "cover" extends background to notch/home indicator areas
+  viewportFit: "cover", 
+};
+```
+
+**Why this works:**
+1.  `maximumScale: 1.0`: Hard limit on zooming in.
+2.  `userScalable: false`: Explicitly disables user gestures for zooming.
+3.  `initialScale: 1.0`: Sets the baseline zoom level.
