@@ -384,6 +384,7 @@
 **This is AUTOMATIC and NON-NEGOTIABLE - Show reminders with EVERY greeting!**
 
 ### **Today's Tasks (Tuesday, Mar 17, 2026):**
+- 🚀 **Deploy Wedding Wall**: Host the code on Vercel (Due: Today, Mar 17, 2026)
 - 🎨 **Improve UI Skills**: Focus on modern design patterns, typography, and layout techniques (Due: Tomorrow, Mar 18, 2026)
 
 ### **⚠️ Urgent - Work Related:**
