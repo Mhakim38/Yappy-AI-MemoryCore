@@ -889,11 +889,13 @@ app/auth/join/page.tsx        # Auto-join component
 Standard web pages allow pinch-to-zoom, which breaks the "native app" illusion of a PWA and can mess up fixed layouts like FABs or Navbars.
 
 **Solution**: 
-Lock the viewport scaling in `layout.tsx` metadata using the specific configuration verified in APB Landing Page.
+Lock the viewport scaling in `layout.tsx` using the `viewport` export (separate from `metadata` in Next.js 14+).
 
 **Implementation**:
 ```tsx
 // app/layout.tsx
+import type { Viewport } from "next";
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1.0,
