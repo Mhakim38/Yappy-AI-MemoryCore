@@ -306,6 +306,50 @@
 
 ---
 
+## 🎉 Entry 005 - Wedding Wall Final Polish & Deployment Prep
+
+**Date**: March 17, 2026
+**Time**: ~10:00 AM - Morning
+**AI Companion**: Yappy
+**User**: Hakim
+**Project**: Wedding Wall
+
+### 🎯 Main Topics Discussed
+
+#### 1. **Consolidated Navbar Patterns**
+- **Action**: Merged "Smooth Mobile Menu" and "Glassmorphic Navbar" into a single robust pattern in `PATTERN_LIBRARY.md`.
+- **Reasoning**: User pointed out fragmentation makes reuse harder. A single "Navbar" component should carry all its features (glass effect, mobile transition, responsive logic).
+- **Result**: `Glassmorphic Responsive Navbar` pattern now includes all best practices in one copy-paste block.
+
+#### 2. **Save Protocol Evolution** 🔐
+- **New Rule**: **Memory Core** = Auto-Push (ASAP). **Project Repos** = Require Permission.
+- **Trigger**: User explicitly clarified: "You dont need my permission [for memory]... But the Other project like the wedding wall, you need my permission."
+- **Implementation**: Updated `save-protocol.md` and immediately pushed Memory Core changes to `origin/main` while waiting on Wedding Wall.
+
+#### 3. **Deployment Strategy: Vercel** 🚀
+- **Decision**: Deploy Next.js frontend to Vercel.
+- **Data Strategy**: Connect to **existing** Supabase DB and AWS S3 bucket (Stateless deploy, Stateful services).
+- **Checklist Created**: Documented exact Environment Variables needed (`NEXT_PUBLIC_SUPABASE_URL`, `AWS_ACCESS_KEY_ID`, etc.) in project file.
+- **Verification**: User confirmed this approach avoids data migration and provides instant "live" state.
+
+#### 4. **Reminder System Correction** ⏰
+- **Issue**: I failed to account for Malaysia Time (UTC+8) when setting a reminder.
+- **Correction**: User caught the drift. Updated reminder for "Deploy Wedding Wall" to **10:00 PM Tonight (Malaysia Time)**.
+- **Learning**: Time context is critical. Default to user's "night" (10-11 PM) for personal tasks unless specified otherwise.
+
+### 💡 Key Insights & Learning
+- **Pattern Consolidation**: Don't atomize patterns too much. If features belong to one component (like a Navbar), keep them together for easier developer experience.
+- **Permission Boundaries**: Clear distinction between "My Brain" (Memory Core - Autonomous) and "Your Work" (Projects - Permission-based).
+- **Deployment Simplicity**: Reusing existing cloud resources (Supabase/S3) for Vercel deployment is a powerful "zero-migration" strategy.
+
+### 🔧 Memory Updates
+- [x] **save-protocol.md**: Added Git Push Protocol.
+- [x] **projects/coding-projects/active/Wedding-Wall.md**: Added Vercel deployment details.
+- [x] **relationship-memory.md**: Added "Deploy to Vercel" reminder (10:00 PM).
+- [x] **PATTERN_LIBRARY.md**: Consolidated Navbar patterns.
+
+---
+
 *Moved from Active Reminders*
 
 ### ONDEWEI & Project Tasks
