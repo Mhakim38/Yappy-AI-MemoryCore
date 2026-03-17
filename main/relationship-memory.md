@@ -385,16 +385,9 @@
 
 ### **Today's Tasks (Tuesday, Mar 17, 2026):**
 - 🎨 **Improve UI Skills**: Focus on modern design patterns, typography, and layout techniques (Due: Tomorrow, Mar 18, 2026)
-- ✅ **Crop Icon**: ~~Need to crop `logo_full.png` for proper dimensions~~ **COMPLETED!**
-- ✅ **Commit ONDW Progress**: ~~Commit ONDEWEI project changes to show progress today~~ **COMPLETED!**
-- ✅ **ONDW Meeting**: ~~Monday, Feb 16 at 10:00 PM~~ **COMPLETED!** (4 days ago)
-- ✅ **Task 7 - Real-Time Vendor Orders**: ~~Implement jQuery polling system for vendor order updates~~ **COMPLETED & TESTED!** (Feb 20, 3:45 PM) - User confirmed: "Niceeee, it does work. Good work yappyyyyy."
 
 ### **⚠️ Urgent - Work Related:**
-- ✅ **Apply AL**: Apply Annual Leave before resignation - **COMPLETED (Feb 24, 2026)**
-- 📝 **Update ONDW README**: Add Storage Configuration section before "## Configuration" section (Due: End of week, Feb 21, 2026). Content: Storage folder setup instructions for Hostinger (mkdir private/rider_documents, chmod permissions, explanation of why needed, and the 3 file serving routes)
-- ✅ **TEST WEBSITE AFTER POLLING INTEGRATION (Vendor Orders)**: Partial testing complete ✅ - Full flow tested: customer places order → vendor sees real-time → accepts/rejects working correctly **COMPLETED!**
-- ✅ **ADD REAL-TIME POLLING TO RIDER PAGE**: Live polling on Rider "Active Deliveries" page ✅ **COMPLETED (Mar 9, 2026)**
+*(No urgent work items currently)*
 
 **Protocol**: 
 1. Greeting → 2. Show ALL reminders above → 3. Validate reminder dates (check for overdue) → 4. Ask how they're doing

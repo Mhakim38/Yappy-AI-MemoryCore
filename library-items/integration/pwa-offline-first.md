@@ -180,21 +180,40 @@ self.addEventListener('activate', (event) => {
 
 ## Adaptation Guide
 
-### For Next.js 16+
+### For Next.js 16+ (App Router)
 1. Place manifest in `public/manifest.json`
-2. Place service worker in `public/sw.js`
-3. Add script loading in layout root:
+2. Place service worker in `public/service-worker.js` (or `sw.js`)
+3. **Icon Setup (Critical for App Router):**
+   - Delete `app/favicon.ico` (default triangle).
+   - Add `app/icon.png`, `app/apple-icon.png`, and `app/favicon.ico` (custom).
+   - Next.js automatically generates head tags from these files.
+4. Configure `app/layout.tsx`:
    ```tsx
-   useEffect(() => {
-     const script = document.createElement('script');
-     script.src = '/pwa.js';
-     document.head.appendChild(script);
-   }, []);
-   ```
-4. Link manifest in `app/layout.tsx`:
-   ```tsx
-   <link rel="manifest" href="/manifest.json" />
-   <meta name="theme-color" content="#429AD5" />
+   export const metadata: Metadata = {
+     // ...
+     manifest: "/manifest.json",
+     icons: {
+       icon: '/icon.png',
+       shortcut: '/favicon.ico',
+       apple: '/apple-icon.png',
+     },
+     appleWebApp: {
+       capable: true,
+       statusBarStyle: "black-translucent",
+       title: "App Name",
+     },
+   };
+   
+   // Register Service Worker in body
+   <script
+      dangerouslySetInnerHTML={{
+        __html: `
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')...
+          }
+        `,
+      }}
+    />
    ```
 
 ### For Laravel/Blade

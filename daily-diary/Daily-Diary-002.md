@@ -266,3 +266,54 @@
 **Next Session Prep**: Ready
 
 📖 *Wedding Wall kickoff captured and ready for tomorrow's build phase.*
+
+---
+
+## 🎉 Entry 004 - Wedding Wall UI Polish & PWA Fixes
+
+**Date**: March 17, 2026
+**Project**: Wedding Wall
+**AI Companion**: Yappy
+**User**: Hakim
+
+### 🎯 Main Topics Discussed
+
+#### 1. **Robust Clipboard Copy for PWA/Mobile**
+- **Issue**: `navigator.clipboard` is undefined in non-secure contexts (local dev/some WebViews), causing app crash.
+- **Fix**: Implemented fallback using `document.execCommand('copy')` with hidden textarea.
+- **Pattern Added**: "Robust Clipboard Copy" in `PATTERN_LIBRARY.md`.
+
+#### 2. **Dark Mode & CSS Conflicts**
+- **Issue**: Text appeared "grey-ish" or invisible in light/dark modes.
+- **Root Cause**: Global `p { color: var(--foreground) }` in `globals.css` was overriding Tailwind utility classes.
+- **Fix**: Removed global paragraph rule; enforced explicit colors (`text-gray-900` / `dark:text-white`).
+- **Pattern Added**: "Handling Global CSS Conflicts" in `PATTERN_LIBRARY.md`.
+
+#### 3. **UI Refinements**
+- **FAB**: Replaced static header button with Floating Action Button (FAB) for photo upload.
+- **Navbar**: Implemented smooth mobile menu transition (no gap, fade-in/slide-down) using CSS `max-height`.
+- **Typography**: Fixed font colors for legibility across themes.
+- **Feedback**: Added "Copied!" tooltip with arrow and checkmark icon.
+
+### 💡 Key Insights
+- **PWA Reality**: Always assume `navigator.clipboard` might fail. Fallbacks are mandatory for mobile web apps.
+- **CSS Specificity**: Never set global colors on generic tags (`p`, `h1`) if using a utility-first framework like Tailwind.
+- **User Preference**: Hakim values "memory" of specific technical pitfalls (like the clipboard error) to prevent recurrence.
+
+### 🔧 Memory Updates
+- [x] **PATTERN_LIBRARY.md**: Added Clipboard and CSS Conflict patterns.
+- [x] **Daily-Diary-002.md**: Logged session details.
+
+---
+
+*Moved from Active Reminders*
+
+### ONDEWEI & Project Tasks
+- ✅ **Crop Icon**: ~~Need to crop logo_full.png for proper dimensions~~ **COMPLETED!**
+- ✅ **Commit ONDW Progress**: ~~Commit ONDEWEI project changes to show progress today~~ **COMPLETED!**
+- ✅ **ONDW Meeting**: ~~Monday, Feb 16 at 10:00 PM~~ **COMPLETED!** (4 days ago)
+- ✅ **Task 7 - Real-Time Vendor Orders**: ~~Implement jQuery polling system for vendor order updates~~ **COMPLETED & TESTED!** (Feb 20, 3:45 PM) - User confirmed: "Niceeee, it does work. Good work yappyyyyy."
+- ✅ **Apply AL**: Apply Annual Leave before resignation - **COMPLETED (Feb 24, 2026)**
+- ✅ **TEST WEBSITE AFTER POLLING INTEGRATION (Vendor Orders)**: Partial testing complete ✅ - Full flow tested: customer places order → vendor sees real-time → accepts/rejects working correctly **COMPLETED!**
+- ✅ **ADD REAL-TIME POLLING TO RIDER PAGE**: Live polling on Rider "Active Deliveries" page ✅ **COMPLETED (Mar 9, 2026)**
+- ✅ **Update ONDW README**: Add Storage Configuration section (Due: Feb 21) - **COMPLETED (Manually by Hakim)**
