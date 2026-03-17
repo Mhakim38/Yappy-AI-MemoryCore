@@ -910,3 +910,80 @@ export const viewport: Viewport = {
 1.  `maximumScale: 1.0`: Hard limit on zooming in.
 2.  `userScalable: false`: Explicitly disables user gestures for zooming.
 3.  `initialScale: 1.0`: Sets the baseline zoom level.
+
+---
+
+### Pattern: Modern Landing Page Typography (Mobile-First)
+
+**Problem**: 
+Large titles that look great on desktop often break or overwhelm mobile screens, while simple responsive scaling doesn't always provide the right hierarchy.
+
+**Solution**: 
+Use a drastic size difference between mobile and desktop, and enforce specific line breaks for visual impact.
+
+**Implementation**:
+```tsx
+<h1 className="text-5xl sm:text-7xl md:text-8xl font-bold">
+  Capture Every
+  {/* Force 2-line layout on mobile, let flow on desktop */}
+  <span className="block sm:inline mt-2">Beautiful Moment</span>
+</h1>
+```
+
+**Key Principles:**
+1.  **Drastic Scaling**: `text-5xl` (mobile) to `text-8xl` (desktop) is a 3-step jump, not just 1.
+2.  **Forced Line Breaks**: Use `block` on mobile spans to control the "shape" of the text, then `sm:inline` to let it flow naturally on wider screens.
+3.  **Subtitle Contrast**: Reduce subtitle size significantly (`text-sm` on mobile vs `text-2xl` on desktop) to keep the focus entirely on the massive headline.
+
+---
+
+### Pattern: Symmetrical Vertical Rhythm
+
+**Problem**: 
+Uneven top and bottom padding (`pt-32 pb-10`) often makes sections feel "top-heavy" or misaligned, especially when content length varies.
+
+**Solution**: 
+Use symmetrical vertical padding (`py`) calculated as the average of previous unequal values to center content visually within the whitespace.
+
+**Implementation**:
+```tsx
+// Instead of pt-32 pb-12
+<div className="py-14 sm:py-24">
+  {/* Content centers itself vertically within the 
+      symmetrical whitespace cushion */}
+</div>
+```
+
+**Why**:
+*   **Balance**: The eye perceives the content as "floating" in the center of the section.
+*   **Predictability**: Sections stack more cleanly when they share consistent vertical rhythm.
+
+---
+
+### Pattern: Integrated Hero CTA
+
+**Problem**: 
+Separating the "Call to Action" (CTA) into its own section below the hero fold adds friction. Users have to scroll to find the "Join" button.
+
+**Solution**: 
+Embed the CTA card directly *inside* the Hero section, immediately following the value proposition.
+
+**Structure**:
+```tsx
+<HeroSection>
+  <Headline />
+  <Subtitle />
+  
+  {/* CTA Card embedded here, not in a separate section */}
+  <div className="relative z-20 -mt-8">
+    <JoinCard />
+  </div>
+  
+  <FeaturePills /> {/* Moved below CTA */}
+</HeroSection>
+```
+
+**Pros**:
+*   **Immediate Action**: The primary goal (Joining) is visible without scrolling.
+*   **Visual Flow**: Read Title -> Read Subtitle -> Act (Join).
+*   **Mobile Friendly**: On tall mobile screens, the input field is often right at thumb-reach height.
