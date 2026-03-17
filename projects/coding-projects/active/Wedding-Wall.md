@@ -70,6 +70,18 @@ Wedding-Wall/
 
 ## Hosting Decision
 
+### Selected Strategy: Vercel + Supabase + S3
+We have chosen **Vercel** for hosting the Next.js frontend and API routes.
+- **Database**: Connects to the existing **Supabase** instance (same data as dev).
+- **Storage**: Connects to the existing **AWS S3** bucket (same files as dev).
+- **Environment Variables**:
+  - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+  - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_S3_BUCKET`
+  - `NEXT_PUBLIC_APP_NAME`, `NEXT_PUBLIC_APP_DESCRIPTION`
+
+### Architecture Note
+Deploying to Vercel does **not** create a new database. It connects to the *same* live production database used in development. Deleting data on the deployed site deletes it from the shared database.
+
 ### Option A: Hostinger
 - **Pros**: Lower cost, familiar environment
 - **Cons**: Can be limiting for modern Node full-stack apps and background workers
