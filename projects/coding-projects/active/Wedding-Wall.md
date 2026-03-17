@@ -129,9 +129,10 @@ Deploying to Vercel does **not** create a new database. It connects to the *same
 - [x] Draft initial database schema for users, events, and photos
 - [x] Scaffold Next.js app with auth, Prisma, and upload API
 - [x] Create end-to-end flow (events, uploads, gallery)
-- [ ] Fix remaining bugs and UI refinements
+- [x] Fix remaining bugs and UI refinements (Dark mode, Mobile menu, PWA clipboard)
 - [ ] Complete testing coverage
-- [ ] Finalize deployment (Supabase + hosting target)
+- [x] Finalize deployment strategy (Vercel + Supabase + S3)
+- [ ] Execute Vercel deployment
 
 ## Known Issues
 - None yet
