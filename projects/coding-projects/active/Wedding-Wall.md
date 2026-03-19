@@ -117,6 +117,12 @@ Deploying to Vercel does **not** create a new database. It connects to the *same
 - ✅ Route restructuring and error handling improvements
 - **Last commit**: "Fix: Remove route groups and restructure to correct URLs" (Mar 10, 23:00)
 
+### March 19, 2026
+- ✅ **Landing Page Redesign**: Complete UI refresh with new typography and integrated hero CTA.
+- ✅ **Production Fixes**: Resolved Vercel DB connection issues using `directUrl`.
+- ✅ **Diagnostics**: Added health check endpoint.
+- **Current Focus**: Verifying production deployment.
+
 ## Code Standards
 - **Style Guide**: ESLint configured
 - **Testing**: [In progress]
@@ -146,6 +152,9 @@ Deploying to Vercel does **not** create a new database. It connects to the *same
 *Space for working notes during active sessions*
 
 ## Memory Patterns
+- **Supabase + Vercel**: Use `directUrl` (port 5432) for Prisma migrations and `DATABASE_URL` (port 6543) for the running app to avoid connection exhaustion in serverless environments.
+- **Responsive Typography**: Use explicit class switching (e.g., `block sm:inline`, `text-5xl sm:text-8xl`) instead of just fluid sizing for better control over text shapes on different devices.
+
 - Error solutions discovered
 - Performance optimizations
 - Architecture decisions
