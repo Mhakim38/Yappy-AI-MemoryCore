@@ -593,3 +593,42 @@ Skip if:
 - ❌ Running on-premise servers
 - ❌ No real-time needs
 - ❌ Working in language without Prisma support
+
+---
+
+## ⚡ Critical: Connection Pooling (PgBouncer) for Vercel/Serverless
+
+**Problem**: 
+Serverless environments (like Vercel) create many short-lived connections. Prisma's default "Prepared Statements" feature fails when connections are swapped rapidly by Supabase's Transaction Pooler (Port 6543), causing errors like:
+> `Error: prepared statement "s1" already exists`
+
+**The Fix Pattern**:
+1. **Use Pooling Port**: Connect to port `6543` (Transaction Pool), NOT `5432` (Session/Direct).
+2. **Disable Prepared Statements**: Add `?pgbouncer=true` to the connection string.
+3. **Separate Migration URL**: Use the Direct Port (`5432`) for migrations (Shadow Database) because migrations *require* session features.
+
+### Configuration
+
+**1. Update `.env` (Production/Vercel):**
+```env
+# DATABASE_URL = Transaction Pool (6543) + pgbouncer=true
+DATABASE_URL="postgresql://postgres:[PWD]@db.[PROJECT].supabase.co:6543/postgres?pgbouncer=true"
+
+# DIRECT_URL = Direct Connection (5432) for migrations
+DIRECT_URL="postgresql://postgres:[PWD]@db.[PROJECT].supabase.co:5432/postgres"
+```
+
+**2. Update `prisma/schema.prisma`:**
+```prisma
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+```
+
+**Why this works**:
+- `pgbouncer=true` forces Prisma to send full query strings instead of prepared statements.
+- `directUrl` allows Prisma CLI to bypass the pooler when running `prisma migrate deploy` (which needs lock/admin access).
+
+**Verified**: March 19, 2026 (Wedding Wall Production Fix)
