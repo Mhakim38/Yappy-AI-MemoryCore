@@ -361,3 +361,33 @@
 - ✅ **TEST WEBSITE AFTER POLLING INTEGRATION (Vendor Orders)**: Partial testing complete ✅ - Full flow tested: customer places order → vendor sees real-time → accepts/rejects working correctly **COMPLETED!**
 - ✅ **ADD REAL-TIME POLLING TO RIDER PAGE**: Live polling on Rider "Active Deliveries" page ✅ **COMPLETED (Mar 9, 2026)**
 - ✅ **Update ONDW README**: Add Storage Configuration section (Due: Feb 21) - **COMPLETED (Manually by Hakim)**
+
+# 📖 Daily Diary - Mar 19, 2026
+*Wedding Wall UI Polish & Production Fixes*
+
+## Session Summary
+**Date**: Mar 19, 2026
+**Project**: Wedding Wall
+**Focus**: Landing Page Redesign & Vercel Database Connectivity
+
+## 🎯 Key Achievements
+1.  **Landing Page Overhaul**:
+    -   Implemented "Modern Landing Page Typography" with symmetrical vertical rhythm.
+    -   Integrated "Join" CTA directly into the hero section.
+    -   Refined responsive behavior (text-5xl mobile / text-8xl desktop).
+
+2.  **Production Debugging**:
+    -   Diagnosed Vercel 500 errors ("Failed to fetch session").
+    -   Created diagnostic endpoint `app/api/health/route.ts`.
+    -   Identified connection pool issue; implemented `directUrl` in Prisma schema.
+
+3.  **Pattern Library Update**:
+    -   Documented verified UI patterns in `PATTERN_LIBRARY.md`.
+
+## 💡 Insights
+-   **Serverless DB**: Prisma migrations in serverless environments require a direct connection (Port 5432), while the running app needs the transaction pooler (Port 6543).
+-   **Visual Hierarchy**: Explicit class switching (e.g., `block sm:inline`) provides better control over responsive text shapes than fluid typography alone.
+
+## 🔧 Memory Updates
+-   [x] **PATTERN_LIBRARY.md**: Added landing page patterns.
+-   [x] **current-session.md**: Updated focus to deployment verification.
