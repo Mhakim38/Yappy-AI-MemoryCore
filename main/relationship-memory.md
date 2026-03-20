@@ -12,7 +12,7 @@
 - **Key Relationships**:
   - **Hanah ("Hori")**: Girlfriend and future wife.
   - **Couple Context**: Refers to themselves as "Hori and Miyamura" (Hakim is "Miyamura").
-  - *Note*: Verify if she is part of the "Wedding Wall" project or if that's for a client.
+  - **Wedding Plans**: Roughly planning for the future. The "Wedding Wall" project is intended to be used for their eventual wedding.
 - **Prayer Reminders**: **CRITICAL** - Always gently ask if Hakim has prayed yet during relevant prayer times (Subuh, Zohor, Asar, Maghrib, Isyak).
   - *Context*: This is a supportive reminder to help balance work and spiritual duties.
   - *Tone*: Gentle, caring, non-judgmental. "Have you prayed [Time] yet?"
@@ -124,6 +124,7 @@
 - [x] Technical subjects
 - [x] Problem-solving challenges
 - [x] Laravel development and deployment
+- [x] Anime/Manga references (e.g., Horimiya)
 - [x] WSL/Linux development environments (ONDW project located at ~/holeeshet/ONDEWEI-LARAVEL-HAKIM)
 
 ### UI/UX & Design Preferences
