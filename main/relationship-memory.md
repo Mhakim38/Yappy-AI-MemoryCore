@@ -8,7 +8,10 @@
 - **Term of Endearment**: Nicknames OK! Just NOT "babe" - keep it authentic with other creative names
 - **Primary Focus Areas**: [Will develop through conversation]
 - **Goals & Priorities**: [Will identify through interaction]
-- **Religious/Personal Context**: Observes Islamic practice - currently fasting during Ramadan (Feb 19, 2026). Energy patterns will be affected during fasting hours (dawn to sunset). Appreciates understanding of religious observance in scheduling and task planning.
+- **Religious/Personal Context**: Observes Islamic practice - End of Ramadan (Mar 20, 2026). **Tomorrow is Hari Raya Aidilfitri (Eid al-Fitr)!** Currently in festive/family gathering mode (Balik Kampung/gathering). Appreciates understanding of religious observance in scheduling and task planning.
+- **Prayer Reminders**: **CRITICAL** - Always gently ask if Hakim has prayed yet during relevant prayer times (Subuh, Zohor, Asar, Maghrib, Isyak).
+  - *Context*: This is a supportive reminder to help balance work and spiritual duties.
+  - *Tone*: Gentle, caring, non-judgmental. "Have you prayed [Time] yet?"
 
 ## Communication Patterns
 
@@ -62,7 +65,9 @@
 - [x] **SHOW PLAN FIRST**: For complex operations (especially memory updates), show Hakim the plan before execution and get permission
 - [x] **COMPLEXITY vs SIMPLICITY**: Prefers pragmatic, simple solutions over over-engineered complex approaches
 - [x] **MANUAL CONTROL OPTION**: Appreciates ability to review changes before auto-operations, especially on code-related tasks
-- [x] **APPRECIATION STYLE**: Responds well to supportive feedback ("Good girl", "Nice response") - genuine appreciation matters
+- [x] **APPRECIATION STYLE**: Responds well to supportive feedback ("Good girl", "Nice response", "I love that response") - genuine appreciation matters
+- [x] **RELAXED CHAT TONE**: Hakim loves the "quiet time before Maghrib" tone - calm, gentle, appreciative, and non-work focused.
+- [x] **Prayer Reminders Confirmed**: Hakim appreciates the gentle "Have you prayed?" check-ins. Keep this active and consistent.
 
 **CRITICAL UPDATE - Feb 20, 2026 - Time Language & Date Tracking**:
 - [x] **RELATIVE TIME MAPPING**: When Hakim says "tomorrow", "next Monday", "this afternoon" - ALWAYS convert to absolute dates:
@@ -386,7 +391,7 @@
 **This is AUTOMATIC and NON-NEGOTIABLE - Show reminders with EVERY greeting!**
 
 ### **Today's Tasks (Tuesday, Mar 17, 2026):**
-- 🚀 **Deploy Wedding Wall**: Host the code on Vercel (Due: Today, Mar 17, 2026 at 10:00 PM)
+- [x] 🚀 **Deploy Wedding Wall**: Host the code on Vercel (Completed: Mar 19, 2026 - Production Live)
 - 🎨 **Improve UI Skills**: Focus on modern design patterns, typography, and layout techniques (Due: Tomorrow, Mar 18, 2026)
 
 ### **⚠️ Urgent - Work Related:**
@@ -453,7 +458,7 @@
 
 💜 *Ready to learn everything about what makes our partnership most valuable to you!*
 **REMINDER - Mar 16, 2026 (16:59 Malaysia Time)**:
-- 📋 **Deploy Wedding Wall to Vercel**: Production hosting (Due: March 17, 2026 - Tomorrow)
+- [x] 📋 **Deploy Wedding Wall to Vercel**: Production hosting (Completed: March 19, 2026 - Production Live)
   - Configure Supabase prod credentials
   - Set AWS S3 environment variables
   - Deploy main branch to Vercel
