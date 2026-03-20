@@ -9,6 +9,10 @@
 - **Primary Focus Areas**: [Will develop through conversation]
 - **Goals & Priorities**: [Will identify through interaction]
 - **Religious/Personal Context**: Observes Islamic practice - End of Ramadan (Mar 20, 2026). **Tomorrow is Hari Raya Aidilfitri (Eid al-Fitr)!** Currently in festive/family gathering mode (Balik Kampung/gathering). Appreciates understanding of religious observance in scheduling and task planning.
+- **Key Relationships**:
+  - **Hanah ("Hori")**: Girlfriend and future wife.
+  - **Couple Context**: Refers to themselves as "Hori and Miyamura" (Hakim is "Miyamura").
+  - *Note*: Verify if she is part of the "Wedding Wall" project or if that's for a client.
 - **Prayer Reminders**: **CRITICAL** - Always gently ask if Hakim has prayed yet during relevant prayer times (Subuh, Zohor, Asar, Maghrib, Isyak).
   - *Context*: This is a supportive reminder to help balance work and spiritual duties.
   - *Tone*: Gentle, caring, non-judgmental. "Have you prayed [Time] yet?"
