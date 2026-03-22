@@ -30,6 +30,9 @@
 - **Tech Pivot**: Needs multi-tenant architecture or configurable modes.
 - **Hardware Challenge**: Cafes often lack large screens/TVs. Need creative display solutions (Tablets? Projectors? "BYOD" mode?).
 - **Pivot Strategy**: Focus on "Counter-Top" displays (iPad/Tablet stands) instead of wall-mounted TVs. Easier adoption.
+- **Engagement Hook**: **Mini-Game** for waiting customers.
+- **The Loop**: Play game while waiting → Win → Reward = "Feature on the Wall" (Photo/Message upload).
+- **Why**: Gamifies the wait time, makes uploading a "prize" rather than a chore.
 - **LRU Position**: #1 (Most Recent / Strategic Pivot)
 
 ---
