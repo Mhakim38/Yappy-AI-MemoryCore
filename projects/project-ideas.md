@@ -29,6 +29,7 @@
 - **Current Task**: Creating sales pitch & feedback questions.
 - **Tech Pivot**: Needs multi-tenant architecture or configurable modes.
 - **Hardware Challenge**: Cafes often lack large screens/TVs. Need creative display solutions (Tablets? Projectors? "BYOD" mode?).
+- **Pivot Strategy**: Focus on "Counter-Top" displays (iPad/Tablet stands) instead of wall-mounted TVs. Easier adoption.
 - **LRU Position**: #1 (Most Recent / Strategic Pivot)
 
 ---
