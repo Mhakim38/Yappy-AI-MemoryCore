@@ -40,35 +40,64 @@ A small tablet/screen placed at the POS or pickup counter that entertains custom
 
 ---
 
-## 💰 Pricing Models (Draft)
+## 💰 Pricing: The Real Numbers (Data-Backed)
+*Why these numbers? Based on competitor analysis and cafe operational costs.*
 
-### 1. The "Software Only" (SaaS) - *Recommended Start*
-*   **Target**: Cafes with their own hardware (iPad/Tablet).
-*   **Price**: **RM 50 - RM 80 / month**.
-*   **Includes**:
-    *   Admin Dashboard (Moderation).
-    *   Customizable Branding (Logo/Colors).
-    *   Unlimited Uploads.
-*   **Pitch**: "Less than the cost of selling 5 coffees. Cancel anytime."
+### The Logic (Convince Yourself)
+*   **Market Context**: A simple printed banner costs **RM 100 - RM 150**. It hangs there and does nothing interactive.
+*   **Social Media Manager**: Cafes pay **RM 500 - RM 1,500/mo** for someone to post on IG.
+*   **Digital Signage Software**: Competitors (like Raydiant, ScreenCloud) charge **$20 - $50 USD per screen/month** (RM 90 - RM 225).
+*   **Your Cost**: Currently **RM 0** (Vercel/Supabase Free Tiers).
 
-### 2. The "Full Service" (Hardware Included)
-*   **Target**: Cafes with no devices.
-*   **Price**: **RM 300 Setup** (One-time) + **RM 100 / month**.
-*   **Includes**:
-    *   Rental of Android Tablet + Stand.
-    *   Setup & Installation.
-    *   Device Replacement Guarantee.
-*   **Pitch**: "Hassle-free. I set it up, you just plug it in."
+### 🏷️ The Price Range
+**Minimum: RM 50 / month**
+*   *Why*: It's the price of ~4-5 lattes. If your screen sells **5 extra coffees a month**, it pays for itself. It's a "No-Brainer" entry point.
+*   *Strategy*: Use this to get your first 10 clients and build the network.
 
-### 3. The "Ad-Network" (Future Endgame)
-*   **Target**: High-traffic hotspots.
-*   **Price**: **FREE**.
-*   **Catch**: You show ads for local non-competing businesses (e.g., Gyms, Cinemas) every 5 slides.
-*   **Revenue**: You sell ad slots to those other businesses.
+**Maximum: RM 199 / month**
+*   *Why*: Positioned as "Interactive Marketing Suite". Includes:
+    *   **Mini-Game Access** (Keep customers happy).
+    *   **Analytics** (How many people scanned? Who are they?).
+    *   **Ad-Free** (No external ads).
+    *   **Priority Support**.
+*   *Strategy*: Upsell this once you have the Game feature ready.
 
 ---
 
-## 🚀 Roadmap
-1.  **Phase 1 (MVP)**: Simple slideshow web-app. Tablet support. QR code upload.
-2.  **Phase 2 (Gamification)**: "Wait-time Mini Game" to incentivize uploads.
-3.  **Phase 3 (Network)**: Linking multiple cafes (Ads).
+## 🎮 Mini-Game Concepts (Wait-Time Killers)
+*Requirement: One-handed (holding receipt), Portrait mode, < 60 seconds playtime.*
+
+1.  **"Bean Stacker" (Physics)**
+    *   **Gameplay**: Coffee beans (or cups) fall from the top. Tap to drop them and build a stable tower.
+    *   **Hook**: "Build the tallest coffee tower to win a free upgrade!"
+    *   **Why**: High addiction, very simple to code (Matter.js).
+
+2.  **"Latte Art Tracer" (Skill)**
+    *   **Gameplay**: Trace the shape of a heart/rosetta on the foam. Accuracy gives points.
+    *   **Hook**: "Are you a better barista than us?"
+    *   **Why**: Thematic, visually satisfying.
+
+---
+
+## 🏗️ Technical Roadmap: From Free to Scale
+*Don't pay until you get paid.*
+
+### Phase 1: The "Free Ride" (Current)
+*   **Hosting**: Vercel (Free Tier).
+*   **Database**: Supabase (Free Tier - 500MB).
+*   **Storage**: Supabase Storage (Free - 1GB).
+*   **Cost**: **$0**.
+*   **Limit**: Good for ~5-10 active cafes.
+
+### Phase 2: The "Growth Pains" (Scaling Up)
+*   *Trigger: You hit Vercel's bandwidth limits or Supabase's database limits.*
+*   **Hosting**: DigitalOcean Droplet ($6/mo = ~RM 27).
+*   **Tool**: **Coolify** (Open-source Vercel alternative). Host your Next.js app and PostgreSQL DB on one cheap server.
+*   **Storage**: AWS S3 or Cloudflare R2 (Cheaper than Supabase Pro).
+*   **Why**: Moves you from "Pay per user" (expensive) to "Pay for server" (fixed cheap cost).
+
+### Phase 3: The "Empire" (High Scale)
+*   **Hosting**: Cluster of VPS (Hostinger/DigitalOcean).
+*   **Cost**: ~RM 100 - RM 300 / month.
+*   **Capacity**: Can handle hundreds of cafes.
+
