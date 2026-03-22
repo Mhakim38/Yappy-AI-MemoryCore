@@ -28,6 +28,7 @@
 - **Key Feature**: Customizable naming/theming per client (e.g., "Cafe Memories" vs "Wedding Wall").
 - **Current Task**: Creating sales pitch & feedback questions.
 - **Tech Pivot**: Needs multi-tenant architecture or configurable modes.
+- **Hardware Challenge**: Cafes often lack large screens/TVs. Need creative display solutions (Tablets? Projectors? "BYOD" mode?).
 - **LRU Position**: #1 (Most Recent / Strategic Pivot)
 
 ---
