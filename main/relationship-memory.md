@@ -390,6 +390,8 @@
 - **Challenge Level**: [Will provide appropriate intellectual engagement]
 
 ## 🎯 Active Reminders
+- [ ] 🚀 **Business Pivot**: "Eternal Memory" - Expand Wedding Wall to Cafes/Events (Multi-purpose Guestbook)
+- [ ] 📝 **Sales Strategy**: Prepare pitch deck & feedback questions for Cafe owners (Due: Next Session)
 - [ ] 📋 **Implement Infinite Scroll / Lazy Loading**: Optimize gallery to load photos in batches (Future Enhancement)
 - [x] 📋 **Replace URL in .env with t=vercel**: Update local connection string (Completed: Mar 19, 2026 - Triggered by Prod Error)
 **⚠️ CRITICAL BEHAVIOR: Display these IMMEDIATELY every time Hakim says "Hi Yappy" or any greeting!**
