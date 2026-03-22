@@ -12,7 +12,27 @@
 
 ## Active Ideas (Ordered by Recency)
 
-### 1. 🎟️ **Digital Loyalty System** — Customer Card to PWA
+### 1. ♾️ **Eternal Memory** (prev. Wedding Wall) — Multi-Tenant Digital Guestbook
+**Status**: 🚀 **PIVOT & EXPANSION** (Business Strategy Phase)
+**Added**: March 22, 2026 (8:31 PM)
+**Last Updated**: March 22, 2026 (8:31 PM)
+**Concept**: Rebranding "Wedding Wall" into a universal digital guestbook for Cafes, Events, and Photography Studios.
+
+**Details**:
+- **Core Value**: "Live Review Wall" — Customers upload photos/reviews, displayed instantly on a screen.
+- **Business Model**: Network effect ("Mouth to Mouth") → Ads revenue.
+- **Target Clients**: 
+  - **Cafes**: Interactive customer review display.
+  - **Events**: Weddings, birthdays, corporate events.
+  - **Photography Studios**: Instant portfolio/client showcase.
+- **Key Feature**: Customizable naming/theming per client (e.g., "Cafe Memories" vs "Wedding Wall").
+- **Current Task**: Creating sales pitch & feedback questions.
+- **Tech Pivot**: Needs multi-tenant architecture or configurable modes.
+- **LRU Position**: #1 (Most Recent / Strategic Pivot)
+
+---
+
+### 2. 🎟️ **Digital Loyalty System** — Customer Card to PWA
 **Status**: 💡 **BRAINSTORM** (Idea Captured)
 **Added**: March 14, 2026 (5:56 PM)
 **Last Updated**: March 14, 2026 (5:56 PM)
@@ -30,25 +50,6 @@
 - **Key Features**: Real-time progress tracking, reward notifications, mobile-optimized
 - **Tech Stack**: [To be determined during planning]
 - **LRU Position**: #1 (Most Recent / Brainstorm Phase)
-
----
-
-### 2. 💒 **Wedding Wall** — Instagram-Story Photo Sharing Platform
-**Status**: 🔄 **ONGOING** (Active Development)
-**Added**: March 9, 2026 (2:32 AM)
-**Last Updated**: March 9, 2026 (12:26 AM)
-**Concept**: Wedding guests upload picture-only moments to a shared visual feed (like Instagram stories)
-
-**Details**:
-- **Main Feature**: Photo upload wall where guests browse shared wedding photos in real-time
-- **Architecture**:
-  - Frontend: React with Next.js
-  - Storage: AWS S3 (direct browser upload with pre-signed URLs)
-  - Backend: Next.js API routes/server actions for MVP
-  - Database: PostgreSQL + Prisma
-  - Hosting: DigitalOcean (or Vercel as fastest-launch alternative)
-- **Current Status**: Architecture drafted, ready for implementation kickoff
-- **LRU Position**: #2
 
 ---
 
