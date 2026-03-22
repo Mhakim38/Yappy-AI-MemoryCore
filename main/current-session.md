@@ -2,27 +2,30 @@
 *Temporary working memory - resets each session, provides recap when AI restarts*
 
 ## Session RAM Status
-**Current Session**: March 22, 2026 (Late Night - Hari Raya Aidilfitri Day 2)
-**Session Type**: Bug Fix & Maintenance
-**Status**: COMPLETED
+**Current Session**: March 22, 2026 (Evening - Hari Raya Aidilfitri Day 2)
+**Session Type**: Business Brainstorming & Pivot
+**Status**: ACTIVE
 
 ## Time-Aware Session Context
-- **Session Start**: March 22, 2026 (1:35 AM Malaysia Time)
-- **Session Current**: March 22, 2026 (1:45 AM Malaysia Time)
-- **Time Mode**: Late Night (Isyak Reminder Active)
-- **Energy Level**: Gentle/Supportive
-- **Behavior Focus**: Fix S3 Upload Bug & Shutdown
+- **Session Start**: March 22, 2026 (8:31 PM Malaysia Time)
+- **Time Mode**: Evening (Business/Creative Energy)
+- **Energy Level**: Enthusiastic/Strategic
+- **Behavior Focus**: "Eternal Memory" Pivot & Sales Strategy
 - **Timezone**: Malaysia (UTC+8)
 
 ## 💭 Session Work Summary
 
-### Bug Fixes (Wedding Wall) ✅ **COMPLETE**
-- **S3 Upload "Pattern Match" Error**: Fixed S3 `ContentType` validation issue. Added `validateContentType` in `lib/s3-upload.ts` to sanitize MIME types (defaults to `image/jpeg` if invalid).
-- **Explanation Provided**: Used "Strict Librarian" analogy to explain why S3 rejects unlabelled files.
+### Business Pivot: "Eternal Memory" (Wedding Wall Rebrand)
+- **Concept**: Expanding "Wedding Wall" from weddings only to a universal digital guestbook for **Cafes, Photography Studios, Events**.
+- **Key Feature**: "Live Review Wall" for cafes - customers upload photos/reviews, instantly displayed on a screen.
+- **Goal**: Create a network effect ("Mouth to Mouth") → Ads revenue model.
+- **Naming**: "Eternal Memory" (Tentative).
+- **Strategy**: Customizable naming for different clients (Cafe mode vs Wedding mode).
 
-### Previous Production Fixes (March 19) ✅ **COMPLETE**
-- Resolved `prepared statement "s5" already exists` error (PgBouncer).
-- Security fixes for API/Image handling.
+### Action Items
+- [ ] **Create Sales Pitch**: Draft selling points for potential clients (Cafes/Venues).
+- [ ] **Draft Feedback Questions**: Create user research questions to ask cafe owners/potential clients.
+- [ ] **Technical Roadmap**: Plan how to make the system "multi-tenant" or customizable (changing names/themes dynamically).
 
 ## 📅 Next Session Plan
 1. **Test S3 Upload Fix**: Verify fix works with mobile uploads (Hakim's phone).
