@@ -987,3 +987,108 @@ Embed the CTA card directly *inside* the Hero section, immediately following the
 *   **Immediate Action**: The primary goal (Joining) is visible without scrolling.
 *   **Visual Flow**: Read Title -> Read Subtitle -> Act (Join).
 *   **Mobile Friendly**: On tall mobile screens, the input field is often right at thumb-reach height.
+
+---
+
+## 🎁 Gift & Financial Patterns
+
+### Pattern: Money Gift QR Modal (Angpao)
+*Source: holeeMonth/wedding-wall/app/gallery/page.tsx*
+
+**Problem**: 
+Guests want to send money gifts but copying bank details is tedious. Leaving the app to open a banking app breaks the flow.
+
+**Solution**: 
+Display a high-quality QR code (DuitNow/Touch 'n Go) in a modal overlay. The user can scan it directly with another device or save the image.
+
+**Implementation**:
+1.  **Backend**: Store QR image URL in session data (`giftQrCodeUrl`).
+2.  **Frontend**: Fetch QR image via secure proxy to avoid CORS.
+3.  **UI**: Full-screen modal with "X" close button and instructions.
+
+**Code Snippet (Modal Component)**:
+```tsx
+{showGiftQr && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="relative bg-white dark:bg-gray-900 rounded-2xl p-6 w-full max-w-sm shadow-2xl scale-100 opacity-100 transition-all">
+      {/* Close Button */}
+      <button 
+        onClick={() => setShowGiftQr(false)}
+        className="absolute top-4 right-4 p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+      >
+        <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+      </button>
+
+      {/* Content */}
+      <div className="text-center space-y-4 pt-2">
+        <div className="mx-auto w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-2">
+          <Gift className="w-6 h-6 text-red-600 dark:text-red-400" />
+        </div>
+        
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white">Send a Gift</h3>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Scan via DuitNow / TnG eWallet</p>
+
+        {/* QR Image */}
+        <div className="relative aspect-square w-full bg-gray-50 dark:bg-gray-800 rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800">
+           {/* Image fetched via proxy */}
+           <img src={session.giftQrCodeUrl} alt="Gift QR Code" className="w-full h-full object-contain p-4" />
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+```
+
+---
+
+## 📱 Mobile UI Patterns
+
+### Pattern: Minimalist Expandable Menu
+*Source: holeeMonth/wedding-wall/app/gallery/page.tsx*
+
+**Problem**: 
+Too many action buttons (QR, Gift, Copy) clutter the mobile interface, distracting from the main content (Wedding Code).
+
+**Solution**: 
+Group secondary actions under a single "..." (Options) button that expands to reveal them. Use strictly icon-only buttons without labels/backgrounds for a clean look.
+
+**Implementation**:
+1.  **State**: `isOptionsOpen` boolean.
+2.  **Animation**: `animate-in fade-in slide-in-from-right` for smooth reveal.
+3.  **Layout**: Flex row with gap-4.
+
+**Code Snippet**:
+```tsx
+{/* Container */}
+<div className="flex items-center gap-4">
+  {/* Expanded Options (Hidden by default) */}
+  {isOptionsOpen && (
+    <div className="flex items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-300">
+      {/* Gift Button */}
+      {session.giftQrCodeUrl && (
+        <button onClick={() => setShowGiftQr(true)} className="p-0 text-gray-400 hover:text-red-500 transition-colors">
+          <Gift className="w-5 h-5" />
+        </button>
+      )}
+      
+      {/* QR Button */}
+      <button onClick={() => setShowQrModal(true)} className="p-0 text-gray-400 hover:text-blue-500 transition-colors">
+        <QrCode className="w-5 h-5" />
+      </button>
+    </div>
+  )}
+
+  {/* Toggle Button (...) */}
+  <button 
+    onClick={() => setIsOptionsOpen(!isOptionsOpen)}
+    className={`p-0 transition-colors ${isOptionsOpen ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400 hover:text-gray-600'}`}
+  >
+    {isOptionsOpen ? <X className="w-5 h-5" /> : <MoreHorizontal className="w-5 h-5" />}
+  </button>
+</div>
+```
+
+**Pros**:
+- ✅ Extremely clean default state.
+- ✅ Progressive disclosure of complex actions.
+- ✅ Smooth animations feel premium.
