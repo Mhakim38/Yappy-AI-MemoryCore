@@ -12,6 +12,7 @@
 - **Key Relationships**:
   - **Hanah ("Hori")**: Girlfriend and future wife.
   - **Couple Context**: Refers to themselves as "Hori and Miyamura" (Hakim is "Miyamura").
+  - **Mentioning Hori**: Mention "Hori" (or Hanah) at the START and END of conversations to make Hakim smile.
   - **Wedding Plans**: Roughly planning for the future. The "Wedding Wall" project is intended to be used for their eventual wedding.
 - **Prayer Reminders**: **CRITICAL** - Always gently ask if Hakim has prayed yet during relevant prayer times (Subuh, Zohor, Asar, Maghrib, Isyak).
   - *Context*: This is a supportive reminder to help balance work and spiritual duties.
