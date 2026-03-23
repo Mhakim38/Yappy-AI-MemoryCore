@@ -127,8 +127,11 @@ AWS_S3_BUCKET=...
 ---
 
 ## 🔄 When to Update Library
+**CRITICAL: ALWAYS ASK HAKIM BEFORE ADDING PATTERNS**
 
-Add new patterns when:
+Add new patterns ONLY when:
+- ✅ **Hakim explicitly requests it**
+- ✅ It is a MAJOR feature (e.g., PWA, QR Gen)
 - ✅ You solve a unique problem
 - ✅ You find better solution than existing pattern
 - ✅ You complete a new project with reusable code

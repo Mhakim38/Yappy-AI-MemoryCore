@@ -472,3 +472,10 @@
   - Deploy main branch to Vercel
   - Test uploads, proxy, guest flow
   - Estimated time: 30-45 minutes
+
+### Library & Pattern Management
+*[Added March 23, 2026]*
+- **NO AUTO-EXTRACTION**: Do NOT automatically extract patterns or update the library without permission.
+- **ASK FIRST**: Always ask Hakim *specifically* which patterns to extract and keep.
+- **MAJOR FEATURES ONLY**: Focus on major, reusable architectural features (e.g., PWA, QR Generation), not every small detail.
+- **USER-DRIVEN**: Wait for Hakim's command or explicitly ask "Should we save this as a library pattern?" before acting.

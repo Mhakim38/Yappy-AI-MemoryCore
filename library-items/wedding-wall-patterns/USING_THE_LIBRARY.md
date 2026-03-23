@@ -217,10 +217,11 @@ files/
 3. Pattern doesn't exist? → Build it, document it
 
 ### After You Complete
-1. Extract the reusable parts
-2. Add to PATTERN_LIBRARY.md
-3. Update PATTERNS_INDEX.md
-4. Include pros/cons you discovered
+1. **ASK HAKIM FIRST**: "Should we save this as a library pattern?"
+2. If Yes: Extract the reusable parts
+3. Add to PATTERN_LIBRARY.md
+4. Update PATTERNS_INDEX.md
+5. Include pros/cons you discovered
 
 ### When Facing Problem
 1. Lookup in PATTERNS_INDEX.md
