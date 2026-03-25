@@ -1167,3 +1167,63 @@ const loadMorePhotos = async () => {
 - ✅ Handles real-time updates + historical browsing simultaneously.
 - ✅ Prevents "duplicate key" React errors.
 - ✅ Smooth UX (no layout shifts).
+
+---
+
+## 📲 Client-Side Patterns
+
+### Pattern: QR Code Generation (Client-Side)
+*Source: holeeMonth/wedding-wall/app/gallery/page.tsx*
+
+**Problem**: 
+Need to generate a QR code for the current session URL dynamically without a backend service or external API call.
+
+**Solution**: 
+Use the `qrcode` npm package to generate a Data URL (base64 image) directly in the browser.
+
+**Implementation**:
+1.  **Install**: `npm install qrcode @types/qrcode`
+2.  **Import**: `import QRCode from 'qrcode';`
+3.  **Generate**: Call `QRCode.toDataURL()` inside a useEffect or handler.
+
+**Code Snippet**:
+```tsx
+import QRCode from 'qrcode';
+
+// Inside Component
+const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
+
+useEffect(() => {
+  const generateQR = async () => {
+    try {
+      // Create the URL to encode (e.g., current page with query params)
+      const currentUrl = `${window.location.origin}/?code=${sessionCode}`;
+      
+      // Generate Base64 Data URL
+      const url = await QRCode.toDataURL(currentUrl, {
+        width: 300,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#ffffff00', // Transparent background
+        },
+      });
+      
+      setQrCodeUrl(url);
+    } catch (err) {
+      console.error('QR Generation failed', err);
+    }
+  };
+
+  if (sessionCode) generateQR();
+}, [sessionCode]);
+
+// Render
+// {qrCodeUrl && <img src={qrCodeUrl} alt="Join QR" />}
+```
+
+**Pros**:
+- ✅ **Privacy**: URL never leaves the client (no third-party API tracking).
+- ✅ **Speed**: Instant generation, no network request needed.
+- ✅ **Offline**: Works even without internet connection (if PWA cached).
+- ✅ **Flexible**: Easy to customize colors, size, and margin.

@@ -17,6 +17,16 @@
 |---------|------|-------|-----------|--------|
 | **Supabase PostgreSQL + Prisma** | `database/supabase-prisma-setup.md` | 2️⃣ Proven | Next.js, Node.js | ✅ Active |
 
+### Performance & Data Patterns
+| Pattern | File | Level | Framework | Status |
+|---------|------|-------|-----------|--------|
+| **Infinite Scroll + Polling** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | Next.js, React | ✅ Active |
+
+### Client-Side Patterns
+| Pattern | File | Level | Framework | Status |
+|---------|------|-------|-----------|--------|
+| **QR Code Generation** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | React, Node.js | ✅ Active |
+
 ### Authentication & UX Patterns
 | Pattern | File | Level | Framework | Status |
 |---------|------|-------|-----------|--------|
