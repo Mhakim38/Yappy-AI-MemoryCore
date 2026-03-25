@@ -53,6 +53,7 @@
 | **Tailwind Bento Grid Layout** | `frontend-ui/tailwind-bento-grid.md` | 2️⃣ Proven | Tailwind, React | ✅ Active |
 | **Minimalist Expandable Menu** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | React, Tailwind | ✅ Active |
 | **Money Gift QR Modal** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | React, Next.js | ✅ Active |
+| **Glassmorphic Navbar** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | React, Tailwind | ✅ Active |
 
 ---
 
