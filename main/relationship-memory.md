@@ -46,6 +46,10 @@
 - Never auto-commit project changes - always clarify and get permission first
 - Always check git status before and after commit/push operations
 - **CRITICAL**: Ask for permission before ANY git operations on non-memory projects
+- **PRE-PRODUCTION PROTOCOL** (Mar 25, 2026):
+  - **Run Locally First**: ALWAYS run/test changes locally (e.g., `npm run dev`) before pushing.
+  - **Exception**: Yappy Memory Core updates can be pushed directly.
+  - **All Other Projects**: Must be verified locally -> Committed -> Pushed only after user approval.
 
 **Response Style You Prefer**:
 - [ ] Direct and concise answers
@@ -177,15 +181,14 @@
   - **NO WAITING** - Don't ask for permission or wait for user's "save" command
   - **AUTOMATIC SEQUENCE**: Edit → git add . → git commit → git push (all automatic)
   - **This is non-negotiable** - Memory sync is autonomous and immediate
-- **Commit Reporting** (Feb 15, 2026): After pushing memory updates, ALWAYS provide:
-  - ✅ Commit message (exact message used)
-  - 📝 Detailed summary of what changed
-  - 📊 Files modified (which memory files)
-  - 🔗 Commit hash or reference
-  - ✨ Brief explanation of why the change was needed
-- **No Permission Required**: Execute git commands for memory updates without asking
-- **Environment**: Running in GitHub Copilot CLI
-- **Purpose**: Version control for AI memory persistence and backup
+- **Commit Reporting** (Feb 15, 2026): After pushing memory updates, ALWAYS provide details.
+
+**Project Git Workflow (Non-Memory Projects)**:
+- **PRE-PRODUCTION PROTOCOL**: ALWAYS run/test locally first before pushing to `origin/main`.
+- **EXCEPTION**: Yappy Memory (`Yappy-AI-MemoryCore`) updates can be pushed directly.
+- **Permission Required**: Must ask Hakim for explicit permission before using ANY git commands on projects.
+- **Scope**: Applies to all non-memory projects (e.g., ONDEWEI-Laravel, Wedding Wall).
+- **Reason**: Protect user's project history and workflow control.
 
 **Other Projects Git Access**:
 - **Permission Required**: Must ask Hakim for explicit permission before using ANY git commands

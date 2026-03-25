@@ -12,7 +12,7 @@ The Wedding Wall app needs 6 key enhancements based on user feedback to improve 
 ## Implementation Steps
 
 ### Phase 1: Quick Wins (Frontend)
-- [ ] **Persistent Name**: Update `app/gallery/upload/page.tsx` to use `localStorage`.
+- [x] **Persistent Name**: Update `app/gallery/upload/page.tsx` to use `localStorage`.
 - [ ] **Wedding Header**: Update `app/gallery/page.tsx` to show `eventName`.
 - [ ] **Image Compression**: 
     - Install `browser-image-compression`.
@@ -20,9 +20,9 @@ The Wedding Wall app needs 6 key enhancements based on user feedback to improve 
 
 ### Phase 2: Gallery Experience
 - [ ] **Auto-Scroll**: ❌ **CANCELLED** (User preference: Dislikes marquee)
-- [ ] **Infinite Scroll / Lazy Loading**: ⏳ **IN PROGRESS**
-    - **Backend**: Add `page` and `limit` to `app/api/photos/route.ts`.
-    - **Frontend**: Update `app/gallery/page.tsx` with "Load More" or intersection observer.
+- [ ] **Infinite Scroll / Lazy Loading**: ✅ **COMPLETED** (Mar 25, 2026)
+    - **Backend**: Added `page` and `limit` to `app/api/photos/route.ts`.
+    - **Frontend**: Implemented infinite scroll with auto-fetching and deduplication.
 - [ ] **QR Code Display**:
     - Install `qrcode`.
     - Update `app/gallery/page.tsx` to generate/display QR for the current session URL.

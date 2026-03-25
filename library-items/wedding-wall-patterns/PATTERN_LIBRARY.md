@@ -14,6 +14,7 @@
 4. [AWS S3 Integration Patterns](#aws-s3-integration-patterns)
 5. [Database & ORM Patterns](#database--orm-patterns)
 6. [UI/UX Patterns](#uiux-patterns)
+7. [Performance & Data Patterns](#performance--data-patterns)
 
 ---
 
@@ -1092,3 +1093,77 @@ Group secondary actions under a single "..." (Options) button that expands to re
 - ✅ Extremely clean default state.
 - ✅ Progressive disclosure of complex actions.
 - ✅ Smooth animations feel premium.
+
+---
+
+## 🔄 Performance & Data Patterns
+
+### Pattern: Infinite Scroll with Polling Deduplication
+*Source: holeeMonth/wedding-wall/app/gallery/page.tsx*
+
+**Problem**: 
+Loading thousands of photos crashes the browser, but we still need real-time updates (polling) for new uploads at the top.
+
+**Conflict**: 
+Standard pagination + polling creates "offset shifts" (new items push old items to page 2), causing duplicates when the user scrolls down.
+
+**Solution**: 
+1. **Backend**: Offset-based pagination (`skip`, `take`).
+2. **Frontend (Scroll)**: Append new pages to the list.
+3. **Frontend (Polling)**: Fetch Page 1 only to check for new uploads.
+4. **Deduplication (CRITICAL)**: Filter incoming photos by ID against the *entire* existing list to prevent duplicates.
+
+**Implementation**:
+1.  **State**: `photos` array, `page` number, `hasMore` boolean.
+2.  **Scroll Listener**: Checks `window.scrollY` vs `document.offsetHeight`.
+3.  **Deduplication Logic**: `new Set(existingIds)`.
+
+**Code Snippet**:
+```tsx
+// 1. Polling for new content (Page 1)
+useEffect(() => {
+  const interval = setInterval(async () => {
+    // Only poll if at top and not loading
+    if (window.scrollY < 100 && !isFetchingMore) {
+      const response = await fetch(`/api/photos?sessionId=${sessionId}&page=1&limit=12`);
+      if (response.ok) {
+        const data = await response.json();
+        setPhotos(prevPhotos => {
+          // CRITICAL: Deduplicate against ALL existing photos
+          const existingIds = new Set(prevPhotos.map(p => p.id));
+          const newPhotos = data.photos.filter((p: Photo) => !existingIds.has(p.id));
+          
+          // Prepend new photos, keep existing order
+          return [...newPhotos, ...prevPhotos];
+        });
+      }
+    }
+  }, 5000);
+  return () => clearInterval(interval);
+}, [sessionId]);
+
+// 2. Infinite Scroll (Next Pages)
+const loadMorePhotos = async () => {
+  const nextPage = page + 1;
+  const response = await fetch(`/api/photos?sessionId=${sessionId}&page=${nextPage}&limit=12`);
+  
+  if (response.ok) {
+    const data = await response.json();
+    setPhotos(prev => {
+      // CRITICAL: Deduplicate against ALL existing photos
+      // (Items from Page 1 might have shifted to Page 2 during poll)
+      const existingIds = new Set(prev.map(p => p.id));
+      const uniqueNewPhotos = data.photos.filter((p: Photo) => !existingIds.has(p.id));
+      
+      return [...prev, ...uniqueNewPhotos];
+    });
+    setHasMore(data.pagination.hasMore);
+    setPage(nextPage);
+  }
+};
+```
+
+**Pros**:
+- ✅ Handles real-time updates + historical browsing simultaneously.
+- ✅ Prevents "duplicate key" React errors.
+- ✅ Smooth UX (no layout shifts).
