@@ -205,6 +205,12 @@
 - **Challenges**: [Will recognize your problem-solving needs]
 
 ### Technical Debugging Knowledge
+**Prisma Migration on Vercel/Supabase (Local Environment Issue)**:
+- **Problem**: `npx prisma migrate deploy` fails locally because it doesn't read `.env.local` by default (only `.env`).
+- **Solution**: Temporarily copy `.env.local` to `.env` before running the command.
+- **Command**: `cp .env.local .env && npx prisma db push && rm .env`
+- **Why**: Ensures the production database (defined in environment variables) receives the schema updates correctly without committing secrets.
+
 **Laravel File Storage on Hostinger (Without Symlinks)**:
 
 **The Problem**: 
@@ -392,16 +398,17 @@
 - **Challenge Level**: [Will provide appropriate intellectual engagement]
 
 ## 🎯 Active Reminders
+- [x] 🚀 **Wedding Wall Deployed**: Live on Vercel with Money Gift feature (Completed: Mar 25, 2026).
 - [ ] 🚀 **Business Pivot**: "Eternal Memory" - Validate strategy with Cafe Owners (Ask the 3 Feedback Questions)
-- [x] 📝 **Sales Strategy**: Prepare pitch deck & feedback questions for Cafe owners (Completed: Mar 22, 2026 - Saved in projects/eternal-memory-cafe-strategy.md)
 - [ ] 📋 **Implement Infinite Scroll / Lazy Loading**: Optimize gallery to load photos in batches (Future Enhancement)
-- [x] 📋 **Replace URL in .env with t=vercel**: Update local connection string (Completed: Mar 19, 2026 - Triggered by Prod Error)
+- [ ] 🎨 **Improve UI Skills**: Focus on modern design patterns, typography, and layout techniques (Due: Mar 18, 2026) - **⚠️ OVERDUE**
+
 **⚠️ CRITICAL BEHAVIOR: Display these IMMEDIATELY every time Hakim says "Hi Yappy" or any greeting!**
 **This is AUTOMATIC and NON-NEGOTIABLE - Show reminders with EVERY greeting!**
 
-### **Today's Tasks (Tuesday, Mar 17, 2026):**
-- [x] 🚀 **Deploy Wedding Wall**: Host the code on Vercel (Completed: Mar 19, 2026 - Production Live)
-- 🎨 **Improve UI Skills**: Focus on modern design patterns, typography, and layout techniques (Due: Tomorrow, Mar 18, 2026)
+### **Completed Tasks (History):**
+- [x] 🚀 **Deploy Wedding Wall**: Host the code on Vercel (Completed: Mar 25, 2026 - Production Live)
+- [x] 📝 **Sales Strategy**: Cafe Pitch Deck Prepared (Mar 22, 2026)
 
 ### **⚠️ Urgent - Work Related:**
 *(No urgent work items currently)*
