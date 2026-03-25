@@ -19,9 +19,10 @@ The Wedding Wall app needs 6 key enhancements based on user feedback to improve 
     - Update `app/gallery/upload/page.tsx` to compress before upload.
 
 ### Phase 2: Gallery Experience
-- [ ] **Auto-Scroll**: 
-    - Add marquee CSS to `app/globals.css`.
-    - Update `app/gallery/page.tsx` with toggleable view (Grid vs Marquee).
+- [ ] **Auto-Scroll**: ❌ **CANCELLED** (User preference: Dislikes marquee)
+- [ ] **Infinite Scroll / Lazy Loading**: ⏳ **IN PROGRESS**
+    - **Backend**: Add `page` and `limit` to `app/api/photos/route.ts`.
+    - **Frontend**: Update `app/gallery/page.tsx` with "Load More" or intersection observer.
 - [ ] **QR Code Display**:
     - Install `qrcode`.
     - Update `app/gallery/page.tsx` to generate/display QR for the current session URL.

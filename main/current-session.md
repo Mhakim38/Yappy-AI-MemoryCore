@@ -28,6 +28,8 @@
 - [x] **Bug Fix**: Enabled persistent guest name via `localStorage`.
 - [x] **Security**: Added server-side filename randomization to prevent malicious uploads.
 - [x] **Error Handling**: Added graceful catching of non-JSON errors (e.g., Payload Too Large).
+- [x] **Feature Preference**: **Dislikes Auto-Scroll/Marquee** feature (Removed from plan).
+- [x] **Feature Request**: Prioritize **Infinite Scroll / Lazy Loading** instead.
 
 ## 💾 Session State Saved
 - **Memory Core**: Updated with deployment success and post-deployment fixes.

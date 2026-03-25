@@ -30,6 +30,7 @@
 - **Tech Pivot**: Needs multi-tenant architecture or configurable modes.
 - **Hardware Challenge**: Cafes often lack large screens/TVs. Need creative display solutions (Tablets? Projectors? "BYOD" mode?).
 - **Pivot Strategy**: Focus on "Counter-Top" displays (iPad/Tablet stands) instead of wall-mounted TVs. Easier adoption.
+- **Feature Note**: **Auto-Scroll** (Marquee) was considered but **rejected** for the Wedding Wall base. Will need re-evaluation for Cafe use-case (maybe "Slide Show" instead of marquee?).
 - **Future Enhancement**: **Mini-Game Integration** (Phase 2).
   - Gamify the wait: Play game → Win → Reward = "Feature on the Wall".
   - Solves "boredom" and incentivizes interaction.
