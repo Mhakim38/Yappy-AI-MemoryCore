@@ -24,9 +24,13 @@
 - [x] **Migrate Production DB**: Synced schema changes (`giftQrCodeUrl`) to Supabase.
 - [x] **Technical Fix**: Solved `.env.local` migration issue by manually copying to `.env` temporarily.
 - [x] **Plan Update**: Updated `next-session-plan.md` to reflect "Live" status.
+- [x] **UI Cleanup**: Removed duplicate "Uploading..." indicator.
+- [x] **Bug Fix**: Enabled persistent guest name via `localStorage`.
+- [x] **Security**: Added server-side filename randomization to prevent malicious uploads.
+- [x] **Error Handling**: Added graceful catching of non-JSON errors (e.g., Payload Too Large).
 
 ## 💾 Session State Saved
-- **Memory Core**: Updated with deployment success.
+- **Memory Core**: Updated with deployment success and post-deployment fixes.
 
 ### Critical Updates
 - **Prisma Migration Tip**: Use `.env` specifically for migrations if `.env.local` fails (`cp .env.local .env && npx prisma db push && rm .env`).
