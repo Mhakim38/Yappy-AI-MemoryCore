@@ -54,6 +54,16 @@
 | **Minimalist Expandable Menu** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | React, Tailwind | ✅ Active |
 | **Money Gift QR Modal** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | React, Next.js | ✅ Active |
 | **Glassmorphic Navbar** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | React, Tailwind | ✅ Active |
+| **Disable PWA Zoom** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | Next.js, HTML | ✅ Active |
+| **Modern Landing Page Type** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | Tailwind | ✅ Active |
+| **Symmetrical Rhythm** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | Tailwind | ✅ Active |
+| **Integrated Hero CTA** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | React, Tailwind | ✅ Active |
+| **Auto-Scroll Gallery (Legacy)** | `ui-patterns/auto-scroll-gallery.md` | 1️⃣ Concept | React, Tailwind | ⏸ Archived |
+
+### Security Patterns
+| Pattern | File | Level | Framework | Status |
+|---------|------|-------|-----------|--------|
+| **Security Headers (CSP/HSTS)** | `security/security-headers.md` | 2️⃣ Proven | Universal | ✅ Active |
 
 ---
 
@@ -162,11 +172,18 @@ All patterns are **Level 2: Proven** meaning:
 
 ## 💡 How Library System Works
 
+### ⚡ **Token-Efficient Search Protocol** (UPDATED MAR 25)
+**CRITICAL**: To save context tokens, **ALWAYS** check `LIBRARY_MASTER_INDEX.md` first.
+- **Do NOT** scan subdirectories recursively.
+- **Do NOT** read individual pattern files to find content unless you know the file path from this Index.
+- **ONLY** read specific pattern files *after* confirming their relevance in this Master Index.
+
 ### Save Protocol
 ```
 User: "save library"
-Yappy: Scan projects → Extract patterns → Save to memory with metadata
-Result: Patterns available for future reuse
+Yappy: Scan projects → Extract patterns → Save to specific file (e.g. project-name.md)
+Yappy: **MUST UPDATE THIS MASTER INDEX** with new entry immediately.
+Result: Patterns available via single-file lookup.
 ```
 
 ### Load Protocol
