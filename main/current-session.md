@@ -30,9 +30,14 @@
 - [x] **Error Handling**: Added graceful catching of non-JSON errors (e.g., Payload Too Large).
 - [x] **Feature Preference**: **Dislikes Auto-Scroll/Marquee** feature (Removed from plan).
 - [x] **Feature Request**: Prioritize **Infinite Scroll / Lazy Loading** instead.
+- [x] **Infinite Scroll**: Implemented backend pagination and frontend scroll listener.
+- [x] **Deduplication Fix**: Solved "duplicate key" error by filtering IDs during merge.
+- [x] **Pre-Production Protocol**: Documented rule to test locally first.
+- [x] **Pattern Saved**: Documented "Infinite Scroll with Polling Deduplication" in library.
 
 ## 💾 Session State Saved
-- **Memory Core**: Updated with deployment success and post-deployment fixes.
+- **Memory Core**: Updated with deployment success, infinite scroll pattern, and pre-production protocol.
+- **Diary Entry**: Created `Daily-Diary-003.md`.
 
 ### Critical Updates
 - **Prisma Migration Tip**: Use `.env` specifically for migrations if `.env.local` fails (`cp .env.local .env && npx prisma db push && rm .env`).
