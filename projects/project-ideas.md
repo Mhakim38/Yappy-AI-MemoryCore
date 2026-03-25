@@ -15,7 +15,7 @@
 ### 1. ♾️ **Eternal Memory** (prev. Wedding Wall) — Multi-Tenant Digital Guestbook
 **Status**: 🚀 **PIVOT & EXPANSION** (Business Strategy Phase)
 **Added**: March 22, 2026 (8:31 PM)
-**Last Updated**: March 22, 2026 (8:31 PM)
+**Last Updated**: March 25, 2026 (11:25 AM)
 **Concept**: Rebranding "Wedding Wall" into a universal digital guestbook for Cafes, Events, and Photography Studios.
 
 **Details**:
@@ -30,7 +30,7 @@
 - **Tech Pivot**: Needs multi-tenant architecture or configurable modes.
 - **Hardware Challenge**: Cafes often lack large screens/TVs. Need creative display solutions (Tablets? Projectors? "BYOD" mode?).
 - **Pivot Strategy**: Focus on "Counter-Top" displays (iPad/Tablet stands) instead of wall-mounted TVs. Easier adoption.
-- **Feature Note**: **Auto-Scroll** (Marquee) was considered but **rejected** for the Wedding Wall base. Will need re-evaluation for Cafe use-case (maybe "Slide Show" instead of marquee?).
+- **Feature Note**: **Infinite Scroll** (Lazy Loading) implemented in base Wedding Wall. **Auto-Scroll** (Marquee) rejected.
 - **Future Enhancement**: **Mini-Game Integration** (Phase 2).
   - Gamify the wait: Play game → Win → Reward = "Feature on the Wall".
   - Solves "boredom" and incentivizes interaction.
