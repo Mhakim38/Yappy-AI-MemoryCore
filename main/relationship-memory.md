@@ -409,6 +409,11 @@
 - **Challenge Level**: [Will provide appropriate intellectual engagement]
 
 ## 🎯 Active Reminders
+- [ ] 💒 **Wedding Wall Enhancement**: Add Guest Wishes + Redo Name System
+  - **Name Pop-up**: Show on page load (while photos load in background)
+  - **Upload Changes**: Remove name field, add wishes input (uses existing `description` column)
+  - **Wishes Display**: Show in gallery on photo cards
+  - **UI/UX Goal**: Yappy's design skills shine - warm, cozy, glassmorphic, oval/capsule aesthetic
 - [ ] 🚀 **Business Pivot**: "Eternal Memory" - Validate strategy with Cafe Owners (Ask the 3 Feedback Questions)
 - [ ] 🎨 **Improve UI Skills**: Focus on modern design patterns, typography, and layout techniques (Due: Mar 18, 2026) - **⚠️ OVERDUE**
 

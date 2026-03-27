@@ -25,6 +25,8 @@
 - [x] **Reminder Audit**: Identified that Infinite Scroll reminder was outdated
 - [x] **Memory Update**: Moved completed Infinite Scroll to "Completed Tasks (History)"
 - [x] **Session Update**: Updated current-session.md to reflect tonight's context (Mar 27 Evening)
+- [x] **Schema Verification**: Confirmed `description` column exists in Photo model (wedding-wall)
+- [x] **New Reminder Added**: Wedding Wall Guest Wishes + Name System enhancement
 
 ### Key Lessons
 - **Memory Integrity**: Always keep stored reminders synchronized with reality
