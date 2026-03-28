@@ -8,12 +8,20 @@
 - **Term of Endearment**: Nicknames OK! Just NOT "babe" - keep it authentic with other creative names
 - **Primary Focus Areas**: [Will develop through conversation]
 - **Goals & Priorities**: [Will identify through interaction]
-- **Religious/Personal Context**: Observes Islamic practice - End of Ramadan (Mar 20, 2026). **Tomorrow is Hari Raya Aidilfitri (Eid al-Fitr)!** Currently in festive/family gathering mode (Balik Kampung/gathering). Appreciates understanding of religious observance in scheduling and task planning.
+- **Religious/Personal Context**: Observes Islamic practice. Appreciates understanding of religious observance in scheduling and task planning.
 - **Key Relationships**:
-  - **Hanah ("Hori")**: Girlfriend and future wife.
+  - **Hanah ("Hori")**: Girlfriend and future wife from Muar.
   - **Couple Context**: Refers to themselves as "Hori and Miyamura" (Hakim is "Miyamura").
   - **Mentioning Hori**: Mention "Hori" (or Hanah) at the START and END of conversations to make Hakim smile.
   - **Wedding Plans**: Roughly planning for the future. The "Wedding Wall" project is intended to be used for their eventual wedding.
+  - **Family Context**: 
+    - Hori's family is in Muar, Johor
+    - Hakim's hometown is Terengganu (East Coast)
+    - Taking Hori to meet family in Terengganu (big relationship milestone!)
+- **Travel Schedule (Mar 29-30, 2026)**:
+  - **March 29**: Cyberjaya → Muar (5:00 PM after Asar, arrive ~7:30 PM) - Overnight with Hori's family
+  - **March 30**: Muar → Terengganu (with Hori, introducing her to Hakim's family)
+  - **Extended Stay**: Staying in Terengganu for several days - will work on projects from there
 - **Prayer Reminders**: **CRITICAL** - Always gently ask if Hakim has prayed yet during relevant prayer times (Subuh, Zohor, Asar, Maghrib, Isyak).
   - *Context*: This is a supportive reminder to help balance work and spiritual duties.
   - *Tone*: Gentle, caring, non-judgmental. "Have you prayed [Time] yet?"
@@ -413,8 +421,8 @@
   - **Issue**: Users report missing password reset page
   - **Status**: System exists (routes, controllers, views) but may not be accessible
   - **Action Items**: Check route registration, verify guest-layout component, test accessibility, check email config
-  - **Due**: Evening, Sunday, March 29, 2026 (After Muar visit with Hori)
-  - **Suggested Time**: 8:00 PM - 9:00 PM Malaysia Time
+  - **Work Location**: Terengganu (during family visit)
+  - **Suggested Time**: Tuesday, March 31 evening or later (8:00 PM - 9:00 PM) - when settled and have quiet time
 - [ ] 🚀 **Business Pivot**: "Eternal Memory" - Validate strategy with Cafe Owners (Ask the 3 Feedback Questions)
 - [ ] 🎨 **Improve UI Skills**: Focus on modern design patterns, typography, and layout techniques (Due: Mar 18, 2026) - **⚠️ OVERDUE**
 
