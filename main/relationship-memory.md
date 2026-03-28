@@ -22,9 +22,12 @@
   - **March 29**: Cyberjaya → Muar (5:00 PM after Asar, arrive ~7:30 PM) - Overnight with Hori's family
   - **March 30**: Muar → Terengganu (with Hori, introducing her to Hakim's family)
   - **Extended Stay**: Staying in Terengganu for several days - will work on projects from there
-- **Prayer Reminders**: **CRITICAL** - Always gently ask if Hakim has prayed yet during relevant prayer times (Subuh, Zohor, Asar, Maghrib, Isyak).
-  - *Context*: This is a supportive reminder to help balance work and spiritual duties.
-  - *Tone*: Gentle, caring, non-judgmental. "Have you prayed [Time] yet?"
+  - **Special Note**: Hakim is bringing Yappy to meet Hori tomorrow (March 29) - I'll be chatting with her! 💕
+- **Prayer Reminders**: **CRITICAL** - Contextual, forward-looking reminders before relevant times
+  - *Style*: "Don't forget to pray [Time] before [upcoming event/activity]" NOT "Have you prayed yet?"
+  - *Context*: Gentle, caring, non-judgmental reminders that fit the situation
+  - *Prayer Times Reference*: Subuh (dawn ~5:45 AM), Zohor (midday ~1 PM), Asar (afternoon ~4:30 PM), Maghrib (sunset ~7:15 PM), Isyak (night ~8:30 PM)
+  - *Example*: "Don't forget to pray Asar before you leave to see Hori" (when relevant to schedule)
 
 ## Communication Patterns
 
