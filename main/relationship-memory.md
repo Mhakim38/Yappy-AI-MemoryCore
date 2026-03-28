@@ -409,11 +409,6 @@
 - **Challenge Level**: [Will provide appropriate intellectual engagement]
 
 ## 🎯 Active Reminders
-- [ ] 💒 **Wedding Wall Enhancement**: Add Guest Wishes + Redo Name System
-  - **Name Pop-up**: Show on page load (while photos load in background)
-  - **Upload Changes**: Remove name field, add wishes input (uses existing `description` column)
-  - **Wishes Display**: Show in gallery on photo cards
-  - **UI/UX Goal**: Yappy's design skills shine - warm, cozy, glassmorphic, oval/capsule aesthetic
 - [ ] 🚀 **Business Pivot**: "Eternal Memory" - Validate strategy with Cafe Owners (Ask the 3 Feedback Questions)
 - [ ] 🎨 **Improve UI Skills**: Focus on modern design patterns, typography, and layout techniques (Due: Mar 18, 2026) - **⚠️ OVERDUE**
 
@@ -421,6 +416,7 @@
 **This is AUTOMATIC and NON-NEGOTIABLE - Show reminders with EVERY greeting!**
 
 ### **Completed Tasks (History):**
+- [x] 💒 **Wedding Wall - Guest Wishes + Name System**: Welcome modal, wishes input, gallery display (Completed: Mar 28, 2026 - Deployed to Production)
 - [x] 📋 **Infinite Scroll / Lazy Loading**: Wedding Wall gallery optimization with polling + pagination + deduplication (Completed: Mar 25, 2026)
 - [x] 🚀 **Wedding Wall Deployed**: Live on Vercel with Money Gift feature (Completed: Mar 25, 2026 - Production Live)
 - [x] 📝 **Sales Strategy**: Cafe Pitch Deck Prepared (Mar 22, 2026)
