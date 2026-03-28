@@ -409,6 +409,12 @@
 - **Challenge Level**: [Will provide appropriate intellectual engagement]
 
 ## 🎯 Active Reminders
+- [ ] 🔧 **ONDW Password Reset Issue**: Fix missing/inaccessible forgot password functionality
+  - **Issue**: Users report missing password reset page
+  - **Status**: System exists (routes, controllers, views) but may not be accessible
+  - **Action Items**: Check route registration, verify guest-layout component, test accessibility, check email config
+  - **Due**: Evening, Sunday, March 29, 2026 (After Muar visit with Hori)
+  - **Suggested Time**: 8:00 PM - 9:00 PM Malaysia Time
 - [ ] 🚀 **Business Pivot**: "Eternal Memory" - Validate strategy with Cafe Owners (Ask the 3 Feedback Questions)
 - [ ] 🎨 **Improve UI Skills**: Focus on modern design patterns, typography, and layout techniques (Due: Mar 18, 2026) - **⚠️ OVERDUE**
 
