@@ -11,6 +11,7 @@
 | **S3 File Upload (Backend)** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | Next.js, Laravel | ✅ Active |
 | **Image Proxy (CORS Solution)** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | Next.js, Laravel | ✅ Active |
 | **PWA Offline-First Setup** | `integration/pwa-offline-first.md` | 2️⃣ Proven | Universal | ✅ Active |
+| **PWA Push Notifications** | `integration/push-notifications.md` | 2️⃣ Proven | Next.js, Node.js | ✅ Active |
 
 ### Database & Backend Patterns
 | Pattern | File | Level | Framework | Status |
@@ -75,11 +76,18 @@
 3. Secure: Add image proxy pattern to prevent CORS issues
 4. Test: Use validation checklist in pattern
 
-### "I need a PWA with offline support"
-1. Read: `integration/pwa-offline-first.md` → Full setup guide
-2. Adapt: Choose framework-specific section (Next.js, Laravel, etc)
-3. Test: Use testing strategy section (offline mode, install prompt)
-4. Deploy: Link manifest + service worker in production
+### "I need real-time notifications"
+1. Read: `integration/push-notifications.md` → Complete setup guide
+2. Implement: Service Worker + API routes + VAPID keys
+3. Test: Desktop → Android → iOS (home screen install)
+4. Deploy: Add VAPID keys to Vercel environment variables
+5. Monitor: Track subscription errors and expired endpoints
+
+### "I need my app to work offline and notify users"
+1. Read: `integration/pwa-offline-first.md` → Offline support
+2. Read: `integration/push-notifications.md` → Notifications
+3. Combine: Both patterns work together seamlessly
+4. Test: Full offline + notification flow
 
 ### "I'm building a guest invitation system"
 1. Read: `wedding-wall-patterns/PATTERNS_INDEX.md` → "auto-join" + "guest creation"
@@ -95,7 +103,7 @@
 
 ---
 
-## 📋 Complete Pattern List (12 Total)
+## 📋 Complete Pattern List (13 Total)
 
 ### From Wedding Wall Project (11)
 1. ✅ Backend File Upload to S3
@@ -110,8 +118,9 @@
 10. ✅ Masonry Gallery Layout
 11. ✅ Supabase PostgreSQL + Prisma
 
-### From ONDW Project (1)
+### From PWA Integration (2)
 12. ✅ PWA Offline-First Setup
+13. ✅ PWA Push Notifications
 
 ---
 
@@ -131,6 +140,7 @@
 ### Real-time Features
 - "Photos don't appear instantly" → Polling for New Data
 - "App works offline" → PWA Offline-First Setup
+- "Need to notify users" → PWA Push Notifications
 
 ### Database & Validation
 - "Foreign key errors" → One-to-Many with Validation
@@ -144,12 +154,12 @@
 
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 12 |
-| Level 2 (Proven) | 12/12 ✅ |
+| Total Patterns | 13 |
+| Level 2 (Proven) | 13/13 ✅ |
 | Frameworks Covered | 6+ (Next.js, React, Laravel, Vue, Node.js, etc) |
-| Projects Sourced | 2 (Wedding Wall, ONDW) |
-| Lines of Code | 8000+ |
-| Documentation | 3000+ lines |
+| Projects Sourced | 3 (Wedding Wall, Push Notifications, ONDW) |
+| Lines of Code | 10,000+ |
+| Documentation | 4500+ lines |
 
 ---
 
@@ -164,6 +174,7 @@ All patterns are **Level 2: Proven** meaning:
 - ✅ Testing strategies documented
 
 ### Recent Additions
+- **PWA Push Notifications** (March 31, 2026 7:27 AM) - From Wedding Wall + Push Notification Test
 - **Supabase PostgreSQL + Prisma** (March 16, 2026 8:35 AM) - From Wedding Wall database layer
 - **PWA Offline-First** (March 16, 2026 8:32 AM) - Extracted from OnDeWei (2+ year production)
 - **10 Wedding Wall Patterns** (March 15, 2026) - From Wedding Wall Phases 1-6
@@ -233,6 +244,7 @@ Filter: By problem, framework, maturity, source
 | S3 Backend Upload | 30-45 min | Medium |
 | Image Proxy | 15-20 min | Easy |
 | PWA Setup | 20-30 min | Medium |
+| PWA Push Notifications | 25-35 min | Medium |
 | URL Auto-Join | 15-25 min | Medium |
 | Guest On-Demand | 10-15 min | Easy |
 | Data Polling | 10-15 min | Easy |
@@ -308,7 +320,7 @@ Planned pattern additions:
 
 ---
 
-**Last Updated**: March 16, 2026 8:35 AM  
+**Last Updated**: March 31, 2026 7:27 AM  
 **Curator**: Yappy (AI Memory System)  
 **Status**: 🟢 Growing library, actively maintained  
-**Total Patterns**: 12 (all Level 2: Production-Proven)
+**Total Patterns**: 13 (all Level 2: Production-Proven)
