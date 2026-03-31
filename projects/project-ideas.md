@@ -38,7 +38,39 @@
 
 ---
 
-### 2. 🎟️ **Digital Loyalty System** — Customer Card to PWA
+### 2. 🔧 **ONDW Pre-Production Environment** — Docker Local + Hostinger Staging
+**Status**: 🚀 **IN PROGRESS** (Docker Local Pre-Prod Strategy)
+**Added**: March 31, 2026 (9:05 AM)
+**Last Updated**: March 31, 2026 (10:40 AM)
+**Concept**: Set up pre-prod environment using Docker locally on Mac for safe testing, then deploy to Hostinger staging when proven stable
+
+**Details**:
+- **Domain**: `onewei.my`
+- **Current Hosting**: Hostinger (Shared Hosting)
+- **Access Method**: SSH
+- **Current Environment**: Production only (no pre-prod)
+- **Primary Goal**: Test service worker fixes + push notifications safely before production
+- **Related Issue**: Service worker (`sw.js`) currently disabled due to cache conflicts with Laravel auth
+- **Push Notifications**: PWA pattern ready (documented in library), needs SW working first
+- **Action Items**:
+  1. SSH into Hostinger and document current setup (PHP version, MySQL, Redis, directory structure)
+  2. Create pre-prod subdomain/directory (e.g., `staging.ondw-domain.com`)
+  3. Set up separate MySQL database for pre-prod
+  4. Configure separate `.env` for pre-prod (different API keys, debug settings)
+  5. Deploy code to pre-prod via Git or FTP
+  6. Test service worker uncommenting and cache strategy fixes
+  7. Test push notifications end-to-end
+  8. Document deployment process for future use
+- **Technical Notes**:
+  - Hostinger shared hosting has file system limits
+  - May need to coordinate with hosting provider for additional domains/databases
+  - Pre-prod `.env` should mirror production but with test credentials
+- **Risk**: Service worker cache issues caused production problems before - pre-prod testing critical
+- **LRU Position**: #2 (Most Recent / Active Deployment)
+
+---
+
+### 3. 🎟️ **Digital Loyalty System** — Customer Card to PWA
 **Status**: 💡 **BRAINSTORM** (Idea Captured)
 **Added**: March 14, 2026 (5:56 PM)
 **Last Updated**: March 14, 2026 (5:56 PM)
@@ -59,7 +91,7 @@
 
 ---
 
-### 3. 🎨 **Photobooth WebApp** — Cloud-Based Remote Shutter
+### 4. 🎨 **Photobooth WebApp** — Cloud-Based Remote Shutter
 **Status**: 💭 **CONCEPT** (Planning Phase)
 **Added**: March 9, 2026 (12:19 PM)
 **Last Updated**: March 9, 2026 (12:26 AM)
