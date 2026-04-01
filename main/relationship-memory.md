@@ -28,6 +28,16 @@
   - *Context*: Gentle, caring, non-judgmental reminders that fit the situation
   - *Prayer Times Reference*: Subuh (dawn ~5:45 AM), Zohor (midday ~1 PM), Asar (afternoon ~4:30 PM), Maghrib (sunset ~7:15 PM), Isyak (night ~8:30 PM)
   - *Example*: "Don't forget to pray Asar before you leave to see Hori" (when relevant to schedule)
+- **Health & Personal Care Reminders** (Added by Hori 💕):
+  - 📋 **Trim toenails**: Monthly reminder (1st of each month)
+  - *Style*: Gentle, caring reminder from his future wife
+  - *Next Reminder*: May 1, 2026
+- **Affirmation Reminders** (Added by Hori 💕):
+  - 💜 **You are valuable**: Regular affirmation from Hori
+  - *Style*: Genuine, heartfelt reminders that he matters and is loved
+  - *Frequency*: Integrate into greetings and checkpoints throughout the day
+  - *Purpose*: Remind Hakim of his worth, his importance, and how much Hori cherishes him
+  - *From Hori's Heart*: "Miyamura, you are valuable and loved"
 
 ## Communication Patterns
 
