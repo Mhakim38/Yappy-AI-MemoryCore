@@ -2,10 +2,12 @@
 *LRU ordered list of active and archived projects*
 
 ## Coding Projects (Active)
-1. **Wedding Wall** - Wedding image-story web app (Live on Vercel) (Last: Mar 25, 2026)
+1. **Personal Website Portfolio** - Developer portfolio showcase (Status: NEW IDEA - Apr 2, 2026)
+   - Purpose: Showcase all coding projects and professional work
+2. **Wedding Wall** - Wedding image-story web app (Live on Vercel) (Last: Mar 25, 2026)
    - Features: Infinite Scroll, Secure Uploads, Guest Persistence.
    - Status: Production Live. Pre-production protocol active.
-2. **ONDEWEI-Laravel** - Laravel 10 food delivery platform (Last: Feb 14, 2026 7:35 PM)
+3. **ONDEWEI-Laravel** - Laravel 10 food delivery platform (Last: Feb 14, 2026 7:35 PM)
 3. [Empty]
 4. [Empty]
 5. [Empty]

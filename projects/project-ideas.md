@@ -12,7 +12,23 @@
 
 ## Active Ideas (Ordered by Recency)
 
-### 1. ♾️ **Eternal Memory** (prev. Wedding Wall) — Multi-Tenant Digital Guestbook
+### 1. 🌐 **Personal Website Portfolio** — Developer Portfolio Site
+**Status**: 💡 **NEW IDEA** (Added Apr 2, 2026)
+**Added**: April 2, 2026 (6:09 PM)
+**Concept**: Build a personal website portfolio to showcase Hakim's projects and skills
+
+**Details**:
+- **Purpose**: Professional portfolio site for Hakim
+- **Projects to Showcase**: Wedding Wall, ONDW, Booking Bus System, and other coding projects
+- **Features**: Project showcase, about section, skills, contact information
+- **Tech Stack**: [To be determined - personal choice]
+- **Design**: Modern, responsive, clean interface
+- **Deployment**: [To be determined]
+- **LRU Position**: #1 (Most Recent - Just Added)
+
+---
+
+### 2. ♾️ **Eternal Memory** (prev. Wedding Wall) — Multi-Tenant Digital Guestbook
 **Status**: 🚀 **PIVOT & EXPANSION** (Business Strategy Phase)
 **Added**: March 22, 2026 (8:31 PM)
 **Last Updated**: March 25, 2026 (11:25 AM)
