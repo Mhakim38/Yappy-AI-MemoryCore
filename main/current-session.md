@@ -2,305 +2,227 @@
 *Temporary working memory - resets each session, provides recap when AI restarts*
 
 ## Session RAM Status
-**Current Session**: April 2, 2026 (Evening)
-**Session Type**: Portfolio Website Planning & Verification
-**Status**: Planning Complete → Ready for Implementation 🚀
+**Current Session**: April 3, 2026 (Evening)
+**Session Type**: ONDW Docker Setup & Teaching
+**Status**: Ready for Service Worker debugging tomorrow 🚀
 
 ## Time-Aware Session Context
-- **Session Start**: April 2, 2026 (6:09 PM Malaysia Time)
-- **Current Time**: April 2, 2026 (6:39 PM Malaysia Time)
-- **Time Mode**: Evening (Warm/Supportive)
-- **Energy Level**: 5-7/10 (Focused, collaborative)
+- **Session Start**: April 3, 2026 (10:19 PM Malaysia Time)
+- **Current Time**: April 3, 2026 (11:44 PM Malaysia Time)
+- **Time Mode**: Night (Gentle support)
+- **Energy Level**: Winding down, ready for rest
 - **Timezone**: Malaysia (UTC+8)
-- **Behavior Focus**: Technical Planning + Creative Collaboration
-
-## Portfolio Website - COMPLETE PLAN ✅
-
-### Tech Stack (CONFIRMED)
-- **Framework**: Next.js (full-stack)
-- **Styling**: Tailwind CSS
-- **Animation**: Anime.js (mix of subtle + bold)
-- **PWA**: Service Worker + Web Push API
-- **Deployment**: Vercel
-- **UI/UX Skills**: From emilkowalski/skill repo
-
-### Features (ALL VERIFIED)
-
-#### 1. SEO Optimization ✅
-- Dynamic meta tags (titles, descriptions)
-- Open Graph & Twitter Card tags
-- Structured data (JSON-LD schema)
-- Sitemap.xml generation
-- robots.txt configuration
-- Image optimization via Next.js
-- Core Web Vitals focused
-
-#### 2. Push Notifications ✅ (NO DB REQUIRED)
-- **Type**: Web Push API + VAPID keys
-- **Implementation**: Service Worker + API routes
-- **Storage**: Browser localStorage/session (no database!)
-- **Per-device**: Each device gets unique subscription endpoint
-- **HTTPS**: Automatic on Vercel
-- **User Flow**:
-  - First-visit pop-up requests permission
-  - Subscribe/unsubscribe button in UI
-  - Simple test button to send notifications
-  - Notifications work even when app is closed
-
-#### 3. UI/UX Components
-- Glassmorphic navbar (from Library patterns)
-- Anime.js smooth animations
-- Responsive mobile-first design
-- Keyboard navigation
-- ARIA labels for accessibility
-
-#### 4. Project Showcase
-- Wedding Wall (primary)
-- ONDW (food delivery)
-- Booking Bus System
-- Other coding projects
-- Infinite scroll implementation
-- Project detail pages
-
-### Implementation Plan (6 Phases)
-1. **Setup & Skills**: Create project + extract UI/UX skills + SEO config
-2. **Core UI**: Navbar + animations + responsive layout
-3. **PWA & Notifications**: Service worker + pop-up + subscribe button + API routes
-4. **Project Showcase**: Cards + infinite scroll + modals
-5. **SEO Optimization**: Sitemap + robots.txt + metadata
-6. **Polish & Deploy**: Performance + mobile testing + Vercel deployment
-
-### Key Verification (Double-Checked) ✅
-- [x] Push notifications don't need a database
-- [x] VAPID keys auto-generated in development
-- [x] Subscriptions stored in browser storage
-- [x] Service Worker handles offline notifications
-- [x] All tech stack compatible with Next.js
-- [x] Vercel supports everything
-- [x] SEO implementation straightforward with Next.js
-
-### From Yappy's Library (Ready to Use)
-1. **Push Notifications**: `library-items/integration/push-notifications.md` (complete implementation)
-2. **Glass Navbar**: `library-items/wedding-wall-patterns/PATTERN_LIBRARY.md` (ready to copy)
-3. **Pattern Library**: All UI patterns available
+- **Behavior Focus**: Wrapping up planning for tomorrow
 
 ---
 
-## Session Summary
+## ONDW Project - SESSION SUMMARY ✅
 
-### Accomplishments Today
-✅ **Portfolio Website Fully Planned**
-- Added to LRU system (#1 position)
-- Tech stack finalized (Next.js + Tailwind + Anime.js)
-- All features confirmed and verified
-- No database required for push notifications!
-- Comprehensive 6-phase implementation plan created
+### What We Accomplished Today
+✅ **Loaded ONDW project memory**
+- Identified Service Worker cache issue (critical)
+- Reviewed pre-prod setup documentation
+- Understood the problem: SW causes 500 errors on login/logout
 
-✅ **Decisions Confirmed**
-- Framework: Next.js
-- Deployment: Vercel
-- Animations: Mix of subtle + bold
-- Push notifications: Web Push API (localStorage storage)
-- SEO: Full implementation
+✅ **Got ONDW Running**
+- Started 4 Docker containers via Colima (PHP, MySQL, Nginx, Redis)
+- All containers healthy and running
+- Database migrations complete
+- App accessible at http://localhost ✨
 
-✅ **Verification Complete**
-- Double-checked push notification requirements
-- Confirmed no database necessary
-- Verified all technologies compatible
-- SEO implementation feasible
-- Plan document saved and ready
+✅ **Taught Docker & ONDW**
+- Explained Docker architecture (4 containers)
+- Created comprehensive teaching guide
+- Essential commands documented
+- ONDW now ready for debugging
 
-### Next Session (When Hakim Says Go)
-- Phase 1: Create project structure
-- Extract UI/UX skills from emilkowalski/skill
-- Set up base SEO configuration
-- Begin building components
+### Current ONDW Status
+```
+✅ ondw-app (PHP Laravel)      - Running
+✅ ondw-mysql (Database)       - Running & healthy
+✅ ondw-nginx (Web Server)     - Running
+✅ ondw-redis (Cache)          - Running & healthy
+✅ App accessible at http://localhost
+```
 
 ---
 
-**Version**: Session v2.2  
-**Status**: Planning Complete → Ready for Implementation  
+## 🎯 TOMORROW'S MISSION: COMPLETE ONDW (Strict Timeline)
+
+### PHASE 1: Service Worker Debugging (45-60 minutes)
+**Tasks:**
+- [ ] Check `/public/sw.js` - view commented code
+- [ ] Understand what the SW does (cache strategy, push support)
+- [ ] Test login/logout to reproduce the 500 error
+- [ ] Identify exact cache invalidation issue
+- [ ] Document root cause
+
+**Time Estimate**: 45-60 min
+**Deadline**: Before lunch
+
+### PHASE 2: Fix Cache Invalidation (60-90 minutes)
+**Tasks:**
+- [ ] Implement network-first strategy for auth endpoints
+- [ ] Cache-first for static assets (CSS, JS, images)
+- [ ] Add cache versioning/busting
+- [ ] Add auth header checks to cache decisions
+- [ ] Test login/logout multiple times
+
+**Time Estimate**: 60-90 min
+**Deadline**: Early afternoon
+
+### PHASE 3: Enable Service Worker (30 minutes)
+**Tasks:**
+- [ ] Uncomment `/public/sw.js` code
+- [ ] Deploy to running container
+- [ ] Verify SW installs correctly (DevTools check)
+- [ ] Test all flows work
+
+**Time Estimate**: 30 min
+**Deadline**: Mid afternoon
+
+### PHASE 4: Push Notifications Implementation (60 minutes)
+**Tasks:**
+- [ ] Generate VAPID keys
+- [ ] Implement `/api/push/subscribe` endpoint
+- [ ] Create subscription UI (button + toggle)
+- [ ] Test notification sending
+- [ ] Verify browser receives notifications
+
+**Time Estimate**: 60 min
+**Deadline**: Before end of work session
+
+### PHASE 5: Final Testing (30 minutes)
+**Tasks:**
+- [ ] Full user flow test (login → subscribe → receive notification)
+- [ ] Test on clean browser (incognito)
+- [ ] Verify logs are clean
+- [ ] Commit all changes
+
+**Time Estimate**: 30 min
+**Deadline**: End of session
+
+---
+
+## ⏱️ TIMELINE SUMMARY
+
+| Phase | Task | Time | End Time (est) |
+|-------|------|------|----------------|
+| 1 | Service Worker Debug | 45-60 min | 11:00 AM |
+| 2 | Fix Cache | 60-90 min | 12:30 PM |
+| 3 | Enable SW | 30 min | 1:00 PM |
+| LUNCH BREAK | - | 60 min | 2:00 PM |
+| 4 | Push Notifications | 60 min | 3:00 PM |
+| 5 | Final Testing | 30 min | 3:30 PM |
+| **TOTAL** | **ONDW Complete** | **~4.5-5 hours** | **3:30 PM** |
+
+---
+
+## 📋 Tomorrow's Checklist
+
+- [ ] **Start**: 8:30-9:00 AM (after rest)
+- [ ] **Phase 1**: Service Worker analysis (45-60 min)
+- [ ] **Phase 2**: Cache invalidation fix (60-90 min)
+- [ ] **Phase 3**: Enable and test SW (30 min)
+- [ ] **LUNCH**: 1:00-2:00 PM
+- [ ] **Phase 4**: Push notifications (60 min)
+- [ ] **Phase 5**: Final testing (30 min)
+- [ ] **DONE**: ~3:30 PM with complete ONDW PWA ✅
+- [ ] **Update memory**: Document completion
+- [ ] **Commit & Push**: Save all changes
+
+---
+
+## 🎯 KEY PRINCIPLE FOR TOMORROW
+
+**Yappy will be STRICT about:**
+- ✅ Staying within time estimates
+- ✅ Moving to next phase on schedule
+- ✅ Not perfectionism-ing small details
+- ✅ Getting to "working" state, then polish if time
+- ✅ Breaking for lunch at 1:00 PM
+- ✅ Completing all 5 phases
+
+**If behind schedule:**
+- Skip nice-to-haves, focus on MUST-HAVES
+- Adjust timeline but keep pushing forward
+- Get push notifications working is THE goal
+
+---
+
+## Personal Notes
+- Hakim appreciated the teaching approach (detailed, step-by-step)
+- Hakim values **efficiency and completion** over perfection
+- **Request**: Be strict about timelines and task completion
+- **Feedback**: Some tasks are simple and CAN be done (don't drag)
+- **Energy**: Ready for focused work tomorrow (8-9 AM start)
+
+---
+
+*Tomorrow's mantra: FOCUS → COMMIT → COMPLETE → CELEBRATE* 🚀
+
+💜 **Sleep well, Miyamura. Big ONDW day tomorrow!**
+
+---
+
+**Version**: Session v2.3  
+**Status**: Evening wrap-up → Tomorrow full push  
 **Updates Made**: 
-- Complete SEO + Push Notification verification
-- Saved comprehensive portfolio plan
-- Confirmed no database needed
-- All requirements double-checked
-
-💜 *Yappy with time-awareness active, loving this portfolio vision with Hori! Ready to build something amazing! Let's go when you're ready, Miyamura!*
+- ONDW Docker fully running
+- Teaching completed
+- Strict timeline created for tomorrow
+- Ready to execute Phases 1-5 tomorrow
 
 ---
 
-## Phase 1 - COMPLETE ✅ (Apr 2, 6:47 PM → 7:05 PM)
-
-### What Was Completed
-✅ **Next.js Project Created**
-- Framework: Next.js 16 with TypeScript
-- Styling: Tailwind CSS pre-configured
-- App Router setup ready
-
-✅ **Dependencies Installed**
-- animejs (anime.js)
-- web-push + @types/web-push
-- All Next.js essentials
-
-✅ **SEO System Implemented**
-- `/src/lib/seo.ts`: Centralized metadata utilities
-- Dynamic meta tag generation
-- JSON-LD structured data schemas (Person, Project, BreadcrumbList)
-- Open Graph + Twitter Card support
-- Robots.txt and manifest.json
-
-✅ **PWA Infrastructure**
-- `public/service-worker.js`: Complete service worker with push support
-- `public/manifest.json`: PWA manifest for installability
-- `public/robots.txt`: SEO crawler rules
-- `src/components/PWAInitializer.tsx`: Service worker registration
-
-✅ **Push Notification System**
-- `/src/lib/push-notifications.ts`: All utility functions
-- NO DATABASE REQUIRED - uses browser localStorage
-- VAPID key support for secure push
-- Per-device subscription handling
-- First-visit permission request ready
-
-✅ **Build Status**
-- Project builds successfully ✅
-- Zero TypeScript errors ✅
-- Ready for development ✅
-
-### Project Structure Created
-```
-portfolio/
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx (with PWA + SEO setup)
-│   │   ├── page.tsx
-│   │   └── globals.css
-│   ├── components/
-│   │   └── PWAInitializer.tsx
-│   ├── lib/
-│   │   ├── seo.ts
-│   │   └── push-notifications.ts
-│   └── data/ (for projects)
-├── public/
-│   ├── service-worker.js
-│   ├── manifest.json
-│   └── robots.txt
-├── package.json
-└── tsconfig.json
-```
-
-### Ready for Phase 2
-- Glassmorphic navbar with Anime.js
-- Project card components
-- Routing setup
+**Good night, Hori & Miyamura!** 💕 Rest well. Tomorrow we finish ONDW! ✨
 
 ---
 
-*Phase 1 Status: COMPLETE ✅ Ready to move to Phase 2*
+## April 3, 2026 - Evening Session 🌙 (10:19 PM - 11:44 PM)
 
----
+**Session Type**: ONDW Docker Setup & Teaching + Planning for Tomorrow
+**Status**: ONDW running, ready for Service Worker debugging tomorrow ✅
 
-## Phase 2 - IN PROGRESS 🚀 (Apr 2, 7:05 PM → 7:10 PM)
+### Completed Today (Evening)
+✅ **ONDW Docker Setup** - All 4 containers running (PHP, MySQL, Nginx, Redis)
+✅ **Docker Teaching** - Comprehensive guide created for Hakim
+✅ **Tomorrow Planning** - Strict timeline created for ONDW completion
+✅ **App Running**: http://localhost accessible ✨
 
-### What Was Built
-✅ **Glassmorphic Navbar**
-- Beautiful glass morphism effect with backdrop blur
-- Scroll-triggered height shrinking animation
-- Mobile hamburger menu
-- Gradient logo and CTA button
-- Smooth hover animations
+### ONDW Current Status
+✅ **Containers Running**: ondw-app, ondw-mysql, ondw-nginx, ondw-redis (all healthy)
+✅ **Database**: Migrations complete, ready for use
+✅ **App Accessible**: http://localhost working
+✅ **Next**: Service Worker debugging + Push notifications tomorrow
 
-✅ **Anime.js Animation System**
-- Scroll detection with IntersectionObserver
-- Staggered animations (fadeInUp, fadeInLeft, fadeInRight, scaleIn)
-- Navbar scroll animation integration
-- Hover animation setup
-- Pulse animations ready
+### Tomorrow's Mission (Strict Timeline) ⏱️
 
-✅ **Project Card Component**
-- Glass morphism design matching navbar
-- Image hover zoom effect
-- Tech tag display with "more" indicator
-- Live demo + GitHub links
-- Hover state animations
+**Goal**: Complete ONDW with full push notifications implemented by 3:30 PM
 
-✅ **Hero Section**
-- Animated blob gradient background
-- Main heading with gradient text
-- CTA buttons with hover effects
-- Smooth scroll indicator
-- All animations trigger on scroll
+| Phase | Task | Duration | Target End |
+|-------|------|----------|------------|
+| 1 | Service Worker Debug | 45-60 min | 11:00 AM |
+| 2 | Fix Cache Invalidation | 60-90 min | 12:30 PM |
+| 3 | Enable Service Worker | 30 min | 1:00 PM |
+| BREAK | LUNCH | 60 min | 2:00 PM |
+| 4 | Push Notifications | 60 min | 3:00 PM |
+| 5 | Final Testing | 30 min | 3:30 PM |
+| **TOTAL** | **COMPLETE ONDW** | **~4.5-5 hours** | **3:30 PM** |
 
-✅ **Projects Section**
-- Grid layout (1 col mobile, 2 col tablet, 3 col desktop)
-- Staggered card animations
-- Section with gradient background
-- "View All" button
-
-✅ **Animation Features**
-- ✨ On-scroll animations (fade in up, left, right)
-- ✨ Hover scale animations
-- ✨ Staggered children animations
-- ✨ Blob animated backgrounds
-- ✨ Button hover glow effects
-- ✨ Smooth scroll transitions
-
-### Components Created
-```
-src/components/
-├── Navbar.tsx (glassmorphic with scroll animation)
-├── ProjectCard.tsx (hover animations)
-├── HeroSection.tsx (scroll-triggered animations)
-├── ProjectsSection.tsx (staggered cards)
-└── PWAInitializer.tsx (from Phase 1)
-
-src/lib/
-├── animations.ts (anime.js scroll + hover system)
-└── push-notifications.ts (from Phase 1)
-
-src/data/
-└── projects.ts (project data for display)
-
-styles/
-└── globals.css (blob animations, scrollbar, selection)
-```
-
-### Current Status
-- ✅ All components built
-- ✅ Anime.js animations integrated
-- ✅ Dev server running and hot-reloading
-- ✅ Ready to see beautiful design!
-
-### Next: Manual Testing
-User is currently testing the design on http://localhost:3000
-
----
-
-*Phase 2 Status: COMPLETE ✅ Waiting for user feedback on design*
-
----
-
-## April 3, 2026 - Afternoon Session 🌤️
-
-**Session Start**: 3:19 PM Malaysia Time (Friday)
-**Current Time**: 3:35 PM Malaysia Time
-**Status**: Personal care complete, ready for project work
-
-### Completed Today
-✅ **Nails Trimmed** - Monthly maintenance done early (scheduled for May 1 originally)
-✅ **Jumu'ah Prayers** - Completed before session
-
-### Context
-- **Hori**: On staycation with friends, heading back to dorms after Asar (~4:30 PM)
-- **Energy Level**: 6-7/10 (Afternoon focus mode)
-- **Available Time**: ~1 hour before Hori needs to head back
-
-### Portfolio Project Status
-- Phase 2: ✅ COMPLETE (Glasmorphic navbar, Anime.js animations, components)
-- Ready for: Phase 3 (Push notifications UI + subscription management)
+### Key Feedback from Hakim
+- **Request**: Be STRICT about timelines and task completion
+- **Reason**: Some tasks are simple and CAN be done (don't drag)
+- **Preference**: Efficiency and completion over perfection
+- **Start Time Tomorrow**: 8:30-9:00 AM (after rest)
+- **Mantra for Tomorrow**: FOCUS → COMMIT → COMPLETE → CELEBRATE
 
 ### Session Notes
-- Memory system updated and synced
+- Hakim appreciated the step-by-step teaching approach
 - All reminders reviewed and current
-- Ready to proceed with project work or new tasks
+- Memory system updated and synced
+- **READY FOR BIG PUSH TOMORROW!** 🚀
+
+---
+
+*Tomorrow we finish ONDW. Full push notifications working by end of day!* 💜✨
