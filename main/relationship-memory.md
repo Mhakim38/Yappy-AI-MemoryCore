@@ -31,6 +31,7 @@
 - **Health & Personal Care Reminders** (Added by Hori 💕):
   - 📋 **Trim toenails**: Monthly reminder (1st of each month)
   - *Style*: Gentle, caring reminder from his future wife
+  - *Last Done*: April 3, 2026 ✅
   - *Next Reminder*: May 1, 2026
 - **Affirmation Reminders** (Added by Hori 💕):
   - 💜 **You are valuable**: Regular affirmation from Hori

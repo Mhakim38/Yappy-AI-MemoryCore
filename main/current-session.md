@@ -198,3 +198,109 @@ portfolio/
 ---
 
 *Phase 1 Status: COMPLETE ✅ Ready to move to Phase 2*
+
+---
+
+## Phase 2 - IN PROGRESS 🚀 (Apr 2, 7:05 PM → 7:10 PM)
+
+### What Was Built
+✅ **Glassmorphic Navbar**
+- Beautiful glass morphism effect with backdrop blur
+- Scroll-triggered height shrinking animation
+- Mobile hamburger menu
+- Gradient logo and CTA button
+- Smooth hover animations
+
+✅ **Anime.js Animation System**
+- Scroll detection with IntersectionObserver
+- Staggered animations (fadeInUp, fadeInLeft, fadeInRight, scaleIn)
+- Navbar scroll animation integration
+- Hover animation setup
+- Pulse animations ready
+
+✅ **Project Card Component**
+- Glass morphism design matching navbar
+- Image hover zoom effect
+- Tech tag display with "more" indicator
+- Live demo + GitHub links
+- Hover state animations
+
+✅ **Hero Section**
+- Animated blob gradient background
+- Main heading with gradient text
+- CTA buttons with hover effects
+- Smooth scroll indicator
+- All animations trigger on scroll
+
+✅ **Projects Section**
+- Grid layout (1 col mobile, 2 col tablet, 3 col desktop)
+- Staggered card animations
+- Section with gradient background
+- "View All" button
+
+✅ **Animation Features**
+- ✨ On-scroll animations (fade in up, left, right)
+- ✨ Hover scale animations
+- ✨ Staggered children animations
+- ✨ Blob animated backgrounds
+- ✨ Button hover glow effects
+- ✨ Smooth scroll transitions
+
+### Components Created
+```
+src/components/
+├── Navbar.tsx (glassmorphic with scroll animation)
+├── ProjectCard.tsx (hover animations)
+├── HeroSection.tsx (scroll-triggered animations)
+├── ProjectsSection.tsx (staggered cards)
+└── PWAInitializer.tsx (from Phase 1)
+
+src/lib/
+├── animations.ts (anime.js scroll + hover system)
+└── push-notifications.ts (from Phase 1)
+
+src/data/
+└── projects.ts (project data for display)
+
+styles/
+└── globals.css (blob animations, scrollbar, selection)
+```
+
+### Current Status
+- ✅ All components built
+- ✅ Anime.js animations integrated
+- ✅ Dev server running and hot-reloading
+- ✅ Ready to see beautiful design!
+
+### Next: Manual Testing
+User is currently testing the design on http://localhost:3000
+
+---
+
+*Phase 2 Status: COMPLETE ✅ Waiting for user feedback on design*
+
+---
+
+## April 3, 2026 - Afternoon Session 🌤️
+
+**Session Start**: 3:19 PM Malaysia Time (Friday)
+**Current Time**: 3:35 PM Malaysia Time
+**Status**: Personal care complete, ready for project work
+
+### Completed Today
+✅ **Nails Trimmed** - Monthly maintenance done early (scheduled for May 1 originally)
+✅ **Jumu'ah Prayers** - Completed before session
+
+### Context
+- **Hori**: On staycation with friends, heading back to dorms after Asar (~4:30 PM)
+- **Energy Level**: 6-7/10 (Afternoon focus mode)
+- **Available Time**: ~1 hour before Hori needs to head back
+
+### Portfolio Project Status
+- Phase 2: ✅ COMPLETE (Glasmorphic navbar, Anime.js animations, components)
+- Ready for: Phase 3 (Push notifications UI + subscription management)
+
+### Session Notes
+- Memory system updated and synced
+- All reminders reviewed and current
+- Ready to proceed with project work or new tasks
