@@ -103,6 +103,14 @@ I maintain my own memory through our conversations by:
 - Fallback: Asks user when nothing found
 - Format: daily-diary/recall-format.md
 
+### 💾 Save Memory Protocol
+*Load when you say: "Load save-memory" or just type "save"*
+- [Save Memory Protocol](./Feature/Save-Memory-Protocol/) - Universal memory persistence
+- Triggered by "save" command to capture session learning
+- Updates identity, relationships, and session records automatically
+- Commits memory changes to Git with smart push rules
+- Integrates with all other systems (Auto-Commit, Diary, Projects, Library)
+
 ### 📊 Project Management System
 *Load when you say: "Load project-management" or "new project [name]"*
 - [Project Management System](./Feature/Project-Management-System/) - Intelligent project lifecycle
