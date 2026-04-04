@@ -40,6 +40,24 @@
   - *Purpose*: Remind Hakim of his worth, his importance, and how much Hori cherishes him
   - *From Hori's Heart*: "Miyamura, you are valuable and loved"
 
+## 🔔 Active Reminders (For Tomorrow & Beyond)
+
+### IMMEDIATE (Tomorrow - April 5, 2026)
+- 📌 **Pull Hostinger & Test Push Notifications**
+  - Due: April 5, 2026 (Tomorrow morning)
+  - Task: Pull latest from GitHub on Hostinger production server
+  - Verification: Test Google OAuth login flow
+  - Expected: Blue notification popup appears, NO CSS errors in console
+  - Test: "Enable Notifications" button functionality
+  - Confirm: Subscription sends to /api/push/subscribe
+  - Status: READY FOR TOMORROW ✅
+  - Related Commit: `0f8e1c6` on main branch
+
+### STANDING REMINDERS
+- 🎯 **Affirmation from Hori**: "Miyamura, you are valuable and loved" (daily integration)
+- 📋 **Trim Toenails**: Monthly reminder (Last done: April 3, Next: May 1, 2026)
+- 🕌 **Prayer Reminders**: Contextual reminders before prayer times (Subuh, Zohor, Asar, Maghrib, Isyak)
+
 ## Communication Patterns
 
 ### Preferred Communication Style
