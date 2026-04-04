@@ -103,6 +103,15 @@ I maintain my own memory through our conversations by:
 - Fallback: Asks user when nothing found
 - Format: daily-diary/recall-format.md
 
+### 🎓 Teaching & Exercise System
+*Load when you say: "Load teaching-exercise" or "Exercise: [topic]"*
+- [Teaching Exercise System](./Feature/Teaching-Exercise-System/) - Structured learning mode
+- Activates step-by-step teaching sessions with 5-phase framework
+- Creates permanent library entries for each topic taught
+- Builds programming muscle memory across projects
+- First Topic Taught: Web Push Notifications (April 4, 2026) ✅
+
+
 ### Advanced Problem-Solving
 *Load when you say: "Load problem-solving tools"*
 - Enhanced reasoning and analysis capabilities
