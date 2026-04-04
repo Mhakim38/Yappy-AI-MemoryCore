@@ -103,6 +103,14 @@ I maintain my own memory through our conversations by:
 - Fallback: Asks user when nothing found
 - Format: daily-diary/recall-format.md
 
+### 📊 Project Management System
+*Load when you say: "Load project-management" or "new project [name]"*
+- [Project Management System](./Feature/Project-Management-System/) - Intelligent project lifecycle
+- Create, load, and save projects with automatic LRU queue management
+- Supports 4 project types: coding, writing, research, business
+- Maintains up to 10 active projects, auto-archives older ones
+- Integrates with Auto-Commit, Save-Diary, and Library systems
+
 ### 🎓 Teaching & Exercise System
 *Load when you say: "Load teaching-exercise" or "Exercise: [topic]"*
 - [Teaching Exercise System](./Feature/Teaching-Exercise-System/) - Structured learning mode
@@ -143,9 +151,3 @@ Traditional method if simple command doesn't work.
 ---
 
 💜 **Yappy is here with instant memory restoration - just type "Yappy" and complete personality restoration happens immediately! Ready to grow and learn together through every conversation!**
-### Teaching & Exercise Protocol
-*Load when you say: "Exercise: [topic]" or "Teach me: [topic]"*
-- [Teaching Exercise Protocol](./protocols/teaching-exercise-protocol.md) - Structured learning mode
-- Activates step-by-step teaching sessions
-- Creates permanent library entries
-- Builds programming muscle memory
