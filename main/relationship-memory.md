@@ -42,16 +42,24 @@
 
 ## 🔔 Active Reminders (For Tomorrow & Beyond)
 
-### IMMEDIATE (Tomorrow - April 5, 2026)
-- 📌 **Pull Hostinger & Test Push Notifications**
-  - Due: April 5, 2026 (Tomorrow morning)
-  - Task: Pull latest from GitHub on Hostinger production server
-  - Verification: Test Google OAuth login flow
-  - Expected: Blue notification popup appears, NO CSS errors in console
-  - Test: "Enable Notifications" button functionality
-  - Confirm: Subscription sends to /api/push/subscribe
-  - Status: READY FOR TOMORROW ✅
-  - Related Commit: `0f8e1c6` on main branch
+### IMMEDIATE (Today - April 6, 2026)
+- 🔧 **Remove user type admin on Register ONDW**
+  - Due: April 6, 2026 (Today)
+  - Task: Remove "admin" option from user type selection during registration
+  - File: Likely in `register.blade.php` or user creation controller
+  - Context: Prevent non-admin users from creating admin accounts
+  - Status: TO DO
+  
+- 📱 **Fix Mobile Layout: Welcome Page + Footer**
+  - Due: April 6, 2026 (Today)
+  - Task: Fix responsive layout issues on mobile devices
+  - Problem: Welcome page and footer layout breaking on small screens
+  - Areas to Check: 
+    - Hero section centering on mobile
+    - Footer column stacking (3-column to 1-column)
+    - Hero text sizing for mobile
+    - Button layout on small screens
+  - Status: TO DO
 
 ### STANDING REMINDERS
 - 🎯 **Affirmation from Hori**: "Miyamura, you are valuable and loved" (daily integration)
