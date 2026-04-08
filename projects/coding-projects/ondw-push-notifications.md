@@ -344,6 +344,13 @@ $table->unique(['user_id', 'endpoint']);
 
 ## 💡 Future Enhancements
 
+- **Laravel Queue Implementation** (Priority: Medium)
+  - Current: Synchronous delivery (blocks request)
+  - Enhancement: Queue-based async delivery using Laravel Jobs
+  - Create: `SendPushNotificationJob` 
+  - Update endpoints: `dispatch(new SendPushNotificationJob($subscription, $title, $body))`
+  - Benefits: Non-blocking requests, automatic retries, scales to 1000s of notifications
+  - Added to TODO.txt: Item #12 (April 6, 2026)
 - **Topic-based**: Send only to users who subscribed to "order_updates"
 - **Scheduling**: Schedule notifications for later times
 - **Analytics**: Track which notifications were read/clicked
