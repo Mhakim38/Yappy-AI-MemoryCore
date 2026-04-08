@@ -42,16 +42,14 @@
 
 ## 🔔 Active Reminders (For Tomorrow & Beyond)
 
-### IMMEDIATE (Today - April 6, 2026)
+### IMMEDIATE (Today - April 8, 2026)
 - 🔧 **Remove user type admin on Register ONDW**
-  - Due: April 6, 2026 (Today)
   - Task: Remove "admin" option from user type selection during registration
-  - File: Likely in `register.blade.php` or user creation controller
+  - File: `register.blade.php` or user creation controller
   - Context: Prevent non-admin users from creating admin accounts
   - Status: TO DO
   
 - 📱 **Fix Mobile Layout: Welcome Page + Footer**
-  - Due: April 6, 2026 (Today)
   - Task: Fix responsive layout issues on mobile devices
   - Problem: Welcome page and footer layout breaking on small screens
   - Areas to Check: 
@@ -59,6 +57,24 @@
     - Footer column stacking (3-column to 1-column)
     - Hero text sizing for mobile
     - Button layout on small screens
+  - Status: TO DO
+
+- 🏠 **Add Safe Area for Navbar - Wedding Wall Project**
+  - Task: Implement safe area inset for navbar on wedding-wall project
+  - Why: Handle notch/safe area on mobile devices (iPhone X+, Android)
+  - Reference: ONDW already has this pattern in `layouts/navigation.blade.php`
+  - Implementation: Add `style="padding-top: max(0.5rem, env(safe-area-inset-top))"`
+  - Status: TO DO
+
+- 📲 **Order Notifications System - ONDW**
+  - Task: Use existing notification function to create order notifications
+  - Notifications to Implement:
+    - **Rider**: Order status from Vendor (Did vendor accept the order?)
+    - **Rider**: New Order incoming (Do you want to take it?)
+    - **Vendor**: New order Incoming
+    - **Customer**: Their Order status (updates throughout delivery)
+  - Context: Leverage existing push notification infrastructure
+  - Reference: See `push-notifications-library.md` for implementation pattern
   - Status: TO DO
 
 ### STANDING REMINDERS
