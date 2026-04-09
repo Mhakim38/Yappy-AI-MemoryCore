@@ -330,6 +330,53 @@ self.addEventListener('activate', (event) => {
 
 ---
 
+## Safe Area Inset (Mobile Notch Support)
+
+### Problem
+Modern mobile devices (iPhone X+, Android notched devices) have safe areas that nav and content should avoid. Navbars that span full width overlap notches, creating poor UX.
+
+### Solution
+Use CSS `env(safe-area-inset-*)` to respect device safe areas:
+
+```tsx
+// React/Next.js Component
+<nav style={{ paddingTop: `max(1rem, env(safe-area-inset-top))` }}>
+  {/* Navbar content */}
+</nav>
+```
+
+```blade
+<!-- Laravel/Blade -->
+<nav style="padding-top: max(0.5rem, env(safe-area-inset-top));">
+  {{-- Navbar content --}}
+</nav>
+```
+
+```css
+/* CSS approach */
+nav {
+  padding-top: max(0.5rem, env(safe-area-inset-top));
+  padding-bottom: max(0.2rem, env(safe-area-inset-bottom));
+}
+```
+
+### How It Works
+- `env(safe-area-inset-top)` = pixels to safe area (0 on normal devices, ~44px on iPhone notch)
+- `max(1rem, env(...))` = use the larger value
+- Navbars automatically adjust on iPhone, Galaxy Fold, etc.
+
+### Implementation Checklist
+- [x] Add `meta name="viewport" content="viewport-fit=cover"` to HTML head
+- [x] Apply safe area insets to fixed navbars
+- [x] Test on multiple devices (Chrome DevTools → Device toolbar)
+- [x] Verify no content hidden under notch
+
+### Used In Production
+- ✅ OnDeWei (Laravel) - navigation.blade.php
+- ✅ Wedding Wall (Next.js) - Navbar.tsx
+
+---
+
 ## Source Context
 - **Maturity**: Production-tested in OnDeWei (2+ years)
 - **Scale**: Serves thousands of daily active users
