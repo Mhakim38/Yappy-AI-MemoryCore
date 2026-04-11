@@ -420,10 +420,84 @@ Apply to all pre-login pages:
 
 ---
 
+## Icon Standardization for PWA
+
+### Problem
+Inconsistent icons across pages (favicon.ico, favicon-32x32.png, different icon sources) causes:
+- Broken appearance on iPhone home screen
+- Inconsistent notification icons
+- Confused manifest.json references
+
+### Solution
+Use single, optimized PWA icon (`icon_PWA.png`) everywhere:
+
+```blade
+<!-- Unified approach -->
+<link rel="icon" type="image/png" href="{{ asset('icon_PWA.png') }}">
+<link rel="apple-touch-icon" href="{{ asset('icon_PWA.png') }}">
+<link rel="manifest" href="{{ asset('manifest.json') }}">
+```
+
+### What Gets Updated
+1. **All HTML pages** - Single icon reference
+2. **manifest.json** - Icons array (all sizes point to icon_PWA.png)
+3. **Service Worker** - Notification icons
+4. **Meta tags** - apple-touch-icon
+
+### Implementation Checklist
+- [x] Replace all favicon.ico references with icon_PWA.png
+- [x] Replace all favicon-32x32.png references with icon_PWA.png
+- [x] Replace all favicon-16x16.png references with icon_PWA.png
+- [x] Update Service Worker push notification icons
+- [x] Update manifest.json icon array
+- [x] Apply to ALL pages (welcome, login, register, google-complete, etc)
+
+### Icon Requirements
+- **Format**: PNG with transparency
+- **Sizes**: 192x192px minimum for notifications, 512x512px for home screen
+- **Design**: Should be recognizable at small sizes
+- **Purpose**: Can include "any maskable" for adaptive icons on Android
+
+### Used In Production
+- ✅ OnDeWei (April 2026) - All pages + notifications
+- ✅ manifest.json
+- ✅ Service Worker push events
+
+---
+
+## Safe Area Implementation on Auth Pages
+
+### Problem
+Register and Google OAuth pages had `viewport-fit=cover` but no padding, causing logo to hide under notch.
+
+### Solution
+Add padding to main container alongside viewport-fit=cover:
+
+```blade
+<!-- Good: Both viewport and padding -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+<div style="padding-top: max(1rem, env(safe-area-inset-top));">
+  <!-- Content pushed below notch -->
+</div>
+```
+
+### Why Both Are Needed
+- `viewport-fit=cover` → Extends viewport under notch
+- `padding-top` → Moves content BELOW the notch
+- Without padding: Content still hides under notch!
+
+### Applied To
+- ✅ register.blade.php
+- ✅ auth/google-complete.blade.php
+- ✅ Matches existing implementation in login.blade.php
+
+---
+
 ## Source Context
 - **Maturity**: Production-tested in OnDeWei (2+ years)
 - **Scale**: Serves thousands of daily active users
 - **Framework**: Originally Laravel, pattern is framework-agnostic
-- **Last Updated**: Checkpoint Phase 6 (Wedding Wall completion)
+- **Last Updated**: Checkpoint Phase 6 (Wedding Wall completion) + Icon standardization
 
 **Reuse Status**: ✅ Ready to extract and implement in Next.js, Vue, React, or any framework.
