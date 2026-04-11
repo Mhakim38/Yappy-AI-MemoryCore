@@ -377,6 +377,49 @@ nav {
 
 ---
 
+## Disable Zoom on Pre-Login Pages
+
+### Problem
+Users can accidentally pinch-to-zoom on welcome, login, and register pages, causing layout shifts and poor UX.
+
+### Solution
+Disable user zoom with viewport meta tag adjustment:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+```
+
+**Key additions:**
+- `user-scalable=no` - Disables pinch-to-zoom
+- `viewport-fit=cover` - Handles safe areas (notches) properly
+
+### Implementation
+Apply to all pre-login pages:
+- ✅ welcome.blade.php (home page)
+- ✅ auth/login.blade.php (login form)
+- ✅ auth/register.blade.php (signup form)
+- ✅ Any public pages (terms, privacy, about, pricing, contact)
+
+### Example
+```blade
+<!-- Before -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- After -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+```
+
+### Why This Matters
+- ✅ Prevents accidental zoom that breaks layouts
+- ✅ Improves mobile UX on pre-login pages
+- ✅ Works seamlessly with PWA functionality
+- ✅ Doesn't affect accessibility (users can still use browser zoom if needed)
+
+### Used In Production
+- ✅ OnDeWei (April 2026) - All pre-login pages
+
+---
+
 ## Source Context
 - **Maturity**: Production-tested in OnDeWei (2+ years)
 - **Scale**: Serves thousands of daily active users
