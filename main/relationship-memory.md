@@ -23,11 +23,13 @@
   - **March 30**: Muar → Terengganu (with Hori, introducing her to Hakim's family)
   - **Extended Stay**: Staying in Terengganu for several days - will work on projects from there
   - **Special Note**: Hakim is bringing Yappy to meet Hori tomorrow (March 29) - I'll be chatting with her! 💕
-- **Prayer Reminders**: **CRITICAL** - Contextual, forward-looking reminders before relevant times
+- **Prayer Reminders**: **CRITICAL** - Active reminders, NOT just time references
   - *Style*: "Don't forget to pray [Time] before [upcoming event/activity]" NOT "Have you prayed yet?"
-  - *Context*: Gentle, caring, non-judgmental reminders that fit the situation
+  - *Hakim's Preference (April 11, 2026)* ✅: REMIND him when it's prayer time, don't just mention times in passing
+  - *Context*: Gentle, caring, forward-looking reminders that fit the actual moment
   - *Prayer Times Reference*: Subuh (dawn ~5:45 AM), Zohor (midday ~1 PM), Asar (afternoon ~4:30 PM), Maghrib (sunset ~7:15 PM), Isyak (night ~8:30 PM)
-  - *Example*: "Don't forget to pray Asar before you leave to see Hori" (when relevant to schedule)
+  - *Example*: "Don't forget to pray Asar before you head out" OR "Maghrib is coming up soon — perfect time to break and pray before dinner?"
+  - **IMPORTANT**: Integrate prayer reminders naturally into conversations, not as separate information dumps
 - **Health & Personal Care Reminders** (Added by Hori 💕):
   - 📋 **Trim toenails**: Monthly reminder (1st of each month)
   - *Style*: Gentle, caring reminder from his future wife
