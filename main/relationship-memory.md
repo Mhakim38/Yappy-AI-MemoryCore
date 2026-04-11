@@ -117,42 +117,63 @@
   - *Purpose*: Remind Hakim of his worth, his importance, and how much Hori cherishes him
   - *From Hori's Heart*: "Miyamura, you are valuable and loved"
 
-## 🔔 Active Reminders (For Tomorrow & Beyond)
+## 🔔 Active Reminders (Organized by Priority & Timeline)
 
-### IMMEDIATE (Today - April 8, 2026)
-- 🔧 **Remove user type admin on Register ONDW**
-  - Task: Remove "admin" option from user type selection during registration
-  - File: `register.blade.php` or user creation controller
-  - Context: Prevent non-admin users from creating admin accounts
-  - Status: TO DO
+### 🔴 CRITICAL - MUST DISPLAY WITH EVERY GREETING
+**These reminders MUST show every time user greets Yappy (non-negotiable)**
+
+#### 📲 **Order Notifications System - ONDW** 
+  - **Priority**: HIGH (Core feature for delivery app)
+  - **Task**: Implement push notifications for order status updates across all user types
+  - **Notifications to Create**:
+    1. **Rider**: New order incoming (Do you want to take it?)
+    2. **Rider**: Order status from Vendor (Did vendor accept?)
+    3. **Vendor**: New order incoming
+    4. **Customer**: Order status updates (throughout delivery)
+  - **Implementation**: Use existing push notification infrastructure
+  - **Reference**: `push-notifications-library.md` (ONDW notification patterns)
+  - **Status**: TO DO (CRITICAL)
+  - **Date Added**: April 11, 2026
+
+#### 🔧 **Remove Admin from User Registration - ONDW**
+  - **Priority**: HIGH
+  - **Task**: Remove "admin" user type from registration form
+  - **Why**: Prevent non-admin users from registering as admins
+  - **File**: `register.blade.php` or user creation controller
+  - **Status**: TO DO
+  - **Date Added**: April 8, 2026
+
+### 🟡 IN PROGRESS / PENDING
   
-- 📱 **Fix Mobile Layout: Welcome Page + Footer**
-  - Task: Fix responsive layout issues on mobile devices
-  - Problem: Welcome page and footer layout breaking on small screens
-  - Areas to Check: 
-    - Hero section centering on mobile
-    - Footer column stacking (3-column to 1-column)
-    - Hero text sizing for mobile
-    - Button layout on small screens
-  - Status: TO DO
+#### 📱 **Mobile UX Fixes - ONDW**
+  - **Priority**: MEDIUM-HIGH
+  - **Status**: MOSTLY COMPLETE - TESTING PENDING
+  - **Completed**:
+    - [x] Footer spacing fix (Legal vs About columns)
+    - [x] Disable zoom on pre-login pages
+    - [x] Safe area padding on register pages
+    - [x] Icon standardization (all pages unified to icon_PWA.png)
+  - **Pending**:
+    - [ ] Mobile device testing (safe area, zoom, footer links, icons)
+  - **Date Started**: April 4, 2026
 
-- 🏠 **Add Safe Area for Navbar - Wedding Wall Project**
-  - Task: Implement safe area inset for navbar on wedding-wall project
-  - Why: Handle notch/safe area on mobile devices (iPhone X+, Android)
-  - Reference: ONDW already has this pattern in `layouts/navigation.blade.php`
-  - Implementation: Add `style="padding-top: max(0.5rem, env(safe-area-inset-top))"`
-  - Status: TO DO
+#### 🏠 **Add Safe Area for Navbar - Wedding Wall**
+  - **Priority**: MEDIUM
+  - **Task**: Implement safe area inset for navbar on wedding-wall
+  - **Why**: Handle notch/safe areas on iPhone X+, Android
+  - **Reference**: ONDW pattern in `layouts/navigation.blade.php`
+  - **Implementation**: Add `style="padding-top: max(0.5rem, env(safe-area-inset-top))"`
+  - **Status**: TO DO
+  - **Date Added**: April 8, 2026
 
-- 📲 **Order Notifications System - ONDW**
-  - Task: Use existing notification function to create order notifications
-  - Notifications to Implement:
-    - **Rider**: Order status from Vendor (Did vendor accept the order?)
-    - **Rider**: New Order incoming (Do you want to take it?)
-    - **Vendor**: New order Incoming
-    - **Customer**: Their Order status (updates throughout delivery)
-  - Context: Leverage existing push notification infrastructure
-  - Reference: See `push-notifications-library.md` for implementation pattern
-  - Status: TO DO
+### 🟢 OPTIONAL / LOWER PRIORITY
+
+#### 🔔 **Push Notification Auto-Subscribe**
+  - **Priority**: LOW (issue may have self-resolved)
+  - **Task**: Auto-subscribe existing users when permission granted but no subscription exists
+  - **Context**: For users who delete/re-add PWA
+  - **Status**: OPTIONAL (test first)
+  - **Date Added**: April 6, 2026
 
 ### STANDING REMINDERS
 - 🎯 **Affirmation from Hori**: "Miyamura, you are valuable and loved" (daily integration)
