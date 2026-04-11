@@ -1,6 +1,81 @@
 # 🤝 Relationship Memory - Understanding Hakim
 *Learning your preferences, style, and needs*
 
+## 🔗 Protocol Location Index
+*Quick reference - where each protocol lives for instant verification*
+
+### 🕌 Prayer & Spiritual Reminders
+- **Prayer Reminder System**
+  - Full Protocol: `Feature/Prayer-Reminder-System/SKILL.md`
+  - Preferences: This file (lines 26-32)
+  - Overview: `Feature/Prayer-Reminder-System/README.md`
+  - Trigger: "prayer", "pray", "salah", prayer times, bedtime
+
+### 💾 Memory & Persistence
+- **Save Memory Protocol**
+  - Full Protocol: `Feature/Save-Memory-Protocol/SKILL.md`
+  - Overview: `Feature/Save-Memory-Protocol/README.md`
+  - Installation: `Feature/Save-Memory-Protocol/install-save-memory.md`
+  - Trigger: User says "save"
+
+- **Echo Memory Recall System**
+  - Full Protocol: `Feature/Echo-Memory-Recall/SKILL.md`
+  - Overview: `Feature/Echo-Memory-Recall/README.md`
+  - Installation: `Feature/Echo-Memory-Recall/install-echo-recall.md`
+  - Format: `Feature/Echo-Memory-Recall/recall-format.md`
+  - Trigger: "do you remember", "recall", "when did we"
+
+### 📋 Daily & Session Management
+- **Daily Diary System**
+  - Protocol: `daily-diary/daily-diary-protocol.md`
+  - Current Entries: `daily-diary/current/`
+  - Archived: `daily-diary/archived/`
+  - Format: `daily-diary/diary-entry-format.md`
+  - Trigger: "save diary", "review diary"
+
+- **Save-Diary System** (Session Documentation)
+  - Full Protocol: `Feature/Save-Diary-System/SKILL.md`
+  - Overview: `Feature/Save-Diary-System/README.md`
+  - Installation: `Feature/Save-Diary-System/install-save-diary.md`
+  - Trigger: End of work sessions, "save diary"
+
+### 🎓 Teaching & Learning
+- **Teaching Exercise System**
+  - Full Protocol: `Feature/Teaching-Exercise-System/SKILL.md`
+  - Overview: `Feature/Teaching-Exercise-System/README.md`
+  - Installation: `Feature/Teaching-Exercise-System/install-teaching-exercise.md`
+  - Trigger: "Exercise: [topic]", "Teach me: [topic]"
+
+### 📁 Project Management
+- **Project Management System**
+  - Full Protocol: `Feature/Project-Management-System/SKILL.md`
+  - Overview: `Feature/Project-Management-System/README.md`
+  - Installation: `Feature/Project-Management-System/install-project-management.md`
+  - Projects Storage: `projects/coding-projects/`, `projects/writing-projects/`, etc.
+  - Trigger: "new project [name]", "load project [name]"
+
+### 🔄 Git & Automation
+- **Auto-Commit System**
+  - Full Protocol: `Feature/Auto-Commit-System/SKILL.md`
+  - Overview: `Feature/Auto-Commit-System/README.md`
+  - Installation: `Feature/Auto-Commit-System/install-auto-commit.md`
+  - Trigger: After feature creation, memory saves, significant changes
+
+- **Skill Plugin System**
+  - Full Protocol: `Feature/Skill-Plugin-System/SKILL.md`
+  - Overview: `Feature/Skill-Plugin-System/README.md`
+  - Installation: `Feature/Skill-Plugin-System/install-skill-plugin.md`
+  - Format: `Feature/Skill-Plugin-System/skill-format.md`
+  - Trigger: Creating new reusable skills/protocols
+
+### 📚 Knowledge Base
+- **Library System**
+  - Location: `library-items/`
+  - Contents: Reusable documentation, learning materials, templates
+  - Examples: `push-notifications-library.md`, `pwa-offline-first.md`
+
+---
+
 ## User Profile
 - **Name**: Hakim 
 - **Relationship Style**: Dynamic Growth Partner partnership with Yappy
