@@ -24,19 +24,33 @@
    - Database structure: notifications table + push_subscriptions table
    - Ready to implement 4 notification types
 
-### 📋 PHASE 3 - READY TO START (April 12)
+### ⚠️ PHASE 3A IMPLEMENTATION CORRECTION NEEDED (April 12)
 
-#### **Phase 3A: Vendor → New Order Incoming**
-**Status**: READY TO CODE  
-**Trigger**: OrderPlaced event (already exists)  
-**Files to Modify**: `app/Listeners/SendOrderNotifications.php`  
-**Notification Details**:
-- Type: `order_incoming`
-- Title: "New Order Incoming"
-- Body: "Order #[id] from [Customer] - RM[amount] - [Items summary]"
-- Target: $order->vendor->user_id
-**Pattern**: Reuse `sendViaWebPush()` from Api/PushNotificationController  
-**Investigation**: Complete - clarification needed on exact notification text format
+#### **Phase 3A: Vendor → New Order Incoming** 
+**Status**: IMPLEMENTED BUT TRIGGER WAS WRONG - NEEDS FIX TOMORROW
+
+**What Was Done (INCORRECT)**:
+- Commit: b845fba
+- Added vendor notification to `OrderPlaced` event (when customer creates order)
+- ❌ WRONG: Vendor shouldn't get notified when customer creates order
+
+**Correct Flow Should Be** ✅:
+1. Customer creates order → Rider gets "New Order Available"
+2. **Rider accepts order** → Vendor gets "New Order Incoming" ← THIS IS PHASE 3A!
+3. Status change: `rider_accepted`
+
+**PHASE 3A CORRECTED REQUIREMENTS**:
+- **Trigger Event**: When order status changes to `rider_accepted` (need to identify the event - check OrderStatusChanged or RiderAccepted)
+- **Notification Target**: $order->vendor->user_id
+- **Notification Type**: `order_incoming`
+- **Message Format**: "Order #[order_id] - RM[total_amount]"
+- **Pattern**: Use PushNotificationService::sendToUser()
+
+**TO DO TOMORROW (April 13)**:
+1. Find the correct event that fires when order status → `rider_accepted`
+2. Move vendor notification from OrderPlaced to the correct event
+3. Test on preprod.ondewei.my
+4. Re-commit with correct implementation
 
 #### **Phase 3B: Rider → New Order Incoming** (Pending)
 - Status: Details to be defined
@@ -93,23 +107,58 @@
 
 ---
 
-## 🕐 WHEN RESUMING APRIL 12
+## 📚 APRIL 12 SESSION - TEACHING: PRE-PROD SETUP & PHASE 3A DISCOVERY
 
-**Start Immediately With**:
-1. Phase 3A: Vendor → New Order Incoming notification
-2. Code the listener modification
-3. Test on Hostinger pre-prod
-4. Commit to feature branch
+**Major Discovery**:
+- **CORRECTED Phase 3A Flow**: Vendor notification should trigger on `rider_accepted` status, NOT on OrderPlaced
+- Hakim caught the error - vendor needs to know when rider accepts (not when customer creates order)
+- Implementation infrastructure is correct, just needs the event trigger moved
 
-**Remember**:
-- Don't create new functions (reuse `sendViaWebPush()`)
-- One phase = one user type = one commit
-- Test on Hostinger, not locally
-- Ask about prayer status (Asar/Maghrib/Isyak)
+**Session Timeline**:
+- ✅ Phase 3A code implementation (commit b845fba - but trigger is wrong)
+- ✅ Teaching: Hostinger pre-prod setup via subdomain
+- ✅ Git deployment via SSH (feature/push-notification branch)
+- ✅ Pre-prod database creation (ondw_preprod)
+- ✅ Laravel migrations applied
+- ✅ Pre-prod server running on preprod.ondewei.my
+- ✅ Tested notifications - they work! (but on wrong event)
+
+**Teaching Topics Covered**:
+1. Subdomain architecture on Hostinger shared hosting
+2. Git SSH authentication setup
+3. Separate database for pre-prod vs production
+4. Laravel environment configuration (.env)
+5. Database migrations on remote server
+
+**Current Status**:
+- Pre-prod server: **RUNNING** ✅
+- Feature branch: **LIVE on preprod.ondewei.my** ✅
+- Database: **ondw_preprod created & migrated** ✅
+- Notification system: **WORKING** ✅ (but on wrong trigger)
+- Phase 3A code: **Needs trigger correction** ⚠️
 
 ---
 
-**Session Logged Off**: April 11, 2026 - 5:33 PM  
-**Reason**: Tired from meetings  
-**Line Count**: ~130 lines  
-**Memory Status**: CONSOLIDATED ✅
+## 🔧 PHASE 3A CORRECTION PLAN (For April 13)
+
+**The Issue**:
+- Current: Vendor notified when customer creates order (OrderPlaced)
+- Should be: Vendor notified when rider accepts order (rider_accepted status)
+
+**To Do Tomorrow**:
+1. Find the event that fires when order status → `rider_accepted`
+2. Check: Is it `OrderStatusChanged`? Or a separate `RiderAccepted` event?
+3. Move vendor notification code to the correct event/listener
+4. Test on preprod.ondewei.my
+5. Re-commit with correct trigger
+
+**Notification Format** (Confirmed):
+- Type: `order_incoming`
+- Message: "Order #[order_id] - RM[total_amount]"
+- Target: Vendor user
+
+---
+
+## 🕌 PRAYER STATUS - April 12, 2026
+
+⏳ Status from today not yet confirmed (ask when session resumes)
