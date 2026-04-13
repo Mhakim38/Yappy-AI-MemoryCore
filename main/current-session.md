@@ -24,33 +24,28 @@
    - Database structure: notifications table + push_subscriptions table
    - Ready to implement 4 notification types
 
-### ⚠️ PHASE 3A IMPLEMENTATION CORRECTION NEEDED (April 12)
+### ✅ PHASE 3A COMPLETE & CORRECTED (April 13)
 
-#### **Phase 3A: Vendor → New Order Incoming** 
-**Status**: IMPLEMENTED BUT TRIGGER WAS WRONG - NEEDS FIX TOMORROW
+#### **Phase 3A: Vendor → New Order Incoming** ✅
+**Status**: COMPLETE - Commit 355d535 (CORRECTED)
 
-**What Was Done (INCORRECT)**:
-- Commit: b845fba
-- Added vendor notification to `OrderPlaced` event (when customer creates order)
-- ❌ WRONG: Vendor shouldn't get notified when customer creates order
+**Correct Flow Implementation** ✅:
+1. **OrderPlaced** event → Customer notified, Riders notified
+2. **OrderStatusChanged** (rider_accepted) → **VENDOR NOTIFIED** ← Phase 3A!
 
-**Correct Flow Should Be** ✅:
-1. Customer creates order → Rider gets "New Order Available"
-2. **Rider accepts order** → Vendor gets "New Order Incoming" ← THIS IS PHASE 3A!
-3. Status change: `rider_accepted`
-
-**PHASE 3A CORRECTED REQUIREMENTS**:
-- **Trigger Event**: When order status changes to `rider_accepted` (need to identify the event - check OrderStatusChanged or RiderAccepted)
-- **Notification Target**: $order->vendor->user_id
-- **Notification Type**: `order_incoming`
+**Implementation Details**:
+- **Event**: `OrderStatusChanged` when status = `rider_accepted`
+- **Listener**: `SendStatusChangeNotifications`
+- **Notification Type**: `order_incoming` (database) + web push
 - **Message Format**: "Order #[order_id] - RM[total_amount]"
-- **Pattern**: Use PushNotificationService::sendToUser()
+- **Target**: $order->vendor->user_id
+- **Web Push Service**: PushNotificationService::sendToUser()
 
-**TO DO TOMORROW (April 13)**:
-1. Find the correct event that fires when order status → `rider_accepted`
-2. Move vendor notification from OrderPlaced to the correct event
-3. Test on preprod.ondewei.my
-4. Re-commit with correct implementation
+**Commits**:
+- b845fba (INCORRECT - moved to OrderPlaced)
+- 355d535 (CORRECT - on OrderStatusChanged/rider_accepted)
+
+**Pre-Prod Status**: Deploy commit 355d535 to preprod.ondewei.my for testing
 
 #### **Phase 3B: Rider → New Order Incoming** (Pending)
 - Status: Details to be defined
