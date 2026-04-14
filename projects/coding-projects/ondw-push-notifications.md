@@ -1,9 +1,9 @@
 # 🔔 ONDW Push Notifications System - Project Memory
 
 **Project**: OnDeWei (Rider + Customer + Vendor + Admin platform)  
-**Feature**: Push Notifications for Real-time Updates  
-**Status**: ✅ Implemented & Tested (April 5, 2026)  
-**Complexity**: Intermediate (Laravel + Service Workers + Web Push API)
+**Feature**: Push Notifications for Real-time Updates + Async Queue System  
+**Status**: ✅ Phase 3A & 3B Complete & Tested (April 14, 2026)  
+**Complexity**: Advanced (Laravel + Queue Jobs + Service Workers + Web Push API)
 
 ---
 
@@ -344,18 +344,121 @@ $table->unique(['user_id', 'endpoint']);
 
 ## 💡 Future Enhancements
 
-- **Laravel Queue Implementation** (Priority: Medium)
-  - Current: Synchronous delivery (blocks request)
-  - Enhancement: Queue-based async delivery using Laravel Jobs
-  - Create: `SendPushNotificationJob` 
-  - Update endpoints: `dispatch(new SendPushNotificationJob($subscription, $title, $body))`
-  - Benefits: Non-blocking requests, automatic retries, scales to 1000s of notifications
-  - Added to TODO.txt: Item #12 (April 6, 2026)
-- **Topic-based**: Send only to users who subscribed to "order_updates"
-- **Scheduling**: Schedule notifications for later times
-- **Analytics**: Track which notifications were read/clicked
-- **Rich Notifications**: Images, action buttons, custom sounds
-- **Fallback**: Email if push fails to deliver
+### ✅ **Phase 3A: Vendor → Order Accepted Notification (COMPLETE - April 13)**
+- **Status**: ✅ Implemented, Tested, Deployed
+- **Trigger**: When rider accepts order (status changes to `rider_accepted`)
+- **Recipients**: Vendor who posted the order
+- **Message Format**: "Order #X - RM xxx"
+- **Implementation**:
+  - Created `app/Jobs/SendPushNotificationJob` with:
+    - 30-second timeout
+    - 3 retry attempts with backoff [10s, 30s, 60s]
+    - Comprehensive logging
+    - Error handling
+  - Updated `SendStatusChangeNotifications` listener to dispatch async job
+  - Set up cron-based queue processing on Hostinger (both preprod & production)
+  - Configured `QUEUE_CONNECTION=database` in .env files
+  - Ran `php artisan queue:table` migrations on both environments
+- **Deployment**:
+  - Hostinger cron: `*/1 * * * *` (every minute)
+  - Command: `php artisan queue:work --max-jobs=10 --max-time=55`
+- **Testing**: 
+  - Preprod: ✅ Verified in logs
+  - Production: ✅ Verified in logs
+- **Branch**: Merged to main (commit b9254d9)
+
+### ✅ **Phase 3B: Rider → New Order Notification (COMPLETE - April 14)**
+- **Status**: ✅ Implemented, Tested on Preprod, Ready for Prod
+- **Trigger**: When customer creates order (status = `pending`)
+- **Recipients**: All ACTIVE (online) riders who have `is_active=true`
+- **Message Format**: "RIDER - New Order #X from {vendor_name}"
+- **Implementation**:
+  - Updated `SendOrderNotifications` listener to:
+    - Filter riders: `Rider::where('is_active', true)->get()`
+    - Dispatch `SendPushNotificationJob` for each online rider
+    - Maintain in-app notifications for consistency
+    - Comprehensive Phase 3B logging
+  - No new migration needed (used existing `is_active` field)
+- **Deployment**:
+  - Preprod: ✅ Deployed & tested (April 14)
+  - Production: ⏳ Pending
+- **Latest Commits**:
+  - a2ba0fa: Phase 3B initial
+  - fe227ce: Fix positional arguments (not named params)
+  - 5538d55: Update message format
+- **Branch**: feature/push-notification (ahead of main by 3 commits)
+
+### ⏳ **Phase 3C: Rider → Order Status Updates (PENDING)**
+- **Trigger**: When rider accepts, starts delivery, completes order
+- **Recipients**: TBD (Customer + Vendor?)
+- **Message Format**: TBD
+- **Status**: Not yet specified
+
+### ⏳ **Phase 3D: Customer → Order Status Updates (PENDING)**
+- **Trigger**: TBD
+- **Recipients**: TBD
+- **Message Format**: TBD
+- **Status**: Not yet specified
+
+---
+
+### 🔧 **Queue Implementation Details (Phase 3A & 3B)**
+
+#### **Configuration**
+- **Queue Connection**: database (stores jobs in `jobs` table)
+- **Processing Method**: Cron-based (shared hosting limitation)
+- **Cron Schedule**: Every minute (`*/1 * * * *`)
+- **Max Jobs**: 10 per run
+- **Max Time**: 55 seconds (exits before next cron run)
+
+#### **Database Tables**
+- `jobs` - Stores queued jobs
+- `job_batches` - Stores job batch info
+
+#### **Job Specification**
+```php
+app/Jobs/SendPushNotificationJob.php:
+- timeout: 30 seconds
+- tries: 3 attempts
+- backoff: [10, 30, 60] seconds (exponential)
+- handle(): Calls PushNotificationService::sendToUser()
+- logging: Comprehensive debug + error logging
+```
+
+#### **Listener Updates**
+| Listener | Trigger | Recipient | Job |
+|----------|---------|-----------|-----|
+| SendStatusChangeNotifications | rider_accepted | Vendor | SendPushNotificationJob |
+| SendOrderNotifications | OrderPlaced (pending) | Online Riders | SendPushNotificationJob |
+
+---
+
+### 📊 **Current Implementation Status**
+
+| Phase | Feature | Status | Preprod | Production | Branch |
+|-------|---------|--------|---------|------------|--------|
+| 3A | Vendor ← Order Accepted | ✅ DONE | ✅ Works | ✅ Works | main |
+| 3B | Rider ← New Order | ✅ DONE | ✅ Works | ⏳ PENDING | feature/push-notification |
+| 3C | Rider → Order Status | ⏳ PENDING | - | - | - |
+| 3D | Customer → Order Status | ⏳ PENDING | - | - | - |
+
+---
+
+### 🚀 **Next Actions (Tonight)**
+1. Deploy Phase 3B to production
+2. Test with sample order creation
+3. Merge feature/push-notification to main
+4. Plan Phase 3C & 3D implementation
+
+---
+
+- **Laravel Queue Implementation** (Priority: HIGH) ✅ COMPLETE
+  - Status: Fully implemented in Phase 3A & 3B
+  - Job: `SendPushNotificationJob` with timeout, retries, backoff
+  - Listeners: Both vendor and rider notifications dispatch async jobs
+  - Deployment: Cron-based processing on Hostinger
+  - Benefits: Non-blocking requests, automatic retries, scales efficiently
+  - Testing: Both preprod and production verified ✅
 
 ---
 
@@ -381,8 +484,8 @@ $table->unique(['user_id', 'endpoint']);
 
 ---
 
-**Last Updated**: April 5, 2026  
-**Status**: Production Ready ✅  
+**Last Updated**: April 14, 2026  
+**Status**: Phase 3A ✅ Production Ready | Phase 3B ✅ Preprod Ready → Prod Pending  
 **Tested By**: Hakim + Yappy  
 **Security Level**: ⭐⭐⭐⭐⭐ (Enterprise Grade)
 
