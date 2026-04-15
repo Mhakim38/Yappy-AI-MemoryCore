@@ -394,11 +394,31 @@ $table->unique(['user_id', 'endpoint']);
 - **Message Format**: TBD
 - **Status**: Not yet specified
 
-### ⏳ **Phase 3D: Customer → Order Status Updates (PENDING)**
-- **Trigger**: TBD
-- **Recipients**: TBD
-- **Message Format**: TBD
-- **Status**: Not yet specified
+### ✅ **Phase 3D: Customer → Order Status Updates (COMPLETE - April 15)**
+- **Status**: ✅ Implemented & Ready for Preprod Testing
+- **Triggers**:
+   1. When rider accepts (status = `rider_accepted`)
+   2. When vendor prepares (status = `preparing`)
+   3. When rider picks up (status = `on_delivery`)
+   4. When order delivered (status = `delivered`)
+   5. When vendor cancels (status = `cancelled` + "Vendor cancellation" in comments)
+   6. When customer cancels (status = `cancelled` + "Customer cancellation" in comments, only if rider assigned)
+- **Notification Formats**:
+   - Rider Found: **Title** "Rider Found [CUSTOMER]" | **Message** "Order #x - Your rider is {full_name}"
+   - Order Preparing: **Title** "Order Preparing [CUSTOMER]" | **Message** "Order #x - Your order is being prepared"
+   - Rider on the Way: **Title** "Rider on the Way [CUSTOMER]" | **Message** "Order #x - Your meal is Ondewei 😊"
+   - Order Completed: **Title** "Order Completed [CUSTOMER]" | **Message** "Order #x - Enjoy your meal! 😋"
+   - Vendor Cancelled: **Title** "Order Cancelled [CUSTOMER]" | **Message** "Order #x - {business_name} cancelled: {reason}"
+   - Customer Cancelled: **Title** "Order Cancelled [RIDER]" | **Message** "Order #x - Customer Cancelled Order: {reason}"
+- **Implementation**:
+   - Updated `SendStatusChangeNotifications` listener with Phase 3D logic
+   - Used match() expression for clean status-based dispatch
+   - Created `handleCancellationNotification()` to distinguish vendor vs customer cancellations
+   - Created `extractReason()` helper to parse reason from order_status_history.comments
+   - Customer cancellation only sends to assigned rider (no broadcast, skip if no rider)
+   - Added comprehensive Phase 3D logging
+- **Latest Commit**: fc64a89 - Phase 3D: Implement customer order status notifications
+- **Branch**: feature/push-notification
 
 ---
 
@@ -484,8 +504,60 @@ app/Jobs/SendPushNotificationJob.php:
 
 ---
 
-**Last Updated**: April 14, 2026  
-**Status**: Phase 3A ✅ Production Ready | Phase 3B ✅ Preprod Ready → Prod Pending  
+---
+
+## 🎨 **Standardized Push Notification Pattern (April 15)**
+
+### **Title Format**
+```
+[ACTION] [RECIPIENT]
+```
+- **Examples**:
+  - "New Order [VENDOR]"
+  - "New Order [RIDER]"
+  - "Vendor Accepted [RIDER]"
+  - "Order Completed [RIDER]"
+
+### **Message Format**
+```
+Order #x - [Details specific to context]
+```
+- **Examples**:
+  - "Order #x - RM{amount}" (Vendor notification)
+  - "Order #x from {vendor_name}" (Rider new order)
+  - "Order #x - {business_name} is preparing the Food" (Rider vendor accepted)
+  - "Order #x - Successfully delivered. Thank you!" (Rider order completed)
+
+### **Recipients in Brackets**
+- `[VENDOR]` - For vendor/merchant notifications
+- `[RIDER]` - For rider/driver notifications
+- `[CUSTOMER]` - For customer notifications (Phase 3D, TBD)
+
+### **Consistency Rules**
+1. ✅ All titles show recipient in brackets
+2. ✅ No redundant information in messages (don't repeat recipient)
+3. ✅ Messages are short and contextual
+4. ✅ All follow "Order #x" prefix format for consistency
+
+### **Current Implementation**
+
+| Phase | To | Title | Message |
+|-------|----|----|---------|
+| 3A | Vendor | "New Order [VENDOR]" | "Order #x - RM{amount}" |
+| 3B | Riders | "New Order [RIDER]" | "Order #x from {vendor_name}" |
+| 3C | Rider | "Vendor Accepted [RIDER]" | "Order #x - {business_name} is preparing the Food" |
+| 3C | Rider | "Order Completed [RIDER]" | "Order #x - Successfully delivered. Thank you!" |
+| 3D | Customer | "Rider Found [CUSTOMER]" | "Order #x - Your rider is {rider_name}" |
+| 3D | Customer | "Order Preparing [CUSTOMER]" | "Order #x - Your order is being prepared" |
+| 3D | Customer | "Rider on the Way [CUSTOMER]" | "Order #x - Your meal is Ondewei 😊" |
+| 3D | Customer | "Order Completed [CUSTOMER]" | "Order #x - Enjoy your meal! 😋" |
+| 3D | Customer | "Order Cancelled [CUSTOMER]" | "Order #x - {vendor_name} cancelled: {reason}" |
+| 3D | Rider | "Order Cancelled [RIDER]" | "Order #x - Customer Cancelled Order: {reason}" |
+
+---
+
+**Last Updated**: April 15, 2026  
+**Status**: Phase 3A ✅ Production Ready | Phase 3B ✅ Preprod Ready → Prod Pending | Phase 3C ✅ Preprod Ready → Prod Pending | Phase 3D ✅ Implemented → Ready for Preprod Testing  
 **Tested By**: Hakim + Yappy  
 **Security Level**: ⭐⭐⭐⭐⭐ (Enterprise Grade)
 
