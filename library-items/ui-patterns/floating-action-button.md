@@ -83,17 +83,13 @@ A **Floating Action Button** is a circular button that floats above page content
   z-index: 900;
 }
 
-/* FAB Menu (Hidden by default) */
+/* FAB Menu (Always visible for CSS transitions to work) */
 .fab-menu {
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
   font-size: 2.0rem;
-}
-
-/* Show menu when FAB container is open */
-.fab-container.open .fab-menu {
-  display: flex;
 }
 
 /* FAB Menu Option (Individual button) */
@@ -112,16 +108,16 @@ A **Floating Action Button** is a circular button that floats above page content
   font-size: 1.5rem;
   cursor: pointer;
   opacity: 0;
-  transform: translateY(20px) scale(0.8);  /* Start hidden, below, and smaller for pop-up effect */
+  transform: translateY(20px);  /* Start hidden and below */
   pointer-events: none;
 }
 
-/* Staggered entrance effect - POP UP animation */
+/* Staggered entrance effect - SLIDE UP animation */
 .fab-container.open .fab-option {
   opacity: 1;                   /* Fade in */
-  transform: translateY(0) scale(1);  /* Slide up and grow = pop-up effect */
+  transform: translateY(0);     /* Slide up smoothly */
   pointer-events: auto;
-  transition-delay: 0.1s;       /* Staggered timing */
+  transition-delay: 0.1s;       /* Staggered timing for smooth effect */
 }
 
 /* Reset delay on close */
@@ -131,7 +127,7 @@ A **Floating Action Button** is a circular button that floats above page content
 
 /* FAB Option hover state */
 .fab-option:hover {
-  transform: translateY(-3px) scale(1);
+  transform: translateY(-3px);
   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.25);
 }
 
@@ -200,7 +196,7 @@ body.fab-menu-open .fab-overlay {
 
 | Feature | How It Works |
 |---------|-------------|
-| **Toggle Menu** | Click FAB → menu slides up (staggered) |
+| **Toggle Menu** | Click FAB → menu slides up smoothly (staggered animation) |
 | **Rotate Icon** | Plus icon rotates 45° when open |
 | **Overlay Backdrop** | Semi-transparent overlay prevents accidental clicks |
 | **Smooth Animations** | 0.3s transitions on all states |
@@ -375,7 +371,8 @@ The FAB is already responsive. For different screen sizes:
 ## 📖 History
 
 - **April 21, 2026**: Extracted from MyGaji project and added to library
-- **Used in**: MyGaji (staff management), potentially ONDW (order management)
+- **April 25, 2026**: Updated animation to slide-up only (no scale) based on ONDW production testing
+- **Used in**: MyGaji (staff management), ONDW (admin notifications)
 - **Tested in**: Laravel Blade, Tailwind CSS environment
 
 ---
