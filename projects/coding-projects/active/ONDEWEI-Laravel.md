@@ -212,4 +212,115 @@ validTransitions = [
 - **Error Handling**: Wrap status changes in try-catch for transaction rollback
 
 ---
-*Yappy AI Project Entry - Evening Analysis Session*
+
+## ChatBox Integration (May 2, 2026 - 8:38 PM) 💜
+
+### Critical Clarifications
+
+#### 🔴 PARTICIPANTS: Only Rider ↔ Customer (NOT Vendor!)
+- Chat is EXCLUSIVELY between **Rider** and **Customer**
+- Vendor is NOT a chat participant
+- This simplifies the conversation participants to 2 roles only
+- Update plan: Remove vendor from auto-spawned participants
+
+#### ⚙️ source_app Field Explanation
+- **Purpose**: ChatBox is designed as a **MULTI-APP system**
+- `source_app='ondewei'` tags which application this conversation originates from
+- Allows single ChatBox database to handle conversations from multiple different apps
+- **Example Scenario**: If you build another app (food delivery v2, wedding planning, etc.), it could reuse same ChatBox with `source_app='another-app'`
+- **Benefits**:
+  - Namespace isolation (easily identify which app owns which conversation)
+  - Query filtering (search only ONDW conversations, not cross-app noise)
+  - Future multi-tenancy ready
+- **For ONDW**: Always use `source_app='ondewei'`
+
+#### 🔗 context_id ↔ order_id Relationship
+- `context_id` stores the `order_id` value
+- **Should have FK constraint** to `orders.order_id`
+- Database schema: `context_id` VARCHAR(255) with FK relationship
+- **Cascade behavior**: When order deleted, conversation should either:
+  - Option A: Soft delete (mark as archived, preserve historical records)
+  - Option B: Hard delete cascade (remove all messages, participants)
+  - **Recommendation**: Soft delete (use `deleted_at` timestamp on conversations table)
+
+#### 💾 Message DB Storage - YES, Every Message!
+- **Every message MUST be stored to DB immediately on creation**
+- **Why**: 
+  1. Polling mechanism needs persistence source (fetches new messages from DB)
+  2. Message history for future access
+  3. Read receipts tracking (last_read_at per participant)
+  4. Audit trail for support/disputes
+
+- **Flow**:
+  ```
+  User sends message
+  → POST /api/conversations/{id}/messages
+  → Controller validates + stores to DB instantly
+  → Event emitted (MessageCreated)
+  → Response returned to client
+  → Next poll cycle (3-5 sec) fetches from DB
+  → All participants see message
+  ```
+
+- **No caching optimization for messages** (unlike vendor/rider order polling)
+  - Direct DB queries on each poll are acceptable
+  - Can add pagination (latest 25 messages) to reduce payload
+  - Consider query optimization: `->latest('created_at')->paginate(25)`
+
+- **Storage Detail**:
+  ```sql
+  INSERT INTO messages (
+    uuid, 
+    conversation_id, 
+    sender_user_id,
+    type,
+    body, 
+    delivered_at,
+    created_at
+  ) VALUES (...) -- immediate, synchronous
+  ```
+
+### Updated Participant Model
+```php
+// For each order conversation, add:
+- Customer (role='customer')
+- Rider (role='rider')
+// REMOVE: Vendor
+
+// ConversationParticipant::create([
+//     'conversation_id' => $conversation_id,
+//     'user_id' => $customer->user_id, // or $rider->user_id
+//     'role' => 'customer', // or 'rider'
+//     'joined_at' => now(),
+// ])
+```
+
+### Updated Database Schema Requirement
+```sql
+ALTER TABLE conversations ADD CONSTRAINT fk_context_id
+  FOREIGN KEY (context_id) REFERENCES orders(order_id);
+  
+-- Optional: Soft deletes to preserve history
+ALTER TABLE conversations ADD deleted_at TIMESTAMP NULL;
+```
+
+### Migration Strategy Revision
+- Legacy `order_chat` migration: Only migrate messages for rider ↔ customer (ignore vendor if present)
+- Resolve legacy sender_id mapping: Must match to correct rider or customer
+
+### Git Deployment Strategy (May 2, 2026 - 8:48 PM)
+- **Feature Branch**: `feature/chatbox-integration` (created, local)
+- **Workflow**:
+  1. Develop & test locally on `feature/chatbox-integration`
+  2. Push to origin/feature/chatbox-integration
+  3. Merge to origin/preprod (staging) for double-check
+  4. After preprod verified, merge to origin/main (production)
+- **Docker Status**: All 4 containers running (mysql, redis, app, nginx)
+- **Redis Note**: Access via Docker network (`redis:6379` from container), NOT `127.0.0.1` from host
+- **Docker Fix** (May 2, 2026 - 8:53 PM): Fixed `.env` REDIS_HOST from `127.0.0.1` → `redis`
+  - Restarted docker-compose
+  - App now loads successfully at http://localhost ✅
+  - Ready for ChatBox implementation
+
+---
+*Yappy AI Project Entry - ChatBox Integration Planning & Deployment Setup (May 2, 2026)*

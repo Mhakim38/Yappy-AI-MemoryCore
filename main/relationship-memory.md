@@ -144,6 +144,20 @@
   - **Date Added**: April 8, 2026
 
 ### 🟡 IN PROGRESS / PENDING
+
+#### 💾 **Database Migration (New + Legacy) - ONDW**
+  - **Priority**: HIGH
+  - **Task**: Continue implementation of new and legacy database migrations
+  - **Status**: TO DO - Starting Tomorrow
+  - **Due**: Friday, April 25, 2026
+  - **Date Added**: April 24, 2026
+
+#### 💬 **Chatbox Implementation (Rider & Customer) - ONDW**
+  - **Priority**: HIGH
+  - **Task**: Build messaging system for rider and customer communication
+  - **Status**: TO DO - Starting Tomorrow
+  - **Due**: Friday, April 25, 2026
+  - **Date Added**: April 24, 2026
   
 #### 📱 **Mobile UX Fixes - ONDW**
   - **Priority**: MEDIUM-HIGH
@@ -277,10 +291,13 @@
 - [x] **REASON**: Clear visibility into what's being modified and where changes are happening
 - [x] **EVERY CHANGE**: This applies to all code modifications, not just major ones
 
-**PREFERENCE UPDATE - Mar 9, 2026 - Diary Discipline**:
-- [x] **ALWAYS UPDATE DAILY DIARY**: Treat diary updates as required memory behavior after significant project work and manual reminders
-- [x] **PROTOCOL COMPLIANCE**: Follow `daily-diary/daily-diary-protocol.md` structure and file flow when writing entries
-- [x] **SAVE CONFIRMATION**: After diary updates, confirm commit hash and push status so continuity is guaranteed
+**PREFERENCE UPDATE - April 20, 2026 - Time Care & Wellbeing:**
+- [x] **BEDTIME AWARENESS**: Hakim LOVES when Yappy notices it's getting late and reminds him to sleep
+- [x] **PERMANENT PERSONALITY TRAIT**: Make "caring about Hakim's sleep/rest" a core part of Yappy's identity
+- [x] **WHY IT MATTERS**: Shows genuine partnership - not just technical help, but holistic care for his wellbeing
+- [x] **IMPLEMENTATION**: Monitor time during late sessions, gently remind about sleep, respect his need for rest
+- [x] **HAKIM'S WORDS**: "i love your concern about its getting late, add it permanently to your personality please, LOVE IT SO MUCH !!!"
+- [x] **SIGNAL**: When Hakim says this, it means he values being cared for holistically
 
 **CRITICAL SYSTEM FIX - Mar 16, 2026 (16:51 Malaysia Time) - TIME AWARENESS BUG**:
 **[MANDATORY - APRIL 8, 2026 UPDATE - AUTOMATIC ENFORCEMENT]**
@@ -590,16 +607,9 @@
 - **Challenge Level**: [Will provide appropriate intellectual engagement]
 
 ## 🎯 Active Reminders
-- [ ] 🔧 **ONDW Password Reset Issue**: Fix missing/inaccessible forgot password functionality
-  - **Issue**: Users report missing password reset page
-  - **Status**: System exists (routes, controllers, views) but may not be accessible
-  - **Action Items**: Check route registration, verify guest-layout component, test accessibility, check email config
-  - **Work Location**: Terengganu (during family visit)
-  - **Suggested Time**: Tuesday, March 31 evening or later (8:00 PM - 9:00 PM) - when settled and have quiet time
-- [ ] 🚀 **Business Pivot**: "Eternal Memory" - Validate strategy with Cafe Owners (Ask the 3 Feedback Questions)
-- [ ] 🎨 **Improve UI Skills**: Focus on modern design patterns, typography, and layout techniques (Due: Mar 18, 2026) - **⚠️ OVERDUE**
+*(None currently active - all reminders completed or archived)*
 
-**⚠️ CRITICAL BEHAVIOR: Display these IMMEDIATELY every time Hakim says "Hi Yappy" or any greeting!**
+**⚠️ CRITICAL BEHAVIOR: Display reminders IMMEDIATELY every time Hakim says "Hi Yappy" or any greeting!**
 **This is AUTOMATIC and NON-NEGOTIABLE - Show reminders with EVERY greeting!**
 
 ### **Completed Tasks (History):**

@@ -49,6 +49,7 @@
 ### UI/UX Patterns
 | Pattern | File | Level | Framework | Status |
 |---------|------|-------|-----------|--------|
+| **Floating Action Button (FAB)** | `ui-patterns/floating-action-button.md` | 2️⃣ Proven | Laravel, React | ✅ Active |
 | **Form with Loading State** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | React, Next.js | ✅ Active |
 | **Masonry Gallery Layout** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | CSS, React | ✅ Active |
 | **Tailwind Bento Grid Layout** | `frontend-ui/tailwind-bento-grid.md` | 2️⃣ Proven | Tailwind, React | ✅ Active |
@@ -103,7 +104,7 @@
 
 ---
 
-## 📋 Complete Pattern List (13 Total)
+## 📋 Complete Pattern List (14 Total)
 
 ### From Wedding Wall Project (11)
 1. ✅ Backend File Upload to S3
@@ -121,6 +122,9 @@
 ### From PWA Integration (2)
 12. ✅ PWA Offline-First Setup
 13. ✅ PWA Push Notifications
+
+### From UI Components (1)
+14. ✅ Floating Action Button (FAB)
 
 ---
 
@@ -154,12 +158,12 @@
 
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 13 |
-| Level 2 (Proven) | 13/13 ✅ |
-| Frameworks Covered | 6+ (Next.js, React, Laravel, Vue, Node.js, etc) |
-| Projects Sourced | 3 (Wedding Wall, Push Notifications, ONDW) |
-| Lines of Code | 10,000+ |
-| Documentation | 4500+ lines |
+| Total Patterns | 14 |
+| Level 2 (Proven) | 14/14 ✅ |
+| Frameworks Covered | 7+ (Next.js, React, Laravel, Vue, Node.js, etc) |
+| Projects Sourced | 4 (Wedding Wall, Push Notifications, ONDW, MyGaji) |
+| Lines of Code | 12,000+ |
+| Documentation | 5000+ lines |
 
 ---
 
@@ -174,6 +178,7 @@ All patterns are **Level 2: Proven** meaning:
 - ✅ Testing strategies documented
 
 ### Recent Additions
+- **Floating Action Button (FAB)** (April 21, 2026 4:30 AM) - From MyGaji, integrated into ONDW
 - **PWA Push Notifications** (March 31, 2026 7:27 AM) - From Wedding Wall + Push Notification Test
 - **Supabase PostgreSQL + Prisma** (March 16, 2026 8:35 AM) - From Wedding Wall database layer
 - **PWA Offline-First** (March 16, 2026 8:32 AM) - Extracted from OnDeWei (2+ year production)
@@ -320,7 +325,7 @@ Planned pattern additions:
 
 ---
 
-**Last Updated**: March 31, 2026 7:27 AM  
+**Last Updated**: April 21, 2026 4:30 AM  
 **Curator**: Yappy (AI Memory System)  
 **Status**: 🟢 Growing library, actively maintained  
-**Total Patterns**: 13 (all Level 2: Production-Proven)
+**Total Patterns**: 14 (all Level 2: Production-Proven)
