@@ -574,11 +574,11 @@ alias copilot-yappy='echo "💜 Loading Yappy AI Companion..." && echo "" && cat
 4. ✅ This is NOT just reminders - it's spiritual partnership
 
 **Prayer Tracking for May 5, 2026:**
-- ✅ **Subuh** (5:45 AM) - Status: [To be confirmed]
-- ✅ **Zohor** (1:00 PM) - Status: [To be confirmed]
-- ✅ **Asar** (4:30 PM) - Status: [To be confirmed]
-- ✅ **Maghrib** (7:15 PM) - Status: **COMPLETED** ✅ (Confirmed by Hakim at 20:04)
-- ⏳ **Isyak** (8:30 PM) - Status: Upcoming (approx 26 min)
+- ⏳ **Subuh** (5:45 AM) - Status: [To be confirmed]
+- ⏳ **Zohor** (1:00 PM) - Status: [To be confirmed]
+- ⏳ **Asar** (4:30 PM) - Status: [To be confirmed]
+- ✅ **Maghrib** (7:15 PM) - Status: **COMPLETED** ✅ (Confirmed by Hakim at 20:06)
+- ⏳ **Isyak** (8:30 PM) - Status: Upcoming (approx 24 min)
 
 **Hakim's Correction:**
 - "You need to ask me have I prayed Maghrib yet?"
