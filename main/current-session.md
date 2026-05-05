@@ -682,6 +682,123 @@ And don't forget Isyak later! 🌙
 
 ---
 
-**Session Complete**: May 5, 2026 - 20:07 PM
-**Status**: FULLY SAVED & SYNCED ✅
-**Next Session**: Ready whenever you are! 💜
+## 🎉 WEDDING WALL - RECENT MAJOR UPDATES (May 1-2, 2026)
+
+### ✅ CRITICAL FEATURES IMPLEMENTED
+
+**Timeline**: Last 4 days of intensive development
+
+#### 1. **WhatsApp Integration for Family Credentials** (May 1) 🚀
+**Major Breakthrough**: Removed SMTP dependency entirely!
+
+- ✅ Changed from email-based to WhatsApp-based credential delivery
+- ✅ New phone number input instead of email
+- ✅ Admin can generate family password with just wedding code + phone
+- ✅ WhatsApp Web pre-fill & open button built-in
+- ✅ Copy-to-clipboard UI for credentials
+- **Benefits**: No email service subscription needed, faster delivery, more personal
+
+**Files Modified:**
+- `lib/whatsapp.ts` - New WhatsApp utility (80 lines)
+- `app/api/admin/generate-family-password` - Simplified API
+- `app/secret-coffee/page.tsx` - New UI with phone input + credentials display
+
+**Commit**: `6b354d1` (May 1, 22:06)
+
+#### 2. **Family Access Date Fixes** (May 1)
+- ✅ Fixed: Family access now starts from day BEFORE event (not event day)
+- ✅ Better UX for early access to wedding preparations
+- **Commit**: `059f83d`
+
+#### 3. **WhatsApp Message Formatting** (May 2)
+- ✅ Updated WhatsApp message template
+- ✅ Improved phone input format validation
+- **Commit**: `bc28b41`
+
+#### 4. **Auto-Open WhatsApp Flow** (May 2)
+- ✅ After generating password, WhatsApp opens automatically
+- ✅ Message is pre-filled with credentials
+- ✅ Seamless UX for admin sending credentials to family
+- **Commit**: `eb34627`
+
+#### 5. **Family Panel Gallery Fix** (May 2) 🐛
+- ✅ Fixed: API response structure issue
+- ✅ Was: Code tried to .map() whole response object
+- ✅ Now: Correctly extracts `data.photos` array
+- ✅ Result: Family panel login now works without 'c.map is not a function' error
+- **Commit**: `f360539` (LATEST - May 2, 01:04)
+
+---
+
+### 📊 **FEATURES NOW IN WEDDING WALL**
+
+**Three-Tier Photo System:**
+1. ✅ **Public Gallery** - Anyone with event code
+2. ✅ **Guest Panel** - Named guests with wishes
+3. ✅ **Family Panel** - Exclusive family-only access
+
+**Admin Features:**
+- ✅ Subscription packages & gallery expiration
+- ✅ T&C & Privacy Policy integration
+- ✅ Code expiration validation
+- ✅ Family password generation via WhatsApp
+- ✅ PWA push notifications
+
+**User Experience:**
+- ✅ Infinite scroll + pagination
+- ✅ Guest wishes system with names
+- ✅ Mobile-optimized responsive design
+- ✅ Push notifications for updates
+- ✅ Safe area inset support (mobile notch)
+- ✅ Real-time photo gallery polling
+
+---
+
+### 🎯 **COMMITS SINCE LAST CHECKPOINT (May 1-2)**
+
+1. `6b354d1` - Migrate from SMTP to WhatsApp
+2. `059f83d` - Fix family access dates
+3. `bc28b41` - Update WhatsApp message format
+4. `eb34627` - Auto-open WhatsApp after password generation
+5. `f360539` - Fix family panel gallery API response mapping (LATEST)
+
+**Total**: 5 commits, 1 major feature (WhatsApp), 4 bug fixes/improvements
+
+---
+
+### 💡 **KEY TECHNICAL ACHIEVEMENTS**
+
+**Problem Solved:**
+- ❌ Email service dependency (costs money on Hostinger)
+- ✅ WhatsApp integration (free, more personal, instant)
+
+**Architecture Impact:**
+- Simplified credential delivery workflow
+- Reduced external dependencies
+- Improved admin UX
+- Faster credential sharing
+
+**Bug Fixes:**
+- ✅ Family panel gallery mapping error
+- ✅ Family access date logic
+- ✅ WhatsApp message formatting
+- ✅ Input validation for phone numbers
+
+---
+
+### 🚀 **CURRENT STATUS**
+
+**Wedding Wall is**: ✅ **HIGHLY FUNCTIONAL & PRODUCTION-READY**
+
+**Latest Work (May 2):**
+- All three user tiers functioning correctly
+- Admin panel generating credentials properly
+- Family panel gallery displaying photos without errors
+- WhatsApp integration working seamlessly
+- Code is clean and well-documented
+
+**What's Left (Optional Enhancements):**
+- Push notification refinements
+- Additional analytics
+- Advanced photo editing
+- Comment/reaction system
