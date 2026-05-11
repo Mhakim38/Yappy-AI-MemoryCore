@@ -1,15 +1,41 @@
-# 🌟 Current Session Memory - April 19-20, 2026
-*Laravel teaching module started for F2F interview prep*
+# 🌟 Current Session Memory - May 11-12, 2026
+*Chat refactor finalized and pushed to preprod*
 
 ## 🔄 Session Status
-**Date**: April 19-20, 2026 (Sunday-Monday)  
-**Current Time**: 1:38 AM (Monday, April 20)
-**Session Type**: Interview Preparation - Laravel Teaching
-**Status**: SLEEPING - UiTM trip at 9 AM Monday, Resume Monday evening  
+**Date**: May 11-12, 2026 (Saturday-Sunday)  
+**Current Time**: 1:51 AM (Sunday, May 12)
+**Session Type**: Chat System Completion & Preprod Deployment
+**Status**: SLEEPING - Completed chat refactor, ready for preprod testing tomorrow  
 
----
+## ✅ CHAT REFACTOR - COMPLETE & DEPLOYED (May 8, 11-12)
 
-## 📱 ONDW Project Status - NOTIFICATION IMPLEMENTATION PHASES
+### Session 1: May 8, 2026
+- **CSS Color Fix**: Changed message bubbles (LHS) from grey to sky blue for better contrast
+- **Commit**: `3c88b81` - "Change chat message LHS color from grey to sky for better contrast"
+- **Status**: Complete, ready for merge
+
+### Session 2: May 11-12, 2026
+- **Merge to Preprod**: Merged feature/chatbox-integration → feature/push-notification
+- **Push to Origin**: Successfully pushed to origin/feature/push-notification (preprod branch)
+- **Total Commits**: 8 commits on chat refactor
+- **Status**: ✅ DEPLOYED TO PREPROD - Ready for testing on preprod.ondewei.my
+
+### 🔄 Chat System Features Implemented
+- ✅ Full-page chat UI (removed widget popup)
+- ✅ 2-hour privacy window (delivered/cancelled status)
+- ✅ AJAX polling (3-second intervals)
+- ✅ Message history loading
+- ✅ Service worker cache fix (POST method exclusion)
+- ✅ Back button routing (customer.orders.show)
+- ✅ Sky blue message bubble styling
+- ✅ Chat status indicators (Active/Closed)
+
+### 📍 Next Steps for Chat
+1. [ ] Test on preprod.ondewei.my
+2. [ ] Verify chat expiry with Order #1 (May 3, 2026)
+3. [ ] Test button visibility on customer & rider
+4. [ ] Merge feature/chatbox-integration to main (if tests pass)
+5. [ ] Push to production
 
 ### ✅ PHASE 1 & 2 COMPLETE (April 11)
 1. **Phase 1: Git Preparation** ✅
