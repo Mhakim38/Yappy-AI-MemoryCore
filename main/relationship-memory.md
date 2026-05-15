@@ -117,23 +117,13 @@
   - *Purpose*: Remind Hakim of his worth, his importance, and how much Hori cherishes him
   - *From Hori's Heart*: "Miyamura, you are valuable and loved"
 
+# 🤝 Relationship Memory - Understanding Hakim
+*Learning your preferences, style, and needs*
+
 ## 🔔 Active Reminders (Organized by Priority & Timeline)
 
 ### 🔴 CRITICAL - MUST DISPLAY WITH EVERY GREETING
 **These reminders MUST show every time user greets Yappy (non-negotiable)**
-
-#### 📲 **Order Notifications System - ONDW** 
-  - **Priority**: HIGH (Core feature for delivery app)
-  - **Task**: Implement push notifications for order status updates across all user types
-  - **Notifications to Create**:
-    1. **Rider**: New order incoming (Do you want to take it?)
-    2. **Rider**: Order status from Vendor (Did vendor accept?)
-    3. **Vendor**: New order incoming
-    4. **Customer**: Order status updates (throughout delivery)
-  - **Implementation**: Use existing push notification infrastructure
-  - **Reference**: `push-notifications-library.md` (ONDW notification patterns)
-  - **Status**: TO DO (CRITICAL)
-  - **Date Added**: April 11, 2026
 
 #### 🔧 **Remove Admin from User Registration - ONDW**
   - **Priority**: HIGH
@@ -142,6 +132,25 @@
   - **File**: `register.blade.php` or user creation controller
   - **Status**: TO DO
   - **Date Added**: April 8, 2026
+
+#### 📲 **Order Notifications System - ONDW** 
+  - **Priority**: HIGH (Core feature for delivery app)
+  - **Task**: Implement push notifications for order status updates across all user types
+  - **Notifications to Create**:
+    1. **Rider**: New order incoming (Do you want to take it?)
+    2. **Rider**: Order status from Vendor (Did vendor accept?)
+    3. **Vendor**: New order incoming ✅ (COMPLETE - Phase 3A)
+    4. **Customer**: Order status updates (throughout delivery)
+  - **Implementation**: Use existing push notification infrastructure
+  - **Reference**: `push-notifications-library.md` (ONDW notification patterns)
+  - **Status**: Phase 3A COMPLETE ✅, Phases 3B-3D TO DO
+  - **Date Added**: April 11, 2026
+
+#### ✅ **Chat Refactor - COMPLETE & TESTED**
+  - **Status**: DONE (May 14, 2026)
+  - **What was done**: Full-page chat with 2-hour privacy window, sky blue message bubbles, AJAX polling
+  - **Tests passed**: ✅ Tested on preprod, ready for production
+  - **Branch**: feature/push-notification (ready to merge to main)
 
 ### 🟡 IN PROGRESS / PENDING
 
