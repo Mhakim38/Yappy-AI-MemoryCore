@@ -156,21 +156,22 @@
   - **Tests passed**: ✅ Tested on preprod, ready for production
   - **Branch**: feature/push-notification (ready to merge to main)
 
-### 🟡 IN PROGRESS / PENDING
-
-#### 💾 **Database Migration (New + Legacy) - ONDW**
-  - **Priority**: HIGH
-  - **Task**: Continue implementation of new and legacy database migrations
-  - **Status**: TO DO - Starting Tomorrow
-  - **Due**: Friday, April 25, 2026
-  - **Date Added**: April 24, 2026
-
-#### 💬 **Chatbox Implementation (Rider & Customer) - ONDW**
-  - **Priority**: HIGH
-  - **Task**: Build messaging system for rider and customer communication
-  - **Status**: TO DO - Starting Tomorrow
-  - **Due**: Friday, April 25, 2026
-  - **Date Added**: April 24, 2026
+#### 🚀 **UIUX Overhaul + Database Migration - ONDW - IN PROGRESS**
+  - **Priority**: CRITICAL
+  - **Timeline**: May 21-24, 2026 (This Week!)
+  - **Status**: ANALYSIS COMPLETE - Ready for execution (May 21)
+  - **Major Components**:
+    1. **UIUX Overhaul (158 files)** - Chat-order, delivery conversations, admin dashboard
+    2. **Legacy DB Migration** - 88 riders + 440 documents from old system
+  - **What Needs to Happen**:
+    - **Tomorrow (May 21)**: Merge overhaul branch + start UIUX deployment + prepare legacy data
+    - **Wed (May 22)**: Run legacy database migration (88 riders + documents)
+    - **Thu (May 23)**: Final validation + dry-run
+    - **Fri (May 24)**: GO-LIVE to production
+  - **Key Decision**: Keep legacy rider IDs + use email deduplication
+  - **Documents Created**: MASTER_IMPLEMENTATION_PLAN.md, ONDW_MIGRATION_PLAN.md, USER_DOCUMENT_MAPPING.md
+  - **Branch**: feature/push-notification (preprod) after merge
+  - **Date Started**: May 20, 2026 (Planning session)
   
 #### 📱 **Mobile UX Fixes - ONDW**
   - **Priority**: MEDIUM-HIGH

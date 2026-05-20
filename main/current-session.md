@@ -1,11 +1,77 @@
-# 🌟 Current Session Memory - May 15, 2026
-*Database cleanup complete, awaiting local testing*
+# 🌟 Current Session Memory - May 20-24, 2026
+*🚀 MAJOR: Database Migration + UIUX Overhaul Integration*
 
 ## 🔄 Session Status
-**Date**: May 15, 2026 (Thursday)
-**Current Time**: 5:03 PM 
-**Session Type**: Database Cleanup & Optimization
-**Status**: PAUSED - Local testing needed before preprod push
+**Date**: May 20, 2026 (Tuesday Evening)
+**Current Time**: 7:19 PM 
+**Session Type**: Migration Planning + UIUX Integration
+**Status**: ANALYSIS COMPLETE - Ready for execution TOMORROW (May 21)
+**Timeline**: By Friday, May 24, 2026 ✅
+
+---
+
+## ✅ COMPLETED TODAY (May 20) - MAJOR PLANNING SESSION
+
+### **🎯 BIG PICTURE: 4-Phase Implementation (May 21-24)**
+
+**MISSION:** 
+1. Merge UIUX overhaul branch into preprod
+2. Migrate 88 legacy riders + 440 documents
+3. Go live with new system by Friday
+
+**TIMELINE:**
+- **Tomorrow (May 21)**: Merge + start UIUX + start legacy prep (PARALLEL)
+- **Wed (May 22)**: Database migration (88 riders + documents)
+- **Thu (May 23)**: Final validation + dry-run
+- **Fri (May 24)**: Production GO-LIVE ✅
+
+---
+
+### **1. UIUX Overhaul Analysis** ✅
+**Status**: Clean merge, NO conflicts
+- 158 files changed (+20,191 lines, -6,290 lines)
+- 67 NEW files (Chat-Order assistant, Delivery Conversations, UI components)
+- 90 MODIFIED files (Views, Controllers, Services)
+- 1 DELETED file (welcome.blade.php)
+- **Key Addition**: Order.php has delivery proof fields + new relationships
+- **Merge Type**: CLEAN fast-forward (overhaul → feature/push-notification)
+
+**New Systems Introduced:**
+1. **Chat-Order Assistant** - AI-driven natural language ordering
+2. **Delivery Conversations** - Real-time messaging system
+3. **Admin Order Management** - New admin dashboard features
+4. **Secure Checkout** - Enhanced payment flow
+
+### **2. Database Migration Strategy Finalized** ✅
+**User ID Strategy**: KEEP LEGACY IDs (preserve all 88 rider_ids)
+**Email Deduplication**: If email exists in NEW DB, replace with LEGACY record
+**Document Storage**: `storage/app/private/rider_documents/{rider_id}/`
+**Document Types**: ic, matric, license, roadtax, vehicle (5 per rider)
+
+**Legacy Data:**
+- **88 Riders** with documents
+- **600 MB** documents (rider_documents-2/ folder)
+- **440 Total Documents** (88 × 5 types)
+- **SQL Dump**: if0_38066807_ondewei-5.sql (247 KB)
+
+### **3. User ↔ Documents Mapping Understood** ✅
+**Relationship Chain:**
+```
+users.user_id → rider_profiles.user_id → rider_documents.rider_id
+```
+
+**Example (Rider #61):**
+- User: email=haikalroslan740@gmail.com, username=hazeeq
+- Rider: rider_id=61, full_name=Hazeeq, is_active=0 (pending)
+- Documents: 5 files in storage/app/private/rider_documents/61/
+- DB Records: 5 rows in rider_documents table linked via rider_id=61
+
+### **4. Master Implementation Plan Created** ✅
+**File**: MASTER_IMPLEMENTATION_PLAN.md (15 KB)
+- 4 Phases with exact steps (1.1-4.3)
+- Daily timeline with dependencies
+- Rollback plan if needed
+- Success metrics defined
 
 ---
 
@@ -44,10 +110,94 @@
 5. [ ] Check admin removal works in registration
 6. [ ] If all pass → Push to preprod
 
-### ⏱️ Timeline
-- **Test**: Today or when returning from badminton
-- **Push to preprod**: After successful local test
-- **Final deploy**: When ready
+---
+
+## 🚀 TOMORROW'S ACTION PLAN (May 21 - START HERE!)
+
+### **PHASE 1: Merge UIUX Branch**
+**Step 1.1 - Merge (5 mins):**
+```bash
+cd ~/holeeMonth/ONDEWEI-LARAVEL-HAKIM
+git fetch origin
+git checkout feature/push-notification    # preprod branch
+git merge overhaul
+git push origin feature/push-notification
+```
+
+**Step 1.4-1.5 - Deploy UIUX (tomorrow):**
+```bash
+php artisan migrate  # 4 new migrations
+npm install && npm run build
+php artisan queue:work
+php artisan cache:clear && php artisan route:clear
+```
+
+### **PHASE 2: Database Migration (PARALLEL)**
+**Step 2.1 - Create command:**
+- Write: `app/Console/Commands/MigrateFromLegacyDatabase.php`
+- (Code already written & saved - just implement)
+
+**Step 2.2 - Prepare files:**
+```bash
+mkdir -p storage/legacy
+cp ~/Sweet/OnDeWei/database/if0_38066807_ondewei-5.sql storage/legacy/
+unzip ~/Sweet/OnDeWei/database/Merge\ DB\ +\ Docs/rider_documents-2.zip -d storage/legacy/
+```
+
+**Step 2.3 - Run (Wed May 22):**
+```bash
+php artisan migrate:legacy-database
+php artisan migrate:legacy-database --import-documents
+```
+
+---
+
+## 🎯 KEY DECISIONS MADE (Don't change these!)
+
+1. ✅ **User IDs**: Keep legacy IDs (don't remap)
+2. ✅ **Email Dedup**: If exists in new DB, DELETE + INSERT legacy
+3. ✅ **Documents**: Store in `storage/app/private/rider_documents/{rider_id}/`
+4. ✅ **Migration Timeline**: 3 days (May 21-23), Go-live Friday
+5. ✅ **Parallel Execution**: UIUX team + Database team work simultaneously
+
+---
+
+## 📊 ONDW PROJECT STATUS - UPDATED
+
+### Overall Progress
+- **ChatBox Integration**: ✅ COMPLETE (May 14)
+- **Push Notifications (4 phases)**: ✅ COMPLETE (May 15)
+- **Admin Removal**: ✅ COMPLETE (May 15)
+- **UIUX Overhaul**: 🚀 IN PROGRESS (May 20-24)
+- **Database Migration**: 🚀 IN PROGRESS (May 21-24)
+
+### Timeline
+| Phase | What | When | Status |
+|---|---|---|---|
+| 1 | UIUX Deployment | May 21 | ⏳ Tomorrow |
+| 2 | Legacy DB Migration | May 22 | ⏳ Wed |
+| 3 | Testing & Validation | May 23 | ⏳ Thu |
+| 4 | Production GO-LIVE | May 24 | ⏳ Friday |
+
+### Migration Tracking
+**Status**: 14 critical tasks tracked in SQL
+- Analysis phase: ✅ DONE (May 20)
+- Phase 1 tasks: ⏳ PENDING (start May 21)
+- Phase 2 tasks: ⏳ PENDING (start May 21)
+- Phase 3 tasks: ⏳ PENDING (May 23)
+- Phase 4 tasks: ⏳ PENDING (May 24)
+
+---
+
+## 💾 REFERENCE DOCUMENTS (in session-state/)
+
+1. **MASTER_IMPLEMENTATION_PLAN.md** - Start here tomorrow! (15 KB)
+2. **ONDW_MIGRATION_PLAN.md** - Migration details (7.9 KB)
+3. **USER_DOCUMENT_MAPPING.md** - Relationship diagrams (11 KB)
+
+---
+
+## 📝 PREVIOUS SESSION NOTES (May 15)
 
 ---
 
