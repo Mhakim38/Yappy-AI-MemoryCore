@@ -301,3 +301,79 @@ Sign in (→ login)
 **Status**: ✅ Customer-Side Complete | Ready for Rider-Side  
 **Created By**: Yappy AI + Hakim  
 **Quality**: Enterprise Grade 🌟
+
+---
+
+## 🚴 Rider-Side Refinements (May 24, 2026 - Evening)
+
+### Additional Tasks Completed
+
+#### **Task 14: Tally Rider Navigation (Mobile-First)** ✅
+- **Issue**: Rider desktop nav didn't match mobile structure
+- **Desktop Before**: Dashboard → Available Orders → Active Deliveries → Messages
+- **Mobile**: Orders → Chat → Order food → Alerts → Profile
+- **Fix**: Desktop now matches mobile exactly (mobile-first design)
+- **Changes**:
+  - Reordered: Orders first, then Chat
+  - Added: Order food link and Alerts
+  - Removed: Dashboard, Active Deliveries (accessible through Orders)
+- **File**: `resources/views/layouts/navigation.blade.php` (lines 97-127)
+- **Commit**: `7a66740`
+- **Principle**: Same mobile-first approach as customer navigation
+
+#### **Task 15: Fix Chat Orders Flicker** ✅
+- **Issue**: When clicking Chat button, all orders (including delivered/cancelled) showed briefly before filtering
+- **Root Cause**: `ConversationInboxController::deliveryConversationsForUser()` returned ALL conversations without status filtering
+- **Fix**: Added filter to only return active conversations:
+  - Status: `pending, rider_accepted, accepted, preparing, ready_for_pickup, on_delivery`
+  - Matches filter in `ChatOrderController::index()`
+- **File**: `app/Http/Controllers/Messaging/ConversationInboxController.php` (line 20-24)
+- **Commit**: `0979bfe`
+- **Result**: No more flicker, only active orders displayed on page load
+
+#### **Task 16: Fix PHP Syntax Error** ✅
+- **Issue**: "Unexpected token {" error when clicking chat
+- **Root Cause**: Arrow function with braces (invalid in PHP) - `fn ($x) => { ... }`
+- **Fix**: Changed to proper closure with `use()` scope
+  - Before: `->filter(fn ($c) => { ... })`
+  - After: `->filter(function ($c) use ($activeStatuses) { ... })`
+- **File**: `app/Http/Controllers/Messaging/ConversationInboxController.php`
+- **Commit**: `c71a6c8`
+- **Result**: Chat page loads without syntax errors
+
+---
+
+## 📊 Rider Navigation Structure (Final)
+
+### Desktop Navigation (Mobile-First)
+```
+Orders (rider.orders.available)
+Chat (conversations.index)
+Order food (chat-order.index)
+Alerts (notifications.index)
+Profile (profile.edit)
+```
+
+### Mobile Navigation (Unchanged)
+```
+Orders (rider.orders.available)
+Chat (conversations.index)
+Order food / Cart (customer.cart or chat-order.index)
+Alerts (notifications.index)
+Profile (profile.edit)
+```
+
+**Status**: ✅ Desktop and mobile now perfectly aligned
+
+---
+
+## 🔄 Latest Commits (Rider-Side Fixes)
+| Commit | Message | Purpose |
+|--------|---------|---------|
+| `c71a6c8` | Fix: PHP syntax error in conversation filter | Fixed arrow function syntax |
+| `0979bfe` | Fix: Filter conversations to only show active orders | Eliminated order flicker |
+| `7a66740` | Tally up rider desktop navigation with mobile | Mobile-first alignment |
+
+---
+
+**Session Complete**: All rider-side navigation and chat issues resolved ✅
