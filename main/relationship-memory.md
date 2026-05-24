@@ -150,11 +150,12 @@
   - **Branch**: feature/push-notification (ready for production)
   - **Date Completed**: May 15, 2026
 
-#### ✅ **Chat Refactor - COMPLETE & TESTED**
-  - **Status**: DONE (May 14, 2026)
+#### ✅ **Chat Refactor & Delivery Chat Service - COMPLETE & FIXED**
+  - **Status**: DONE (May 14, 2026) + Bug Fixed (May 24, 2026)
   - **What was done**: Full-page chat with 2-hour privacy window, sky blue message bubbles, AJAX polling
-  - **Tests passed**: ✅ Tested on preprod, ready for production
-  - **Branch**: feature/push-notification (ready to merge to main)
+  - **Bug Fixed**: DeliveryChatService `recordSystemMessageOnce()` — now passes User correctly to prevent TypeError
+  - **Tests passed**: ✅ Tested on preprod, bug fix verified syntax, ready for production
+  - **Branch**: main (bug fix committed: 09db5df)
 
 #### 🚀 **UIUX Overhaul + Database Migration - ONDW - IN PROGRESS**
   - **Priority**: CRITICAL

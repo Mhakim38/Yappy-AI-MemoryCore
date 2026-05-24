@@ -1,12 +1,44 @@
 # 🌟 Current Session Memory - May 20-24, 2026
-*🚀 MAJOR: Database Migration + UIUX Overhaul Integration + UI/UX Phase 1.2*
+*🚀 MAJOR: Database Migration + UIUX Overhaul Integration + UI/UX Refinements + DeliveryChatService Fix*
 
 ## 🔄 Session Status
 **Date**: May 20-24, 2026 (Tuesday-Saturday Evening)
-**Current Time**: 4:54 AM May 24 
-**Session Type**: Migration Planning + UIUX Integration + UI/UX Refinements
-**Status**: ✅ PHASE 1.2 UI/UX COMPLETE - Ready for testing
+**Current Time**: 4:54 AM → Afternoon May 24 (ongoing session)
+**Session Type**: Migration Planning + UIUX Integration + UI/UX Refinements + Production Bug Fix
+**Status**: ✅ PHASE 1.2 UI/UX COMPLETE + DeliveryChatService Fixed
 **Timeline**: By Friday, May 24, 2026 ✅
+
+---
+
+## 🐛 CRITICAL BUG FIX - DeliveryChatService (May 24, Afternoon)
+
+### **Problem Identified**
+Server error on production: `TypeError` in `DeliveryChatService::recordSystemMessage()`
+- **Error**: "Argument #2 ($user) must be of type App\Models\User, string given"
+- **Line**: 227 in DeliveryChatService.php
+- **Trigger**: Order status transitions, rider joins, vendor acceptance events
+
+### **Root Cause**
+`recordSystemMessageOnce()` was calling `recordSystemMessage()` with wrong parameter order:
+- **Expected**: `recordSystemMessage($conversation, $user, $message, $metadata)`
+- **Actual call**: `recordSystemMessage($conversation, $message, $metadata)` ← Missing User!
+
+### **Solution Implemented** ✅
+**File Modified**: `app/Services/DeliveryChatService.php`
+
+**Changes**:
+1. Updated `recordSystemMessageOnce()` signature to accept `User $user` parameter
+2. Updated method to pass User to `recordSystemMessage()` correctly
+3. Updated 4 call sites to pass `$order->customer->user`:
+   - `attachRider()` — when rider joins (line 117)
+   - `recordVendorAcceptance()` — when vendor accepts (line 130)
+   - `recordStatusTransition()` — status change message (line 155)
+   - `recordStatusTransition()` — delivery photo nudge (line 163)
+4. Added `$order->loadMissing('customer.user')` in each method before calling
+
+**Commit**: `09db5df` - "fix: DeliveryChatService - add User parameter to recordSystemMessageOnce"
+
+**Status**: ✅ Syntax verified, committed to main branch, ready for deployment
 
 ---
 
