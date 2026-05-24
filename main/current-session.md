@@ -1,12 +1,84 @@
-# 🌟 Current Session Memory - May 20-24, 2026
-*🚀 MAJOR: Database Migration + UIUX Overhaul Integration + UI/UX Refinements + DeliveryChatService Fix*
+# 🌟 Current Session Memory - May 24, 2026 (Evening)
+*🔧 ONDW Evening Session: Chat Alignment + Photo UI + Registration + PWA Fixes*
 
 ## 🔄 Session Status
 **Date**: May 24, 2026 (Sunday)
-**Current Time**: 4:42 PM (16:42 Malaysia time)
-**Session Type**: Production Bug Fixes + Branch Sync + Service Worker Polish
-**Status**: ✅ ALL TASKS COMPLETE - Codebase Clean & Ready
-**Accomplishments**: DeliveryChatService fix + Branch tally-up + SW caching fix
+**Current Time**: 9:20 PM (21:20 Malaysia time)
+**Session Type**: Bug Fixes + UI Polish + PWA Improvements
+**Status**: ✅ ALL TASKS COMPLETE — Merged & pushed to both main + preprod
+**Accomplishments**: 8 files changed, 10 commits, all pushed
+
+---
+
+## ✅ MAY 24 EVENING SESSION — COMPLETE SUMMARY
+
+### Fixes Implemented
+
+#### 1. Rider Chat Alignment (viewer-aware) ✅
+- `chat-bubble.blade.php`: added `$isOwn` prop, alignment based on viewer not type
+- `show.blade.php`: computes `$isOwn = $message->sender_user_id === auth()->id()`
+- Result: Rider's own messages now appear on RIGHT (blue), others on LEFT
+
+#### 2. Customer Photo UI ✅ (partial — still unresolved on mobile)
+- `message-composer.blade.php`: Added remove button (z-10, overflow-hidden on img only)
+- Camera handler: removed ALL accept attribute changes, only manages capture
+- `ConversationAttachmentController`: buffered response (Storage::get) to fix QUIC error
+- ⚠️ Still unresolved: remove button not visible, mobile send still failing, QUIC error persists
+- Logged in reminders with "next to try" notes
+
+#### 3. Admin Removed from Registration ✅
+- `register.blade.php`: admin card removed, ctaText() cleaned
+- `RegisteredUserController.php`: in:customer,rider,vendor (no admin)
+- Shared fields if-condition cleaned
+
+#### 4. PWA Zoom Disabled — ALL pages ✅
+- 8 blade files updated: app.blade.php, register, login, google-complete, secure-checkout-login, guest, 404, 500
+- Pattern: `maximum-scale=1.0, user-scalable=no, viewport-fit=cover`
+
+#### 5. Register Loading Button ✅
+- Alpine `submitting: false` + `@submit="submitting = true"`
+- Spinner icon, "Uploading documents..." / "Creating account...", button disabled
+
+#### 6. Role Picker 3-Column Layout ✅
+- grid-cols-3, gap-2, rider card no longer col-span-2
+- Earning badge shrunk to fit narrower column
+
+#### 7. Role Card Equal Heights ✅
+- `.role-card label`: `height:100%`, `justify-content:center`, `box-sizing:border-box`
+
+#### 8. SW POST Buffering Fix ✅ ← ROOT CAUSE of mobile slowness
+- `public/sw.js`: removed `event.respondWith(fetch(event.request))` for non-GET
+- Was: SW buffered entire multipart body (up to 25MB) in memory before forwarding
+- Now: `return` without respondWith() → browser sends POST natively, SW bypassed
+- Explains desktop fast / mobile slow discrepancy
+
+### Commits (feature/push-notification → merged to main)
+- `e4f3784` Viewer-aware chat alignment
+- `7bcb4b2` Photo preview remove button + camera send
+- `c4d4666` z-index fix + QUIC streaming
+- `210489b` Remove admin from registration + zoom disable
+- `0fdbe3b` Loading state on register submit
+- `39513a0` Role picker 3-column
+- `5509bd8` Equal card heights
+- `b3dfe16` SW POST fix ← most impactful
+- `426a890` Login zoom disable
+- `529519e` All pages zoom disable
+
+### Git State (end of session)
+- `main`: ad9444b ✅ pushed
+- `feature/push-notification`: 529519e ✅ pushed
+- Both branches pushed to origin/GitHub
+
+### ⚠️ Still Unresolved (tracked in reminders)
+1. Chat photo remove button not visible after image selected
+2. Mobile/PWA photo send still failing (hasFile stays false)
+3. ERR_QUIC_PROTOCOL_ERROR on attachment viewing
+
+### 🕌 Prayer
+- Hakim reminded to pray Isyak before sleep ✅
+- Hakim resting for the night
+
+---
 
 ---
 

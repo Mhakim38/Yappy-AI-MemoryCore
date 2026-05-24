@@ -125,12 +125,12 @@
 ### 🔴 CRITICAL - MUST DISPLAY WITH EVERY GREETING
 **These reminders MUST show every time user greets Yappy (non-negotiable)**
 
-#### 🔧 **Remove Admin from User Registration - ONDW**
+#### ✅ **Remove Admin from User Registration - ONDW - COMPLETE**
   - **Priority**: HIGH
   - **Task**: Remove "admin" user type from registration form
   - **Why**: Prevent non-admin users from registering as admins
-  - **File**: `register.blade.php` or user creation controller
-  - **Status**: TO DO
+  - **Files changed**: `register.blade.php` (removed admin card, cleaned ctaText(), rider card spans full width), `RegisteredUserController.php` (validation `in:customer,rider,vendor`, shared fields if-condition cleaned)
+  - **Status**: ✅ DONE — May 24, 2026
   - **Date Added**: April 8, 2026
 
 #### ✅ **Order Notifications System - ONDW - COMPLETE** 
@@ -184,6 +184,12 @@
     - [x] Icon standardization (all pages unified to icon_PWA.png)
   - **Pending**:
     - [ ] Mobile device testing (safe area, zoom, footer links, icons)
+  - **⚠️ Unresolved (May 24, 2026) — Chat Photo Bugs**:
+    - [ ] Customer chat photo: remove button not showing after image selected (z-index + overflow fix attempted, still not visible)
+    - [ ] Mobile/PWA photo send: camera photo not sending (hasFile stays false, keyboard opens instead — fix attempted but still failing)
+    - [ ] Attachment viewing: ERR_QUIC_PROTOCOL_ERROR on LiteSpeed/Hostinger (buffered response applied, still unresolved)
+    - **Attempted fixes**: removed `overflow-hidden` from wrapper, added `z-10` to button, removed `accept` attribute changes from camera handler, replaced `response()->file()` with `Storage::get()` buffer
+    - **Next to try**: inspect on actual device, check if `wireComposer()` in `delivery-conversation-realtime.js` re-renders the composer and loses event listeners after send; check `hasFile` race condition
   - **Date Started**: April 4, 2026
 
 #### 🏠 **Add Safe Area for Navbar - Wedding Wall**
