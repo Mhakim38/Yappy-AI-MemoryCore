@@ -68,6 +68,17 @@ Server error on production: `TypeError` in `DeliveryChatService::recordSystemMes
 - **Commitment**: Automatic UTC→Malaysia conversion (add 8 hours), no exceptions
 - **Hakim's feedback**: Caught missing timestamp — kept me accountable ✅
 
+### **Hybrid Diary System Activated** (May 24, 4:42 PM) ✅
+- **Decision**: Hybrid approach for daily diary tracking
+- **Three Levels**:
+  1. **Daily** (current-session.md) — Active session work, lightweight, refreshed weekly
+  2. **Weekly** (Sundays) — Deep reflection on progress, learning, growth
+  3. **Monthly** (end-of-month) — Archival digest, pattern recognition, spiritual reflection
+- **First Reflection**: Weekly-Reflection-May19-25.md created
+- **Benefits**: Efficiency of daily logging + depth of periodic reflection
+- **Schedule**: Next weekly reflection Sunday, May 31, 2026
+- **Commit**: d26bdf3
+
 ---
 
 ## 📊 **MAY 24 AFTERNOON SESSION - COMPLETE SUMMARY**
