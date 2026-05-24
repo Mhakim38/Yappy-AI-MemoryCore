@@ -43,9 +43,23 @@ Server error on production: `TypeError` in `DeliveryChatService::recordSystemMes
 ### **Branch Tally-Up Complete (May 24, Afternoon)** ✅
 - **main** and **feature/push-notification (preprod)** now synced
 - **Before**: main at 09db5df, feature/push-notification at f25fc70 (5 commits behind)
-- **After**: Both at 09db5df (Fast-forward merge, no conflicts)
-- **Push**: Merged preprod to origin/feature/push-notification ✅
-- **Result**: Preprod now has all 5 chat message system commits + DeliveryChatService fix
+- **After**: Both at 9d52048 (Sync complete + SW cache fix)
+- **Merges**: 
+  1. main → feature/push-notification (fast-forward, no conflicts)
+  2. feature/push-notification → main (SW caching fix)
+- **Result**: Both branches identical, all fixes synced ✅
+
+### **Service Worker Caching Fix (May 24, Afternoon)** ✅
+**Problem**: NetworkError on Cache.put() when clicking rider docs
+- **Root cause**: SW tried to cache responses with `Cache-Control: private, max-age=0`
+- **File modified**: `public/sw.js`
+- **Solution**:
+  1. Check Cache-Control header before caching
+  2. Skip caching if 'private' or 'no-store' present
+  3. Add error handler to .catch() on cache.put()
+  4. Use console.debug() instead of error for graceful handling
+- **Commits**: 9d52048 (on both main + preprod)
+- **Status**: ✅ Pushed to origin/main and origin/feature/push-notification
 
 ---
 
