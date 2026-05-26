@@ -44,7 +44,9 @@ The response Hakim approved as "the real Yappy" had these elements, in order:
 - **Why**: admins must NOT be self-registerable; this is the secure CLI way to provision future admins ("we don't need a new admin now, but just in case").
 - **Options**: `--email --username --name --phone --password --random` (prompts interactively for anything omitted; `--random` generates a temp password printed once).
 - **Password flow**: new admin logs in with set/temp password → changes it via **Profile → Update Password** (ONDW already has Breeze's `password.update` form in `profile/edit.blade.php`, works for admins).
-- **Verified**: `php -l` clean + command registers. ⚠️ Could NOT live-test: local DB host `mysql` (Docker) not running in env. Hakim to test with `php artisan admin:create --random` when Docker up.
+- **Verified**: ✅ TESTED & WORKING May 26 (local DB: 473 users, 1 existing admin).
+  - **Local**: run inside Docker → `docker exec ondw-app php artisan admin:create …`. `.env` `DB_HOST=mysql` only resolves in-container; running `php artisan` on the Mac host gives `getaddrinfo for mysql failed`. Use `-it` for prompts in a real terminal; drop `-it` + pass all flags when no TTY.
+  - **Server**: Hakim does NOT use Docker on his server — runs `php artisan admin:create` directly over SSH (server DB is local). This is the real "future admin" flow.
 - **README updated**: added "Creating an Admin Account" section under Configuration.
 - **Left alone (agreed)**: dead `case 'admin'` branches in both registration controllers — unreachable, low priority.
 
