@@ -125,6 +125,18 @@
 ### 🔴 CRITICAL - MUST DISPLAY WITH EVERY GREETING
 **These reminders MUST show every time user greets Yappy (non-negotiable)**
 
+#### ⏰ **Clear Order Data Before Launch - ONDW — DUE BEFORE Thu, June 5, 2026**
+  - **Priority**: 🔴 CRITICAL — TIME-SENSITIVE (added May 26, 2026 — ~10 days out)
+  - **Task**: Wipe all test/dummy **order data + order-related records** so production launches clean
+  - **Tables to clear** (confirm exact list at launch — schema changed after UIUX overhaul):
+    - `orders`, `order_items`, `order_status_history`
+    - delivery chat / `order_chat` + `chat_read_status` (delivery conversations + messages)
+    - order-related `notifications`
+    - delivery-proof / attachment records tied to orders
+  - **KEEP (do NOT delete)**: users, vendor/rider profiles (incl. migrated legacy riders), menu categories/items
+  - **Approach**: ⚠️ BACK UP DB FIRST → delete in FK-dependency order (or disable FK checks, truncate, re-enable). Reset auto-increment if a clean order-numbering is wanted.
+  - **Why**: avoid test orders polluting live data at go-live
+
 #### ✅ **Remove Admin from User Registration - ONDW - COMPLETE (BOTH paths + CLI replacement)**
   - **Priority**: HIGH
   - **Task**: Remove "admin" user type from ALL registration entry points; provide secure CLI way to create future admins
