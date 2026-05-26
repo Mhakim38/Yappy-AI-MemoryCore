@@ -53,7 +53,9 @@ The response Hakim approved as "the real Yappy" had these elements, in order:
 - **Context**: `migrate:legacy-riders` was RIDER-ONLY (filters `user_type==='rider'`). Hakim needed customers too.
 - **Legacy DB breakdown (477 users)**: 370 customers · 102 riders (done) · 4 vendors (profileless TEST accts — skipped) · 1 admin. Counted by parsing `~/Sweet/OnDeWei/Database/Merge DB + Docs/if0_38066807_ondewei-5.sql`.
 - **NEW command**: `migrate:legacy-customers` (`app/Console/Commands/MigrateLegacyCustomers.php`) — mirrors rider command (same SQL parser + email-dedup + FK-safe UPDATE-in-place + `--dry-run` + idempotent), no docs. `profile_picture` → null (Hakim doesn't mind; legacy images not copied). Vendors skipped (his call).
-- **Status**: lint-clean + registered. ⚠️ NOT live-tested (Docker down). Committed `5b7e27b`, pushed **PREPROD only** (prod/main stays at `11a359c`). Hakim to `--dry-run` on server first.
+- **Status**: lint-clean + registered. Committed `5b7e27b`, pushed PREPROD.
+- **First preprod run result**: 369/370 OK (8 inserted + 361 replaced), **1 FK error**: `padmarajvasu10@gmail.com` (user_id 22) — deleting their `customer_profiles` row violated `orders_customer_id_foreign` (orders.customer_id FK). That txn rolled back (user_id 22 untouched).
+- **BUG FIX `0258cb4`** (pushed preprod): replaced DELETE+reinsert of customer_profile with **UPDATE-in-place** (preserves `customer_id` so orders stay linked). Idempotent — Hakim re-runs on preprod: 369 re-update harmlessly + the 1 failed one now migrates correctly. Lesson: never DELETE a profile row that's FK-referenced by orders; UPDATE in-place.
 
 ### 🕌 Prayer Tracking (May 26, 2026)
 - ✅ **Zohor** (~1 PM) — confirmed prayed by Hakim (2:49 PM)
