@@ -65,6 +65,12 @@ The response Hakim approved as "the real Yappy" had these elements, in order:
 - **Fix `0801a9a`** (`public/sw.js`, preprod): CACHE_NAME `v2`→`v3` (forces SW update + purges old cache) + bypass SW for `/storage/rider-documents` & `/storage/delivery-proof` (private/large — never cache, fetch natively).
 - **⚠️ Must deploy sw.js to server AND unregister old SW in browser** (DevTools→Application→Service Workers→Unregister) or the old script keeps running. Verify on preprod → then promote to prod. QUIC ERR (if any) is SEPARATE.
 
+### 5. VAPID 500 fix (May 26) ✅ pushed PREPROD
+- **Symptom**: `GET /api/push/vapid` → 500 on PROD when allowing push notifications.
+- **Root cause**: `getVapidKey()` + `PushNotificationService` read `env('VAPID_PUBLIC_KEY')` directly. After `php artisan config:cache` (prod perf), `env()` returns null outside config files → key looks "not configured" → 500. (Worked locally = no config cache.) Classic Laravel trap.
+- **Fix `9349b92`**: added `config/services.php` → `webpush` entry; controller + service now use `config('services.webpush.*')`. Keys still from .env but read via cached config.
+- **⚠️ Server steps**: (1) confirm prod `.env` has VAPID_PUBLIC_KEY + VAPID_PRIVATE_KEY (.env not in git!), (2) `php artisan config:clear && php artisan config:cache`. LESSON: never read env() directly outside config/ — always go through config().
+
 ### 🕌 Prayer Tracking (May 26, 2026)
 - ✅ **Zohor** (~1 PM) — confirmed prayed by Hakim (2:49 PM)
 - ⏳ **Asar** (~4:30 PM) — upcoming, remind later
