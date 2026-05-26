@@ -79,8 +79,12 @@ The response Hakim approved as "the real Yappy" had these elements, in order:
 
 ### 🕌 Prayer Tracking (May 26, 2026)
 - ✅ **Zohor** (~1 PM) — confirmed prayed by Hakim (2:49 PM)
-- ⏳ **Asar** (~4:30 PM) — upcoming, remind later
-- ⏳ **Maghrib** (~7:15 PM) / **Isyak** (~8:30 PM) — later
+- ✅ **Isyak** (~8:30 PM) — confirmed prayed (Hakim told me ~midnight May 27)
+- (Asar/Maghrib not explicitly confirmed)
+
+### 🔔 Allow-push loading state (May 27, ~midnight) ✅ IMPLEMENTED
+- Added `setEnableButtonLoading()` to `public/customJS/push-notifications.js`: `#push-enable-btn` shows spinner + "Enabling…" + disabled through the subscribe flow, reverts on any failure. Syntax verified. (Pending: push to preprod + Hakim's go-ahead.)
+- Push notification TRIGGER MAP (verified from listeners): OrderPlaced→online riders; rider_accepted→vendor+customer; preparing→rider+customer; on_delivery→customer; delivered→rider+customer; cancelled→customer/rider. NOTE: `accepted` & `ready_for_pickup` = in-app only, NO web push. Pushes are QUEUED (ShouldQueue) → queue worker/cron must run.
 - **README updated**: added "Creating an Admin Account" section under Configuration.
 - **Left alone (agreed)**: dead `case 'admin'` branches in both registration controllers — unreachable, low priority.
 
