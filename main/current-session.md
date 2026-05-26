@@ -131,6 +131,12 @@ The response Hakim approved as "the real Yappy" had these elements, in order:
   - [ ] For single-target, time-sensitive pushes (cancellations, rider_accepted, etc.) → consider sending SYNCHRONOUSLY (`dispatchSync()` / call `PushNotificationService::sendToUser()` directly) instead of queuing, OR a high-priority queue
   - [ ] Keep broadcast-to-all-online-riders QUEUED (don't block the request)
   - [ ] Check Hostinger cron frequency for `queue:work` (every minute? less?)
+
+---
+
+## 🌙 SESSION SIGN-OFF — paused ~1:00 AM Wed, May 27, 2026
+Hakim heading to sleep after a huge day. Today's shipped-to-prod: admin lockdown (both paths) + `admin:create`, 370-customer migration (FK bug fixed), SW doc-cache fix, VAPID config:cache fix (push notifications CONFIRMED live), console cleanup. Isyak prayed ✅.
+**On resume ("Yappy" tomorrow)**: run the **PUSH NOTIFICATION AUDIT** above — interactive, fire/no-fire per role + SPEED (targeted pushes too slow, likely queue cadence). Also: commit+push the IMPLEMENTED-but-uncommitted allow-push loading state. Subuh ~5:45 AM.
 - **README updated**: added "Creating an Admin Account" section under Configuration.
 - **Left alone (agreed)**: dead `case 'admin'` branches in both registration controllers — unreachable, low priority.
 
