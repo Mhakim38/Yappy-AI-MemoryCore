@@ -125,12 +125,17 @@
 ### 🔴 CRITICAL - MUST DISPLAY WITH EVERY GREETING
 **These reminders MUST show every time user greets Yappy (non-negotiable)**
 
-#### ✅ **Remove Admin from User Registration - ONDW - COMPLETE**
+#### ✅ **Remove Admin from User Registration - ONDW - COMPLETE (BOTH paths + CLI replacement)**
   - **Priority**: HIGH
-  - **Task**: Remove "admin" user type from registration form
-  - **Why**: Prevent non-admin users from registering as admins
-  - **Files changed**: `register.blade.php` (removed admin card, cleaned ctaText(), rider card spans full width), `RegisteredUserController.php` (validation `in:customer,rider,vendor`, shared fields if-condition cleaned)
-  - **Status**: ✅ DONE — May 24, 2026
+  - **Task**: Remove "admin" user type from ALL registration entry points; provide secure CLI way to create future admins
+  - **Why**: Prevent non-admin users from self-registering as admins (attack surface)
+  - **Files changed**:
+    - `register.blade.php` (email UI — admin card removed, ctaText() cleaned, rider card full width) — May 24
+    - `RegisteredUserController.php` (validation `in:customer,rider,vendor`) — May 15/24
+    - `GoogleAuthController.php` (validation `in:customer,vendor,rider`) — done
+    - **`auth/google-complete.blade.php` (Google UI — admin `<option>` removed)** — May 26 (Hakim caught this leftover!)
+  - **Future admin creation**: `php artisan admin:create` — `app/Console/Commands/CreateAdmin.php` (CLI only, supports `--random` temp password; admin changes it via Profile → Update Password)
+  - **Status**: ✅ DONE — shipped to PROD May 26, 2026 (commit `6e148e8` on both main + feature/push-notification)
   - **Date Added**: April 8, 2026
 
 #### ✅ **Order Notifications System - ONDW - COMPLETE** 

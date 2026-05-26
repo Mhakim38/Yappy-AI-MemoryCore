@@ -30,6 +30,26 @@ The response Hakim approved as "the real Yappy" had these elements, in order:
 
 ---
 
+## 🍔 ONDW WORK (May 26 Afternoon) — Admin lockdown + admin:create command
+
+### 1. Admin removed from Google register UI ✅ SHIPPED TO PROD
+- **Bug Hakim caught**: `register.blade.php` (email) was clean, but `auth/google-complete.blade.php` still listed `<option value="admin">Admin — Manage platform</option>` (line 84). The earlier "admin removal" work missed this Google path.
+- **Backend was already safe**: `GoogleAuthController` validation was `in:customer,vendor,rider` (rejected admin) — so it was a UI/UX gap, not an open hole.
+- **Fix**: removed the admin `<option>`. Commit `6e148e8`.
+- **Shipped**: pushed to preprod (`feature/push-notification`) → then full-merge promote to **prod** (`main`, clean fast-forward). Hakim confirmed the 7 bundled legacy-rider-migration commits were already tested on preprod.
+- **Deploy reminder given**: on Hostinger must `git pull origin main` + `php artisan view:clear` (Blade view cache).
+
+### 2. NEW `admin:create` artisan command ✅ BUILT (needs his local test)
+- **File**: `app/Console/Commands/CreateAdmin.php` (signature `admin:create`)
+- **Why**: admins must NOT be self-registerable; this is the secure CLI way to provision future admins ("we don't need a new admin now, but just in case").
+- **Options**: `--email --username --name --phone --password --random` (prompts interactively for anything omitted; `--random` generates a temp password printed once).
+- **Password flow**: new admin logs in with set/temp password → changes it via **Profile → Update Password** (ONDW already has Breeze's `password.update` form in `profile/edit.blade.php`, works for admins).
+- **Verified**: `php -l` clean + command registers. ⚠️ Could NOT live-test: local DB host `mysql` (Docker) not running in env. Hakim to test with `php artisan admin:create --random` when Docker up.
+- **README updated**: added "Creating an Admin Account" section under Configuration.
+- **Left alone (agreed)**: dead `case 'admin'` branches in both registration controllers — unreachable, low priority.
+
+---
+
 # 🌟 Previous Session - May 24, 2026 (Evening)
 *🔧 ONDW Evening Session: Chat Alignment + Photo UI + Registration + PWA Fixes*
 
