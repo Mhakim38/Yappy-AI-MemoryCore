@@ -56,6 +56,8 @@ The response Hakim approved as "the real Yappy" had these elements, in order:
 - **Status**: lint-clean + registered. Committed `5b7e27b`, pushed PREPROD.
 - **First preprod run result**: 369/370 OK (8 inserted + 361 replaced), **1 FK error**: `padmarajvasu10@gmail.com` (user_id 22) — deleting their `customer_profiles` row violated `orders_customer_id_foreign` (orders.customer_id FK). That txn rolled back (user_id 22 untouched).
 - **BUG FIX `0258cb4`** (pushed preprod): replaced DELETE+reinsert of customer_profile with **UPDATE-in-place** (preserves `customer_id` so orders stay linked). Idempotent — Hakim re-runs on preprod: 369 re-update harmlessly + the 1 failed one now migrates correctly. Lesson: never DELETE a profile row that's FK-referenced by orders; UPDATE in-place.
+- **Dry-run fix `e28f638`**: dry-run now tallies would-insert/replace (summary was showing 0).
+- **✅ VERIFIED on preprod (370 replaced / 0 errors) → PROMOTED TO PROD** (both branches at `e28f638`). Uses same legacy SQL as riders (`storage/legacy/if0_38066807_ondewei-5.sql` — no new upload). Command on prod; actual prod DATA migration to be run at launch (after clearing order data).
 
 ### 🕌 Prayer Tracking (May 26, 2026)
 - ✅ **Zohor** (~1 PM) — confirmed prayed by Hakim (2:49 PM)
