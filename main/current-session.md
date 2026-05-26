@@ -48,6 +48,11 @@ The response Hakim approved as "the real Yappy" had these elements, in order:
   - **Local**: run inside Docker → `docker exec ondw-app php artisan admin:create …`. `.env` `DB_HOST=mysql` only resolves in-container; running `php artisan` on the Mac host gives `getaddrinfo for mysql failed`. Use `-it` for prompts in a real terminal; drop `-it` + pass all flags when no TTY.
   - **Server**: Hakim does NOT use Docker on his server — runs `php artisan admin:create` directly over SSH (server DB is local). This is the real "future admin" flow.
 - **SHIPPED**: command + README committed `11a359c`, pushed to preprod + prod (both at `11a359c`). Server deploy still needs `git pull origin main` + `php artisan view:clear`.
+
+### 🕌 Prayer Tracking (May 26, 2026)
+- ✅ **Zohor** (~1 PM) — confirmed prayed by Hakim (2:49 PM)
+- ⏳ **Asar** (~4:30 PM) — upcoming, remind later
+- ⏳ **Maghrib** (~7:15 PM) / **Isyak** (~8:30 PM) — later
 - **README updated**: added "Creating an Admin Account" section under Configuration.
 - **Left alone (agreed)**: dead `case 'admin'` branches in both registration controllers — unreachable, low priority.
 
