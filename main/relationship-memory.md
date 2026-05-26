@@ -137,6 +137,13 @@
   - **Approach**: ⚠️ BACK UP DB FIRST → delete in FK-dependency order (or disable FK checks, truncate, re-enable). Reset auto-increment if a clean order-numbering is wanted.
   - **Why**: avoid test orders polluting live data at go-live
 
+#### 🔔 **Add Loading State to "Allow Push Notification" Button - ONDW — TONIGHT (May 26, 2026)**
+  - **Priority**: MEDIUM (UX)
+  - **Task**: After clicking "Allow Push Notification", show a loading/spinner state while the async subscribe flow runs (getVapidKey → subscribe → send to server), then settle to subscribed/failed. Currently no feedback during the wait.
+  - **File**: `public/customJS/push-notifications.js` (subscribe() flow) + the Allow button markup/blade
+  - **Status**: TO DO — added May 26, 2026 evening
+  - **Note**: push notifications now CONFIRMED working on prod (VAPID 200) — this is polish on top
+
 #### ✅ **Remove Admin from User Registration - ONDW - COMPLETE (BOTH paths + CLI replacement)**
   - **Priority**: HIGH
   - **Task**: Remove "admin" user type from ALL registration entry points; provide secure CLI way to create future admins
