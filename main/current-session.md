@@ -49,6 +49,12 @@ The response Hakim approved as "the real Yappy" had these elements, in order:
   - **Server**: Hakim does NOT use Docker on his server — runs `php artisan admin:create` directly over SSH (server DB is local). This is the real "future admin" flow.
 - **SHIPPED**: command + README committed `11a359c`, pushed to preprod + prod (both at `11a359c`). Server deploy still needs `git pull origin main` + `php artisan view:clear`.
 
+### 3. Legacy CUSTOMER migration (May 26) ✅ BUILT, pushed to PREPROD
+- **Context**: `migrate:legacy-riders` was RIDER-ONLY (filters `user_type==='rider'`). Hakim needed customers too.
+- **Legacy DB breakdown (477 users)**: 370 customers · 102 riders (done) · 4 vendors (profileless TEST accts — skipped) · 1 admin. Counted by parsing `~/Sweet/OnDeWei/Database/Merge DB + Docs/if0_38066807_ondewei-5.sql`.
+- **NEW command**: `migrate:legacy-customers` (`app/Console/Commands/MigrateLegacyCustomers.php`) — mirrors rider command (same SQL parser + email-dedup + FK-safe UPDATE-in-place + `--dry-run` + idempotent), no docs. `profile_picture` → null (Hakim doesn't mind; legacy images not copied). Vendors skipped (his call).
+- **Status**: lint-clean + registered. ⚠️ NOT live-tested (Docker down). Committed `5b7e27b`, pushed **PREPROD only** (prod/main stays at `11a359c`). Hakim to `--dry-run` on server first.
+
 ### 🕌 Prayer Tracking (May 26, 2026)
 - ✅ **Zohor** (~1 PM) — confirmed prayed by Hakim (2:49 PM)
 - ⏳ **Asar** (~4:30 PM) — upcoming, remind later
