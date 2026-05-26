@@ -59,6 +59,12 @@ The response Hakim approved as "the real Yappy" had these elements, in order:
 - **Dry-run fix `e28f638`**: dry-run now tallies would-insert/replace (summary was showing 0).
 - **✅ VERIFIED on preprod (370 replaced / 0 errors) → PROMOTED TO PROD** (both branches at `e28f638`). Uses same legacy SQL as riders (`storage/legacy/if0_38066807_ondewei-5.sql` — no new upload). Command on prod; actual prod DATA migration to be run at launch (after clearing order data).
 
+### 4. SW doc-cache error fix (May 26) ✅ pushed PREPROD
+- **Symptom**: admin opening rider docs → `sw.js:46 Uncaught Cache.put() NetworkError`, slow doc loading.
+- **Root cause**: a STALE v2 service worker was running (pre-May-24 version, no `.catch`, no private-check). The repo's sw.js was already correct — the OLD SW was just never replaced on the client/server. (The "Uncaught" = no `.catch` = proof it's the old script.)
+- **Fix `0801a9a`** (`public/sw.js`, preprod): CACHE_NAME `v2`→`v3` (forces SW update + purges old cache) + bypass SW for `/storage/rider-documents` & `/storage/delivery-proof` (private/large — never cache, fetch natively).
+- **⚠️ Must deploy sw.js to server AND unregister old SW in browser** (DevTools→Application→Service Workers→Unregister) or the old script keeps running. Verify on preprod → then promote to prod. QUIC ERR (if any) is SEPARATE.
+
 ### 🕌 Prayer Tracking (May 26, 2026)
 - ✅ **Zohor** (~1 PM) — confirmed prayed by Hakim (2:49 PM)
 - ⏳ **Asar** (~4:30 PM) — upcoming, remind later
