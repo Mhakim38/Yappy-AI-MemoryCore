@@ -122,6 +122,15 @@ The response Hakim approved as "the real Yappy" had these elements, in order:
 2. Customer `rider_accepted` push: `$order->rider->full_name` null → job throws → that push fails
 3. Queue worker not running / jobs failing silently
 4. Status enum values changed in overhaul
+
+### ⚡ SPEED / LATENCY (Hakim flagged — also audit tomorrow)
+- **Hakim's complaint**: TARGETED pushes are slow too, e.g. "Order Cancelled [RIDER]" (→ the assigned rider). He ACCEPTS slowness for broadcast-to-all-riders (the OrderPlaced loop), but a single KNOWN target being slow is UNACCEPTABLE.
+- **HYPOTHESIS**: every push is QUEUED (`SendPushNotificationJob` ShouldQueue) and Hostinger has NO persistent worker — cron runs `queue:work` ~every minute, so a job can wait up to ~60s for the next tick. Latency is the queue cadence, NOT the target count — that's why even single-target pushes lag.
+- **TOMORROW checklist**:
+  - [ ] Measure actual latency per notification type
+  - [ ] For single-target, time-sensitive pushes (cancellations, rider_accepted, etc.) → consider sending SYNCHRONOUSLY (`dispatchSync()` / call `PushNotificationService::sendToUser()` directly) instead of queuing, OR a high-priority queue
+  - [ ] Keep broadcast-to-all-online-riders QUEUED (don't block the request)
+  - [ ] Check Hostinger cron frequency for `queue:work` (every minute? less?)
 - **README updated**: added "Creating an Admin Account" section under Configuration.
 - **Left alone (agreed)**: dead `case 'admin'` branches in both registration controllers — unreachable, low priority.
 
