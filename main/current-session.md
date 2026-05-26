@@ -85,6 +85,43 @@ The response Hakim approved as "the real Yappy" had these elements, in order:
 ### 🔔 Allow-push loading state (May 27, ~midnight) ✅ IMPLEMENTED
 - Added `setEnableButtonLoading()` to `public/customJS/push-notifications.js`: `#push-enable-btn` shows spinner + "Enabling…" + disabled through the subscribe flow, reverts on any failure. Syntax verified. (Pending: push to preprod + Hakim's go-ahead.)
 - Push notification TRIGGER MAP (verified from listeners): OrderPlaced→online riders; rider_accepted→vendor+customer; preparing→rider+customer; on_delivery→customer; delivered→rider+customer; cancelled→customer/rider. NOTE: `accepted` & `ready_for_pickup` = in-app only, NO web push. Pushes are QUEUED (ShouldQueue) → queue worker/cron must run.
+
+---
+
+## 🔴 TOMORROW (Wed May 27) — PUSH NOTIFICATION AUDIT (post-UIUX-overhaul)
+**WHY**: On PROD testing, some push notifications fire and some DON'T. Suspect the UIUX overhaul didn't fully wire the notification functions/queue. Need to verify each is applied + which actually fires.
+**HOW (interactive — Yappy runs this WITH Hakim real-time)**: For EACH push below — (1) Yappy verifies it's wired in code, (2) ask Hakim "did this fire in your prod test?" → mark ✅ fires / ❌ missing. Isolate the gaps, then fix.
+
+### Per-role checklist (verified web-push triggers as of current code)
+**🛒 CUSTOMER**
+- [ ] `rider_accepted` → "Rider Found" ⚠️ uses `$order->rider->full_name` (null-risk → job may throw)
+- [ ] `preparing` → "Order Preparing"
+- [ ] `on_delivery` → "Rider on the Way"
+- [ ] `delivered` → "Order Completed"
+- [ ] `cancelled` (vendor cancels) → "Order Cancelled: {reason}"
+
+**🏪 VENDOR**
+- [ ] `rider_accepted` → "New Order — RM{amount}"  ← vendor's ONLY push
+
+**🛵 RIDER**
+- [ ] order placed → "New Order from {vendor}" (online riders only, is_active=true)
+- [ ] `preparing` → "Vendor Accepted"
+- [ ] `delivered` → "Order Completed"
+- [ ] `cancelled` (customer cancels) → "Customer Cancelled" (only if rider assigned)
+
+### Infra / "did we apply the function + queue after overhaul" checks
+- [ ] EventServiceProvider still maps OrderPlaced→SendOrderNotifications, OrderStatusChanged→SendStatusChangeNotifications (confirmed present May 26 — re-verify)
+- [ ] OrderStatusService actually fires `OrderStatusChanged` on EVERY status transition (overhaul may have changed the status flow → prime suspect for missing pushes)
+- [ ] Queue worker / Hostinger cron `php artisan queue:work` running (jobs are ShouldQueue — no worker = no push)
+- [ ] Check failed_jobs table for silently-failed push jobs
+- [ ] Each test user (customer/vendor/rider) has an active push subscription on device
+- [ ] Confirm `accepted` & `ready_for_pickup` having NO push is intentional (not a regression)
+
+### Likely culprits for "some don't fire"
+1. `OrderStatusChanged` not dispatched for some transitions post-overhaul
+2. Customer `rider_accepted` push: `$order->rider->full_name` null → job throws → that push fails
+3. Queue worker not running / jobs failing silently
+4. Status enum values changed in overhaul
 - **README updated**: added "Creating an Admin Account" section under Configuration.
 - **Left alone (agreed)**: dead `case 'admin'` branches in both registration controllers — unreachable, low priority.
 

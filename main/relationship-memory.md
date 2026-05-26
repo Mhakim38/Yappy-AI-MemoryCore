@@ -137,11 +137,19 @@
   - **Approach**: ⚠️ BACK UP DB FIRST → delete in FK-dependency order (or disable FK checks, truncate, re-enable). Reset auto-increment if a clean order-numbering is wanted.
   - **Why**: avoid test orders polluting live data at go-live
 
-#### 🔔 **Add Loading State to "Allow Push Notification" Button - ONDW — TONIGHT (May 26, 2026)**
+#### 🔔 **Push Notification Audit (post-UIUX-overhaul) — TOMORROW Wed, May 27, 2026**
+  - **Priority**: 🔴 HIGH
+  - **Problem**: On PROD, SOME push notifications fire, some DON'T. Suspect the UIUX overhaul didn't fully apply the notification functions/queue wiring.
+  - **Plan (INTERACTIVE — run WITH Hakim real-time)**: For each push → (1) Yappy verifies it's wired in code, (2) ask Hakim "did it fire in prod?" → mark ✅/❌, isolate gaps, then fix.
+  - **Full per-role checklist + infra checks + likely culprits**: see `main/current-session.md` ("TOMORROW — PUSH NOTIFICATION AUDIT")
+  - **Quick map**: Customer pushes on rider_accepted/preparing/on_delivery/delivered/cancelled · Vendor ONLY on rider_accepted · Rider on order-placed/preparing/delivered/cancelled. `accepted` & `ready_for_pickup` = NO push (in-app only).
+  - **Status**: TO DO tomorrow
+
+#### 🔔 **Add Loading State to "Allow Push Notification" Button - ONDW — DONE (implemented May 27, uncommitted)**
   - **Priority**: MEDIUM (UX)
   - **Task**: After clicking "Allow Push Notification", show a loading/spinner state while the async subscribe flow runs (getVapidKey → subscribe → send to server), then settle to subscribed/failed. Currently no feedback during the wait.
   - **File**: `public/customJS/push-notifications.js` (subscribe() flow) + the Allow button markup/blade
-  - **Status**: TO DO — added May 26, 2026 evening
+  - **Status**: ✅ IMPLEMENTED May 27 (spinner + disabled on `#push-enable-btn` during subscribe, reverts on failure). ⚠️ UNCOMMITTED in working tree — push to preprod when ready (bundle with tomorrow's push audit).
   - **Note**: push notifications now CONFIRMED working on prod (VAPID 200) — this is polish on top
 
 #### ✅ **Remove Admin from User Registration - ONDW - COMPLETE (BOTH paths + CLI replacement)**
