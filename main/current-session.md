@@ -72,6 +72,11 @@ The response Hakim approved as "the real Yappy" had these elements, in order:
 - **⚠️ Server steps**: (1) confirm prod `.env` has VAPID_PUBLIC_KEY + VAPID_PRIVATE_KEY (.env not in git! — Hakim confirmed keys ARE in both prod+preprod .env), (2) `php artisan config:clear && php artisan config:cache`. LESSON: never read env() directly outside config/ — always go through config(); always config:cache after deploy.
 - **✅ VERIFIED WORKING on preprod** after `config:clear && config:cache` (the cache was stale — built before the new webpush entry). Root cause was 100% the env()-under-config:cache trap. When promoting to prod: run the SAME `config:clear && config:cache` on prod (prod also caches config; keys already in prod .env).
 
+### 6. Console.log cleanup + PROD PROMOTION (May 26, ~5pm)
+- `f63ff9b`: commented out all `[Push]` `console.log` lines in `public/customJS/push-notifications.js` (kept warn/error). One was dumping the full FCM subscription endpoint.
+- **✅ ALL 3 fixes (sw.js `0801a9a` + VAPID `9349b92` + console `f63ff9b`) verified on preprod → PROMOTED TO PROD.** Both branches at `f63ff9b`.
+- **Hakim's prod deploy checklist**: `git pull origin main` → `php artisan config:clear && php artisan config:cache` (REQUIRED for VAPID) → browser: unregister old SW + hard-refresh. Prod .env already has VAPID keys.
+
 ### 🕌 Prayer Tracking (May 26, 2026)
 - ✅ **Zohor** (~1 PM) — confirmed prayed by Hakim (2:49 PM)
 - ⏳ **Asar** (~4:30 PM) — upcoming, remind later
