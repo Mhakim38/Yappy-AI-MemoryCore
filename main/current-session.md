@@ -16,9 +16,14 @@
 - **Pruning verify method** (documented): orphan a real sub via browser console `pushManager.getSubscription().then(s=>s.unsubscribe())` (leaves DB row), then send to that user → watch `Pruning expired push subscription` log + row count drop. NOT yet verified live.
 - **Architecture trade-off noted**: synchronous listener runs inside `OrderStatusService` DB transaction → a listener throw could roll back the status change. Low practical risk (relations guarded). Fallback if ever needed: keep listener queued on `high` instead.
 
+### PERKESO GIG Workers API (May 27 evening)
+- New mandatory gig-worker social-security integration (ACT 789, 1.25% per job). IP-WHITELISTED API — works ONLY from the server (Postman from laptop times out; curl on server = 200 + JSON). Docs: ~/Sweet/OnDeWei/API/GIG Workers API Documentation V2.1.pdf (45pp).
+- BUILT a full admin testing harness on branch `perkeso-api-test` (commit `4adcf4a`, NOT pushed): `PerkesoService` (all 12 endpoints) + admin testing UI ("Integrations" nav → form-per-endpoint + live JSON viewer) + public callback logger + config block. All verified (lint + routes + blade compile). Details in [[ondw-status]].
+- Hakim was at Maghrib/rest while I built it ("you can do this Yappy"). I installed `poppler` via brew to read the PDF. Recommended an admin UI over a bare JSON link (endpoints need varied params; runs server-side from whitelisted IP).
+
 ### On resume
-- Confirm the PROD deploy actually ran (cron recreate + `git pull origin main` + `config:cache`). If not, walk him through it.
-- Optionally verify pruning live (preprod or prod).
+- PERKESO: review branch `perkeso-api-test` → push to origin on his OK → pull to preprod, set `PERKESO_TOKEN` in .env, test at `/admin/integrations/perkeso`. Next phase = wire deductions into the order flow (his product decisions).
+- Push notifications: confirm the PROD deploy actually ran (cron recreate + `git pull origin main` + `config:cache`). Optionally verify pruning live.
 
 ---
 
