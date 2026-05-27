@@ -530,6 +530,38 @@ $subs = PushSubscription::where('endpoint', $endpoint)->get();
 
 ---
 
+## 🔧 Production Latency & Reliability Hardening (ONDW, May 27, 2026)
+
+Surfaced after going live on **Hostinger shared hosting** (database queue, cron-only worker, no Redis/Supervisor).
+
+### 1. Targeted pushes ~1 min slow → the cron `--max-jobs` trap
+**Symptom**: even single-recipient pushes lagged ~a minute. **Causes (compounding):**
+- `queue:work --max-jobs=10` → worker drained 10 jobs then *exited*, leaving a ~50s dead window each minute.
+- **Double queue hop**: the listener was `implements ShouldQueue` AND dispatched a queued `SendPushNotificationJob` → 2 cron cycles per push.
+- **Broadcast flood**: order-placed dispatches a push per online rider; later targeted pushes queued *behind* that flood.
+
+**Fixes:**
+- **Cron**: `php artisan queue:work --queue=high,default --sleep=1 --max-time=55` — drop `--max-jobs` (worker stays alive ~55s), add a priority lane.
+- **Remove `ShouldQueue`** from the time-sensitive listener so it runs in-request (cheap) and dispatches the push job immediately — kills one hop.
+- **Route single-target pushes to a `high` queue** (`dispatch(...)->onQueue('high')`); keep the broadcast loop on `default`.
+- ⚠️ Code + cron must change **together** — if code routes to `high` but the cron lacks `--queue=high,default`, those pushes NEVER fire.
+
+### 2. "Some never arrive" → dead subscriptions never pruned
+`sendOneNotification()` returns a `MessageSentReport` that was discarded; expired subs (HTTP **410/404**) stayed in the DB forever, silently failing. Detection is **reactive** — no expiry timestamp; you learn a sub is dead only from the push service's response on the next send.
+```php
+$report = $webPush->sendOneNotification($pushSubscription, $payload);
+if ($report->isSubscriptionExpired()) {   // in_array(status, [404, 410])
+    $subscription->delete();              // self-healing, no cron
+}
+```
+
+### 3. VAPID 500 under `config:cache`
+After `php artisan config:cache`, `env()` returns null outside `config/`. Read keys via a `config/services.php` entry + `config('services.webpush.*')`, and run `config:clear && config:cache` after deploy.
+
+**Lesson**: on shared hosting, queue latency is dominated by **cron cadence + worker lifetime flags**, not recipient count. Keep the worker alive, use a priority queue for time-sensitive single-target jobs, prune dead subs on 410/404, and never call `env()` outside config files.
+
+---
+
 ## 🔗 References
 
 - [Web Push API](https://developer.mozilla.org/en-US/docs/Web/API/Push_API)

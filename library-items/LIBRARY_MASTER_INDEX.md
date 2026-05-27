@@ -12,6 +12,8 @@
 | **Image Proxy (CORS Solution)** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | Next.js, Laravel | ✅ Active |
 | **PWA Offline-First Setup** | `integration/pwa-offline-first.md` | 2️⃣ Proven | Universal | ✅ Active |
 | **PWA Push Notifications** | `integration/push-notifications.md` | 2️⃣ Proven | Next.js, Node.js | ✅ Active |
+| **Push Notifications (Laravel)** | `push-notifications-library.md` | 2️⃣ Proven | Laravel | ✅ Active |
+| **PERKESO GIG Workers API** | `integration/perkeso-gig-api.md` | 1️⃣ Emerging | Laravel | 🚧 In progress |
 
 ### Database & Backend Patterns
 | Pattern | File | Level | Framework | Status |
@@ -104,7 +106,7 @@
 
 ---
 
-## 📋 Complete Pattern List (14 Total)
+## 📋 Complete Pattern List (16 Total)
 
 ### From Wedding Wall Project (11)
 1. ✅ Backend File Upload to S3
@@ -125,6 +127,10 @@
 
 ### From UI Components (1)
 14. ✅ Floating Action Button (FAB)
+
+### From ONDW Integrations (2)
+15. ✅ Push Notifications (Laravel) — incl. May-27 latency/reliability hardening
+16. 🚧 PERKESO GIG Workers API — IP-whitelisted gov API + admin testing harness
 
 ---
 
@@ -158,7 +164,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 14 |
+| Total Patterns | 16 |
 | Level 2 (Proven) | 14/14 ✅ |
 | Frameworks Covered | 7+ (Next.js, React, Laravel, Vue, Node.js, etc) |
 | Projects Sourced | 4 (Wedding Wall, Push Notifications, ONDW, MyGaji) |
@@ -178,6 +184,8 @@ All patterns are **Level 2: Proven** meaning:
 - ✅ Testing strategies documented
 
 ### Recent Additions
+- **PERKESO GIG Workers API** (May 27, 2026) - IP-whitelisted government API integration + admin testing harness (ONDW)
+- **Push Notifications (Laravel) — Latency & Reliability Hardening** (May 27, 2026) - Cron/queue tuning + dead-sub (410/404) pruning (ONDW)
 - **Floating Action Button (FAB)** (April 21, 2026 4:30 AM) - From MyGaji, integrated into ONDW
 - **PWA Push Notifications** (March 31, 2026 7:27 AM) - From Wedding Wall + Push Notification Test
 - **Supabase PostgreSQL + Prisma** (March 16, 2026 8:35 AM) - From Wedding Wall database layer
@@ -325,7 +333,7 @@ Planned pattern additions:
 
 ---
 
-**Last Updated**: April 21, 2026 4:30 AM  
+**Last Updated**: May 27, 2026 11:15 PM  
 **Curator**: Yappy (AI Memory System)  
 **Status**: 🟢 Growing library, actively maintained  
-**Total Patterns**: 14 (all Level 2: Production-Proven)
+**Total Patterns**: 16 (15 Proven + 1 Emerging)

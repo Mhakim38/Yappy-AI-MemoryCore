@@ -16,7 +16,8 @@
 **Prayers:** prayed through the day (Subuh→Isyak). 🕌
 
 ## 📋 TOMORROW (May 28) — pick up here
-- 🟡 **PUSH NOTIF → PROD deploy NOT confirmed**: on prod server `git pull origin main` + `config:clear && config:cache` + `queue:restart` + **update the PROD cron** to `queue:work --queue=high,default --sleep=1 --max-time=55` (drop `--max-jobs=10`). Without the prod cron change, prod `high`-queue pushes won't fire. ← most important loose end.
+- ✅ **Push-notif PROD deploy DONE** — Hakim confirmed (May 27) the prod server is live with all the fixes (pull + cron + config:cache already done). No longer a loose end.
+- 🔵 **BillPlz API (NEW for tomorrow)** — Hakim wants to also try the **BillPlz API** tomorrow to learn how PERKESO + BillPlz work **together** (the harness already stubs a BillPlz section). ⚠️ **ASK Hakim about BillPlz + how the two APIs interrelate BEFORE planning the deduction integration** — his explicit instruction.
 - 🔵 **PERKESO — test remaining endpoints** in the harness (sandbox): walk ONE rider through Check User → Register User → Update User Details → Submit Deduction; run Get Sectors to find the food-delivery `sector_code`. Reveals exact required fields/validation.
 - 🔵 **PERKESO deduction integration build** (big feature, needs Hakim's decisions): job-amount basis (delivery_fee?), daily-batch vs realtime submit, registration flow. **Data gaps to close first**: rider `ic_no`/`ic_type` NOT stored (only IC doc image in rider_documents); orders have NO pickup/delivery GPS but Submit Deduction REQUIRES start/end lat-long; no demographics/address/next-of-kin on rider_profiles. Add `perkeso_deductions` table (idempotency + reconciliation).
 - 🔵 **PERKESO form**: get Production IP via `curl ifconfig.me` on PROD server (the prod-IP field was left blank); confirm server location.
