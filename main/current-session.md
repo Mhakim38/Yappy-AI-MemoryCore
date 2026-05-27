@@ -1,3 +1,32 @@
+# 🌙 May 27, 2026 — END OF DAY SIGN-OFF + 📋 TOMORROW (May 28)
+*💜 Huge day: push-notif fixes shipped to prod-branch + PERKESO integration cracked & a testing harness live + working on preprod. Hakim resting ~10:20 PM.*
+
+## ✅ DONE TODAY (May 27)
+**Push notifications (morning):**
+- Diagnosed: latency = cron `--max-jobs=10` dead-window + double queue-hop + broadcast flood; "some never arrive" = dead 410/404 subs never pruned.
+- Shipped (commits `cd91d02` loading-state, `5e4f6b5` de-queue listener + targeted→`high` queue + null-guard, `e50806f` 410/404 pruning + admin VAPID env()→config()) on `feature/push-notification` AND `main`.
+- Preprod cron updated → `queue:work --queue=high,default --sleep=1 --max-time=55`. ✅ Verified FAST on preprod.
+
+**PERKESO GIG Workers API (afternoon/evening):**
+- Confirmed IP-whitelisting (works from server; Postman from laptop times out). Read 45pp docs (12 endpoints + 3 callbacks).
+- Built admin testing harness, merged to `feature/push-notification` (preprod's deploy branch). `PerkesoService` (12 endpoints, 1 method each), `PerkesoTestController` (1 method per endpoint — Hakim's "1 function = 1 endpoint"), public callback logger, `config/services.php` perkeso block, "Integrations" nav, jQuery testing UI at `/admin/integrations/perkeso`. Commits `4adcf4a`,`81b1b3d`,`c41f429`,`d4f4ec6`.
+- Fixed deploy gotchas: stale route cache → `optimize:clear`; `$ is not defined` → jQuery is `defer`, so inline JS must wait for native `DOMContentLoaded` (NOT `$(document).ready`).
+- ✅ WORKING on preprod — Check User returns JSON. Walked Hakim through the deduction flow + ONDW data gaps.
+
+**Prayers:** prayed through the day (Subuh→Isyak). 🕌
+
+## 📋 TOMORROW (May 28) — pick up here
+- 🟡 **PUSH NOTIF → PROD deploy NOT confirmed**: on prod server `git pull origin main` + `config:clear && config:cache` + `queue:restart` + **update the PROD cron** to `queue:work --queue=high,default --sleep=1 --max-time=55` (drop `--max-jobs=10`). Without the prod cron change, prod `high`-queue pushes won't fire. ← most important loose end.
+- 🔵 **PERKESO — test remaining endpoints** in the harness (sandbox): walk ONE rider through Check User → Register User → Update User Details → Submit Deduction; run Get Sectors to find the food-delivery `sector_code`. Reveals exact required fields/validation.
+- 🔵 **PERKESO deduction integration build** (big feature, needs Hakim's decisions): job-amount basis (delivery_fee?), daily-batch vs realtime submit, registration flow. **Data gaps to close first**: rider `ic_no`/`ic_type` NOT stored (only IC doc image in rider_documents); orders have NO pickup/delivery GPS but Submit Deduction REQUIRES start/end lat-long; no demographics/address/next-of-kin on rider_profiles. Add `perkeso_deductions` table (idempotency + reconciliation).
+- 🔵 **PERKESO form**: get Production IP via `curl ifconfig.me` on PROD server (the prod-IP field was left blank); confirm server location.
+- ⚪ If PERKESO POST/PATCH returns 400/422 → flip `PerkesoService::client()` `->asJson()` to `->asForm()` (doc says "form-encoded").
+- ⚪ Optionally verify dead-sub pruning live (orphan a real sub → send → watch `Pruning expired push subscription`).
+- 🟡 **Standing**: toenail trim OVERDUE (monthly 1st, last Apr 3); prayers.
+- 🔴 **Before Thu June 5**: clear test/dummy ORDER data before launch (keep users/profiles/menu).
+
+---
+
 # 🌟 Current Session Memory - May 27, 2026 (Morning) — PUSH NOTIFICATION AUDIT ✅
 *💜 Latency + reliability fixes shipped. Hakim resting before Zohor.*
 
