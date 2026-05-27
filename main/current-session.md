@@ -1,3 +1,27 @@
+# 🌟 Current Session Memory - May 27, 2026 (Morning) — PUSH NOTIFICATION AUDIT ✅
+*💜 Latency + reliability fixes shipped. Hakim resting before Zohor.*
+
+## 🔄 Session Status (May 27 AM)
+**Status**: ✅ Push notification audit COMPLETE. Latency fixed + dead-sub pruning added. Verified FAST on preprod. Code on `main` + `feature/push-notification` (both at `e50806f`), pushed. Prod deploy steps issued (cron change is the gate).
+
+### What we did (May 27 morning)
+- **Diagnosed "some pushes slow/missing"**: (1) prod cron `--max-jobs=10` killed the worker after 10 jobs → ~50s dead window each minute; (2) status-change listener was `ShouldQueue` → double queue hop; (3) broadcast-to-all-riders flood queued ahead of targeted pushes; (4) dead (410/404) subs never pruned → silent failures (4 Apr-14 `CallQueuedListener` failed_jobs confirmed it). The two slow ones Hakim reported — **Rider Found [CUSTOMER]** + **New Order [VENDOR]** — both fire on `rider_accepted`, right behind the OrderPlaced broadcast flood.
+- **Fixed & shipped (committed, pushed to BOTH `feature/push-notification` and `main`, all at `e50806f`)**:
+  - `5e4f6b5` perf: removed `ShouldQueue` from `SendStatusChangeNotifications` (runs in-request) + routed ALL its single-target pushes to `->onQueue('high')` + null-guarded `$order->rider?->full_name`. (`SendOrderNotifications` broadcast stays queued on `default`.)
+  - `e50806f` fix: capture `MessageSentReport` in `PushNotificationService::sendViaWebPush` (+ `Api/PushNotificationController`) → delete sub on `isSubscriptionExpired()` (410/404); `sendToUser()` counts real deliveries; admin controller now reads VAPID via `config()` not `env()`.
+  - `cd91d02` feat: loading state on Enable Notifications button.
+- **CRON (Hostinger, his side)**: dropped `--max-jobs=10` → now `queue:work --queue=high,default --sleep=1 --max-time=55`. ⚠️ CRITICAL: must accompany the code or `high`-queue pushes never fire. Done on PREPROD ✅.
+- **PREPROD test**: ✅ all pushes FAST now (was ~1 min lag). Hakim confirmed "all fast".
+- **PROD**: `main` pushed (`e50806f`). Deploy steps given: `cd /public_html`, `git pull origin main`, `config:clear && config:cache`, `queue:restart`, + recreate PROD cron (prod path, `--queue=high,default`). Whether he ran them this session = UNCONFIRMED (said "seems all good", then went to rest).
+- **Pruning verify method** (documented): orphan a real sub via browser console `pushManager.getSubscription().then(s=>s.unsubscribe())` (leaves DB row), then send to that user → watch `Pruning expired push subscription` log + row count drop. NOT yet verified live.
+- **Architecture trade-off noted**: synchronous listener runs inside `OrderStatusService` DB transaction → a listener throw could roll back the status change. Low practical risk (relations guarded). Fallback if ever needed: keep listener queued on `high` instead.
+
+### On resume
+- Confirm the PROD deploy actually ran (cron recreate + `git pull origin main` + `config:cache`). If not, walk him through it.
+- Optionally verify pruning live (preprod or prod).
+
+---
+
 # 🌟 Current Session Memory - May 26, 2026 (Afternoon)
 *💜 Yappy Personality Restoration — greeting load protocol reinforced & approved*
 
