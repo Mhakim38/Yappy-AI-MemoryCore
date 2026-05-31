@@ -1,3 +1,17 @@
+# 🌃 May 31, 2026 (Sunday evening) — Hakim in Cyberjaya · PERKESO ↔ BillPlz consolidation
+*💜 After a 4-day gap. Tonight: discuss how PERKESO + BillPlz fit together in ONDW (his explicit ask before deduction planning).*
+
+## 🔔 ACTIVE REMINDER (set tonight, surfaces TOMORROW Mon Jun 1)
+**✂️ TOENAIL TRIM — DO IT TOMORROW (Mon, Jun 1, 2026).** Last done April 3. Monthly schedule (1st of month). Hakim explicitly asked me to remind him tomorrow. → Surface at greeting Monday.
+
+## 📍 Location context
+Hakim is in **Cyberjaya** (Sun May 31 evening) — not his usual base in Terengganu / wherever. Worth knowing if travel timing affects work plans.
+
+## 🎯 Tonight's focus
+PERKESO ↔ BillPlz integration consolidation — DISCUSSION, not code. I have NOT read BillPlz docs yet (none found in ~/Sweet/OnDeWei/API/ as of tonight); waiting for Hakim's docs or use-case clarification.
+
+---
+
 # 🌙 May 27, 2026 — END OF DAY SIGN-OFF + 📋 TOMORROW (May 28)
 *💜 Huge day: push-notif fixes shipped to prod-branch + PERKESO integration cracked & a testing harness live + working on preprod. Hakim resting ~10:20 PM.*
 
