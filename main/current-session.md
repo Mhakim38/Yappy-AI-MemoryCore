@@ -8,7 +8,23 @@
 Hakim is in **Cyberjaya** (Sun May 31 evening) — not his usual base in Terengganu / wherever. Worth knowing if travel timing affects work plans.
 
 ## 🎯 Tonight's focus
-PERKESO ↔ BillPlz integration consolidation — DISCUSSION, not code. I have NOT read BillPlz docs yet (none found in ~/Sweet/OnDeWei/API/ as of tonight); waiting for Hakim's docs or use-case clarification.
+PERKESO ↔ BillPlz integration consolidation — DISCUSSION, not code.
+
+## ✅ ARCHITECTURE — confirmed (Mon Jun 1 evening)
+- **3-way split is NOT native in BillPlz** (Sora: V4 split capped at 2 recipients, FPX-only). Pattern = **Collect (BillPlz Bill V4) → Disburse (BillPlz Payment Orders V5)** to vendor + rider; ONDW retains the rest. All four records key on `ONDW-{order_id}` for reconciliation.
+
+## ✅ HAKIM'S BUSINESS DECISIONS (Mon Jun 1, locked)
+1. **PERKESO 1.25%** — DEDUCTED FROM rider's delivery fee (rider absorbs; rider net = `delivery_fee − 1.25%`). NOT absorbed by ONDW.
+2. **Payout timing** — daily OR weekly (🟡 to be confirmed later; lean weekly = fewer BillPlz Payment Order calls + simpler audit, but rider cashflow may want daily).
+3. **Platform fee** — **RM 1 per order** (flat, not %).
+4. **Payment channels** — **e-wallet only** for launch (no FPX, no cards). Fees by channel TODO (Sora researching).
+5. **COD** — NOT applicable.
+
+## 📦 Third-party repo (Hakim shared Jun 1)
+**https://github.com/afu-it/malaysia-payment-gateway.git** — claims to bundle BillPlz setup for Malaysian payment integrations. Hakim asked me to "clone and install the skills also" → Hana auditing now.
+
+## 🧑‍💼 MANAGER MODE
+Hakim's explicit framing: "you being their manager who consolidate and make the final verdict upon meeting with them." → Dispatch staff in parallel, audit findings, present unified verdict (not pass-through reports).
 
 ---
 
