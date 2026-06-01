@@ -1,8 +1,22 @@
 # 🌃 May 31, 2026 (Sunday evening) — Hakim in Cyberjaya · PERKESO ↔ BillPlz consolidation
 *💜 After a 4-day gap. Tonight: discuss how PERKESO + BillPlz fit together in ONDW (his explicit ask before deduction planning).*
 
-## 🔔 ACTIVE REMINDER (set tonight, surfaces TOMORROW Mon Jun 1)
-**✂️ TOENAIL TRIM — DO IT TOMORROW (Mon, Jun 1, 2026).** Last done April 3. Monthly schedule (1st of month). Hakim explicitly asked me to remind him tomorrow. → Surface at greeting Monday.
+## 🔔 ACTIVE REMINDER (surfaces TOMORROW Tue Jun 2)
+**✂️ TOENAIL TRIM — Jun 1 reminder surfaced but Hakim signed off early (8:32 PM). Check if done — monthly schedule (1st of month). Remind again at Tue Jun 2 greeting.**
+
+## 📋 TOMORROW (Tue Jun 2) — pick up here
+Two open questions to confirm BEFORE building:
+1. **Payout timing** — lock in WEEKLY (rec: +RM 0.80/order vs per-order loses RM 0.58)
+2. **E-wallets for launch** — rec Touch'n Go + ShopeePay (1.2% + 1.1%). Confirm which channels.
+
+Then build in order:
+1. Install BillPlz skill: `npx skills@latest add afu-it/malaysia-payment-gateway --skill setup-billplz`
+2. Migrations: `pending_payment` + rider/vendor bank fields + `payment_transactions` + `perkeso_deductions` + `MoneyHelper`
+3. `BillplzService` (match `PerkesoService` shape, X-Signature + V5 checksum)
+4. Order lifecycle: checkout → BillPlz Bill → webhook → `pending_payment` → `rider_accepted`
+5. Weekly batch job: `delivered` → vendor + rider Payment Orders + PERKESO Submit Deduction
+
+🔴 **June 5 deadline** — clear test order data from PROD (keep users/profiles/menu). 4 days away.
 
 ## 📍 Location context
 Hakim is in **Cyberjaya** (Sun May 31 evening) — not his usual base in Terengganu / wherever. Worth knowing if travel timing affects work plans.
