@@ -26,6 +26,27 @@ PERKESO ↔ BillPlz integration consolidation — DISCUSSION, not code.
 ## 🧑‍💼 MANAGER MODE
 Hakim's explicit framing: "you being their manager who consolidate and make the final verdict upon meeting with them." → Dispatch staff in parallel, audit findings, present unified verdict (not pass-through reports).
 
+## 🧾 MEETING VERDICT (Mon Jun 1 ~8 PM, after Hana×2 + Sora)
+
+**1. The afu-it/malaysia-payment-gateway repo** is NOT a Laravel package — it's an **AI Agent Skills collection** (Markdown for Claude Code). Install via `npx skills@latest add afu-it/malaysia-payment-gateway --skill setup-billplz`. Use as REFERENCE; still write our own `BillplzService` matching PerkesoService pattern. Skill covers V3/V4/V5 + X-Signature + V5 epoch/checksum order.
+
+**2. ONDW has ZERO payment infra.** Migrations needed BEFORE BillPlz code: (a) add `pending_payment` status between pending↔rider_accepted (riders can currently pick up unpaid orders); (b) rider_profiles += ic_no/ic_type/address/demographics/next_of_kin/bank_code/bank_account_number; (c) vendor_profiles += bank_code/bank_account_number/business_reg/address; (d) new `payment_transactions` table; (e) new `perkeso_deductions` table; (f) `MoneyHelper` utility (RM↔sen — ONDW stores RM decimal(10,2), BillPlz uses sen). Flag: chat_order_drafts duplicates money fields → reconciliation risk.
+
+**3. UNIT ECONOMICS finding (critical):** at Hakim's RM 1 platform fee + e-wallet only, per-order payouts LOSE money (≈ −RM 0.58/order) because each Payment Order disbursement = RM 0.70. **WEEKLY batched payouts (per vendor + per rider)** turn it into +RM 0.80/order. → STRONG REC: **WEEKLY** payouts (Hakim's #2 question — was "daily or weekly TBC").
+
+**4. BillPlz fees (Standard plan RM 999/yr):** Touch'n Go 1.2%, Boost 1.4%, ShopeePay 1.1% (cheapest e-wallet), GrabPay 1.2%, FPX RM 0.70 flat, Cards 1.5%. Payment Order out = RM 0.70 flat. Settlement T+1 inbound, T+0 outbound.
+
+**5. Flags to act on:**
+- 🔴 BillPlz "3 req / 10 min production rate limit" — Sora confirmed in docs but it's IMPLAUSIBLE as a global limit. **Hakim to email team@billplz.com to clarify per-endpoint vs global.** Launch-blocker if true.
+- 🟡 E-wallet activation requires emailing team@billplz.com with SSM + KYC. Lead time.
+- 🟡 PERKESO Register User needs IC + demographics + next-of-kin from rider — none captured today; new onboarding form needed.
+
+## 🛣️ NEXT BUILD STEPS (when Hakim approves)
+1. Install the skill (`npx skills@latest add afu-it/malaysia-payment-gateway --skill setup-billplz`).
+2. Migrations: status + rider/vendor fields + payment_transactions + perkeso_deductions + MoneyHelper.
+3. `BillplzService` matching PerkesoService shape, X-Signature + V5 checksum helpers.
+4. Order lifecycle: checkout → BillPlz Bill → webhook → pending_payment → rider_accepted. Weekly batch on `delivered` → vendor + rider Payment Orders + PERKESO Submit Deduction.
+
 ---
 
 # 🌙 May 27, 2026 — END OF DAY SIGN-OFF + 📋 TOMORROW (May 28)
