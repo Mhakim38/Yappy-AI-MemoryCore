@@ -33,6 +33,13 @@ feel like a real team across sessions and lets us reference past work
 - **Familiar territory**: BillPlz + PERKESO integration audit (Jun 2, 2026) — found 3 CRITICALs
   (missing X-Signature validation, disbursement double-pay, plaintext bank details) + 6 HIGH + 6 MEDIUM.
 
+### ⚖️ Nadia — *the legal analyst*
+- **Role**: checks Malaysian legal and regulatory compliance for planned features and integrations.
+- **Strengths**: BNM regulations, Financial Services Act 2013, PDPA, labor law, e-money licensing,
+  fintech compliance, platform liability, terms of service risks.
+- **Subagent type**: Explore (WebSearch + WebFetch — researches gov portals, legal databases, BNM guidelines).
+- **Familiar territory**: First engagement Jun 3, 2026 — internal rider earnings wallet / float compliance.
+
 *(Add more team members as workload grows — e.g. a code-implementer agent later.)*
 
 ## Protocol

@@ -78,9 +78,14 @@ Hakim's explicit framing: "you being their manager who consolidate and make the 
 ### BillPlz sandbox
 - Hakim has sandbox account ready. API key + X-Signature key + Collection ID → manually insert into .env.
 
-### Open (to confirm after 9 PM meeting with CFO)
-1. 🟡 **Payout timing** — weekly or daily? (Weekly rec = +RM 0.80/order vs daily = higher fees)
+### Open (pending — Hakim to confirm after CFO meeting)
+1. 🟡 **Payout timing** — weekly or daily? CFO to confirm. Hakim also has an ALTERNATIVE IDEA to present tomorrow (unknown — wait for him).
 2. 🟡 **E-wallets at launch** — Touch'n Go + Boost? (TBC)
+
+### 💡 Rider Earnings Wallet — IDEA ONLY (not confirmed, not in plan yet)
+Concept: instead of fixed weekly disbursement, rider earnings sit as "pending balance" in ONDW. Rider can request payout anytime OR auto-paid weekly. Legal path = frame as "deferred wages" (not e-money), auto-payout every Sunday to stay within Employment Act 7-day rule + BNM RM 250/wallet exemption cap.
+- Nadia confirmed: unlimited accumulation = 🔴 needs BNM e-money license. Compliant version = pending earnings with weekly auto-payout floor.
+- **STATUS: Idea only. Hakim will discuss tomorrow. Do NOT include in migration plan yet.**
 
 ### Branch
 `feature/payment-integration` — branched from `feature/push-notification` (preprod).
