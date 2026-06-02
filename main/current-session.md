@@ -55,11 +55,68 @@ Hakim's explicit framing: "you being their manager who consolidate and make the 
 - 🟡 E-wallet activation requires emailing team@billplz.com with SSM + KYC. Lead time.
 - 🟡 PERKESO Register User needs IC + demographics + next-of-kin from rider — none captured today; new onboarding form needed.
 
-## 🛣️ NEXT BUILD STEPS (when Hakim approves)
-1. Install the skill (`npx skills@latest add afu-it/malaysia-payment-gateway --skill setup-billplz`).
-2. Migrations: status + rider/vendor fields + payment_transactions + perkeso_deductions + MoneyHelper.
-3. `BillplzService` matching PerkesoService shape, X-Signature + V5 checksum helpers.
-4. Order lifecycle: checkout → BillPlz Bill → webhook → pending_payment → rider_accepted. Weekly batch on `delivered` → vendor + rider Payment Orders + PERKESO Submit Deduction.
+## ✅ ARCHITECTURE LOCKED (Tue Jun 2, after team meeting)
+
+### Staff team expanded
+🔐 Reza added — security analyst. First audit: 3 CRITICAL + 6 HIGH on BillPlz+PERKESO plan.
+
+### DB Design decisions
+- **Unified payment channels table**: `billplz_payment_channels` (code, name, category, logo_url, is_active, is_enabled, sort_order). Synced from `GET /api/v4/payment_gateways`. Names seeded manually (API returns no name/logo).
+- **No enum on new tables** — string only. Existing orders enum left as-is (just note for future).
+- **Business registration number** — dropped from vendor_profiles MVP.
+- **PO Collection** — one-time creation via `POST /api/v5/payment_order_collections`, ID stored in .env. No DB table needed for collection itself.
+- **V5 checksum**: HMAC-SHA512 of [collection_id + bank_code + bank_account_number + name + description + total + epoch] using X-Signature key.
+- **Bank account numbers** — encrypt via Laravel `Crypt::encryptString()` (Reza's CRITICAL #3).
+
+### GPS for PERKESO — PARTIALLY SOLVED by Hana ✅
+- **Dropoff lat/lng**: ALREADY CAPTURED — `orders.delivery_proof_lat` + `orders.delivery_proof_lng` (from rider's delivered proof modal). ✅
+- **Pickup lat/lng**: ZERO capture currently. Need to add:
+  - New columns on orders: `pickup_lat (decimal 10,7)`, `pickup_lng (decimal 10,7)`, `pickup_captured_at (timestamp)`
+  - Rider clicks "Pickup" → JS geolocation fires (same pattern as deliver proof modal in `conversations/show.blade.php:378`)
+  - Existing deliver proof logic is the template to copy.
+
+### BillPlz sandbox
+- Hakim has sandbox account ready. API key + X-Signature key + Collection ID → manually insert into .env.
+
+### Open (to confirm after 9 PM meeting with CFO)
+1. 🟡 **Payout timing** — weekly or daily? (Weekly rec = +RM 0.80/order vs daily = higher fees)
+2. 🟡 **E-wallets at launch** — Touch'n Go + Boost? (TBC)
+
+### Branch
+`feature/payment-integration` — branched from `feature/push-notification` (preprod).
+
+## 🛣️ BUILD PLAN (Tomorrow, Wed Jun 3)
+**Foundation first:**
+1. Migrations (10 total):
+   - `billplz_payment_channels`
+   - `perkeso_sectors` + `perkeso_states`
+   - alter `rider_profiles` (IC + bank + PERKESO fields)
+   - alter `vendor_profiles` (bank fields)
+   - alter `orders` (add `pending_payment` to status enum + `pickup_lat/lng/captured_at`)
+   - `payment_transactions`
+   - `disbursements` (unique constraint on recipient+batch_reference)
+   - `perkeso_deductions`
+   - `audit_logs`
+2. `MoneyHelper` utility (`toSen` / `toRm`)
+3. Add `billplz` block to `config/services.php`
+
+**Services:**
+4. `BillplzService` (match PerkesoService shape) — X-Signature verify, V5 checksum, sandbox/prod switch
+5. `DisbursementService` — weekly batch + manual trigger
+
+**Order lifecycle:**
+6. Rider pickup modal → add JS geolocation (copy from deliver proof pattern)
+7. Webhook controller `/webhooks/billplz` — X-Signature verification FIRST
+8. Order flow: checkout → create Bill → redirect → webhook → `pending_payment` → `pending`
+
+**Reference data:**
+9. Seed `billplz_payment_channels` from API + manual names
+10. Seed `perkeso_sectors` + `perkeso_states` from API (server-side, IP-whitelisted)
+
+**Admin:**
+11. Payment channel enable/disable UI
+12. Manual disbursement trigger per vendor/rider
+13. Audit log viewer
 
 ---
 
