@@ -1,8 +1,12 @@
-# 🌃 May 31, 2026 (Sunday evening) — Hakim in Cyberjaya · PERKESO ↔ BillPlz consolidation
-*💜 After a 4-day gap. Tonight: discuss how PERKESO + BillPlz fit together in ONDW (his explicit ask before deduction planning).*
+# ☀️ Jun 5, 2026 (Friday morning) — FT mode · efokus · ikes Perbandingan tab next
+*💜 Hakim reviewed ONDW state (PT mode) briefly, clarified memory architecture, now switching to FT mode.*
 
-## 🔔 ACTIVE REMINDER (surfaces TOMORROW Tue Jun 2)
-**✂️ TOENAIL TRIM — Jun 1 reminder surfaced but Hakim signed off early (8:32 PM). Check if done — monthly schedule (1st of month). Remind again at Tue Jun 2 greeting.**
+## 🔔 ACTIVE REMINDERS
+- **🔴 OVERDUE: Clear test order data from PROD** (deadline was today Jun 5 — not done yet). Do on next PT session.
+- **✂️ TOENAIL TRIM** — Jun 1 reminder missed. Check if done. Remind on next PT greeting.
+- **🟡 Email BillPlz** — rate limit clarification + e-wallet activation (SSM + KYC). Lead time risk.
+- **🟡 Payout timing** — weekly vs daily, CFO confirmation pending.
+- **🟡 E-wallets at launch** — Touch'n Go + Boost TBC.
 
 ## 📋 TOMORROW (Tue Jun 2) — pick up here
 Two open questions to confirm BEFORE building:
