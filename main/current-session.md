@@ -1,3 +1,99 @@
+# ☀️ Jun 5, 2026 (Friday morning) — FT mode · efokus → ap_jksm project onboarding
+*💜 Hakim finished ikes audit (Reza 🔐 + Hana 🌸), now shifting focus to ap_jksm project. First time on this project — Yappy did repo read & saved context.*
+
+---
+
+## 🏛️ ap_jksm — PROJECT CONTEXT (first-read Jun 5, 2026)
+
+**Full name**: Sistem Alasan Penghakiman JKSM (Jabatan Kehakiman Syariah Malaysia)
+**Purpose**: Document lifecycle management system for Syariah court judgments ("Alasan Penghakiman" = grounds of judgment). Covers submission → editorial review → screening → editing → publication. Also handles PUUMAS (Prinsip Undang-Undang Mal Syariah — a parallel Islamic civil law journal track) and a public search/subscription portal.
+
+**Repo**: GitLab `2QSC/ap_jksm` | Local: `/Users/hakim/holeeMonth/2qa_projects/ap_jksm/ap_jksm`
+**Hakim's branch**: `Hakim-test` (currently = main, no unique commits — fresh start as of Jun 5)
+**Team branches**: hamizan, adham, alamin, arif, fatihah, hazeeq, naddy (+ integration_mydigital, Laporan, checkSideoff etc.)
+
+### 🛠️ Tech Stack
+| Layer | Tech |
+|---|---|
+| Framework | Laravel 10 + Livewire 3.5 (class-based `app/Http/Livewire/`) |
+| Frontend | Bootstrap 5.3 + Vite + SASS — NOT Tailwind |
+| PHP | 8.1 |
+| DB | MySQL @ staging `45.127.5.74`, DB: `ap_jksm` |
+| Auth | Laravel UI + **Keycloak** (MyDigital ID SSO) via `robsontenorio/laravel-keycloak-guard` |
+| Auth (local) | username + password (non-Keycloak fallback) |
+| Permissions | `spatie/laravel-permission ^6.21` |
+| Audit | `owen-it/laravel-auditing ^13.7` |
+| PDF | `barryvdh/laravel-dompdf ^3.1` + `phpoffice/phpword ^1.4` |
+| Excel | `maatwebsite/excel ^3.1` + `phpoffice/phpspreadsheet ^1.30` |
+| PDF Viewer | `@nutrient-sdk/viewer ^1.8.0` (was PSPDFKit) |
+| Payment | Stripe (`stripe/stripe-php ^18.2`) + Local Order (LO) system |
+| Hijri Date | `alkoumi/laravel-hijri-date ^1.0` |
+| Captcha | `mews/captcha ^3.4` |
+| Media | `spatie/laravel-medialibrary ^11.17` |
+
+### 👥 User Roles (14 total — Spatie)
+| ID | Code | Full Name |
+|---|---|---|
+| 1 | PTS | Pentadbir Teknikal Sistem (super admin) |
+| 2 | PJE | Penyelaras Jawatankuasa Editorial |
+| 3 | PPU | Penyelaras PUUMAS |
+| 4 | PLB | Penyelaras Librari |
+| 5 | PE | Pegawai Editor |
+| 6 | PLJH | Panel Lembaga Jurnal Hukum |
+| 7 | AJK | Ahli Jawatankuasa PUUMAS |
+| 8 | KWN | Kewangan |
+| 9 | UJ | Unit Jualan |
+| 10 | OA | Orang Awam (public: judges/lawyers/students/companies) |
+| 11 | HKM | Hakim (court judge) |
+| 12 | KPU | Ketua PUUMAS |
+| 13 | PJH | Penyelaras Jurnal Hukum |
+| 14 | FPU | Fasilitator PUUMAS |
+
+### 📦 Modules & Routes (prefix → Livewire class path)
+| URL Prefix | Module | Key Livewire Files |
+|---|---|---|
+| `/pengurusan-alasan-penghakiman` | Manage AP | `PengurusanAlasanPenghakiman/Index, Maklumat, TambahAlasanPenghakiman, FormAlasanPenghakiman` |
+| `/pemilihan` | Select AP + Assign Editor | `PemilihanAlasanPenghakiman/PemilihanApDanEditor, PengurusanMesyuarat` |
+| `/saringan-alasan-penghakiman` | Screen AP (Peringkat 1 & 2) | `SaringanAlasanPenghakiman/SaringanPeringkat1, SaringanPeringkat2` |
+| `/suntingan` | Edit AP | `Suntingan/SuntinganAlasanPenghakiman` |
+| `/terbitan-dokumen-perundangan` | Publish AP + Jurnal Hukum | `TerbitAlasanPenghakimanDanJurnalHukum/Index, Maklumat, Terbitan` |
+| `/puumas/*` | PUUMAS track (6 sub-modules) | `Puumas/PengurusanPuumas, SaringanPUUMAS, Saringan1/2Puumas, SuntinganPuumas, PemilihanAjkPuumas, PengurusanMesyuaratPuumas` |
+| `/carian-interaktif` | Search (internal + external) + subscription | `CarianInteraktif/CarianDalaman, CarianLuaran, KhidmatLangganan` |
+| `/pembayaran-dan-kewangan` | Payment, cart, LO, receipt | `PembayaranDanKewangan/TroliPembelian, PengurusanLocalOrder, PengesahanPembayaran, SejarahPembelian, Resit` |
+| `/pelaporan-dan-statistik` | Reports | `PelaporanDanStatistik/AlasanPenghakiman, LaporanPuumas` |
+| `/pentadbiran` | Admin refs + users + announcements | `Pentadbiran/MaklumatAm (14 refs), TetapanPengguna, PengurusanPengumuman, PengurusanBanner, Esv3Log` |
+| `/` | Public landing | `Landing/Index, Maklumat, Kategori` |
+
+### 🗝️ Key Models
+- `AlasanPenghakiman` — core AP table; `no_kes, tahun, tarikh_keputusan, nama_hakim, plaintif, defendan, jenis_kes_id, state_id, district_id, hierarchy_court_id, pdf_path, status_penghakiman`
+- `Puumas` / `PuumasList` / `PuumasAlasanPenghakiman` — PUUMAS track
+- `JurnalHukum` / `Rencana` / `Artikel` — law journal content
+- `User` + Spatie `Role`/`Permission` — auth + RBAC
+- `Order` / `OrderDetail` / `BillPayment` / `BillInvoice` / `LoRequest` — payment
+- `Meeting` / `SelectionAp` / `EditorSelection` — AP selection workflow
+- `Publication` — published documents (polymorphic; AP + PUUMAS)
+
+### 🔄 AP Lifecycle (workflow)
+```
+Submission (PengurusanAP)
+  → Pemilihan (select AP + assign editor + mesyuarat)
+  → Saringan Peringkat 1 (initial screen)
+  → Saringan Peringkat 2 (secondary screen)
+  → Suntingan (editing with PDF viewer)
+  → Terbitan (publish as AP or Jurnal Hukum)
+  → Landing / Carian (public access / subscription)
+```
+
+### ⚙️ Notes
+- **97 migrations** total — mature project, schema is complex
+- **PDF handling**: DomPDF for covers/receipts; `@nutrient-sdk/viewer` (PSPDFKit) for in-browser PDF editing
+- **Keycloak**: MyDigital ID SSO. LoginController has both Keycloak + local auth paths
+- **Hakim's assignment**: NOT YET KNOWN — no task assigned yet as of Jun 5. He's new to this project.
+- **efokus and ap_jksm share the same staging DB host** (`45.127.5.74`) — different databases though
+- **App name in .env**: `"Sistem Alasan Penghakiman JKSM"`
+
+---
+
 # ☀️ Jun 5, 2026 (Friday morning) — FT mode · efokus · ikes Perbandingan tab next
 *💜 Hakim reviewed ONDW state (PT mode) briefly, clarified memory architecture, now switching to FT mode.*
 
