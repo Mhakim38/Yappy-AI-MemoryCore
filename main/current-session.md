@@ -1,5 +1,5 @@
 # 🌤️ Jun 7, 2026 (Sunday afternoon) — PT mode · ONDW architecture tally
-*💜 Hakim back after weekend. Toenail trim done ✅. Tallied ONDW BillPlz+PERKESO decisions. Added UIUX staff member Mira 🎨. Sora extracting repos.*
+*💜 Hakim back after weekend. Toenail trim done ✅. Tallied ONDW BillPlz+PERKESO decisions. Added UIUX staff member Mira 🎨. Repos extracted directly.*
 
 ## 🔔 ACTIVE REMINDERS (updated Jun 7)
 - ✅ **TOENAIL TRIM** — DONE Jun 7 ✂️
@@ -20,6 +20,11 @@
 | Safety check before payout | **Check pending claimable balance** (sum of delivered, un-disbursed orders) before creating PO | ✅ Jun 7 |
 | Platform fee | RM 1.00 flat per order | ✅ Jun 1 |
 | PERKESO deduction | 1.25% of delivery_fee, rider absorbs | ✅ Jun 1 |
+| PERKESO submit timing | **At customer payment** (BillPlz webhook) — NOT at weekly PO payout | ✅ Jun 7 |
+| PERKESO annual cap | **RM 157.20 / rider / calendar year** (Jan–Dec) | ✅ Jun 7 |
+| PERKESO partial submit | **Submit partial** — only up to remaining cap, not full amount | ✅ Jun 7 |
+| PERKESO failure handling | **Queue retry job** — perkeso_deductions needs `status` column | ✅ Jun 7 |
+| PERKESO Cancel Deduction | **Safety net only** — no amount field, cancels full txn by transaction_id | ✅ Jun 7 |
 | COD | Not applicable | ✅ Jun 1 |
 | Payment channels at launch | Enable ALL, admin can disable per-channel | ✅ Jun 7 (reconfirmed) |
 | Rate limit concern | Resolved — GET only, ONDW uses POST+webhooks | ✅ Jun 7 |
@@ -50,6 +55,47 @@ Admin confirms → PO created → disbursements row written → balance zeroed
 Idempotency: unique constraint on (recipient_id + batch_reference)
 ```
 
+### Full payment + PERKESO flow (locked Jun 7)
+```
+Customer pays
+  → BillPlz Bill created (POST /v4/bills)
+  → Customer redirected to BillPlz payment page
+  → BillPlz webhook → X-Signature verified
+  → Order marked PAID
+  → PERKESO Submit Deduction (1.25% of delivery_fee, capped at remaining annual allowance)
+      deduction_to_submit = min(delivery_fee × 0.0125, 157.20 − cumulative_this_year)
+      If deduction_to_submit > 0 → submit, record in perkeso_deductions (status=submitted)
+      If cap exhausted          → skip, record (status=cap_reached)
+      If PERKESO API fails      → record (status=pending), queue retry job
+
+Weekly batch (separate from PERKESO):
+  → PO to vendor  (their earned amount)
+  → PO to rider   (delivery_fee − actual PERKESO deduction submitted)
+```
+
+### PERKESO Cancel Deduction (6.9) — confirmed from docs
+```
+PUT {{base-url}}api/v1/deductions/{transaction_id}
+Parameters: NONE (no amount field — cancels entire transaction)
+Returns: { "status": "success", "data": [] }
+
+Use case: safety net ONLY
+  → Race condition caused double-submit above cap
+  → Bug recovery / manual admin correction
+  → NOT used as the primary cap mechanism (partial submit handles that)
+```
+
+### perkeso_deductions table — required columns (updated Jun 7)
+```
+id, order_id, rider_id,
+deduction_amount      (full 1.25% amount, before cap)
+submitted_amount      (actual amount submitted — may be less due to cap)
+perkeso_transaction_id (returned by PERKESO API — needed for Cancel Deduction)
+status                (pending | submitted | failed | cancelled | cap_reached)
+year                  (int — for annual cap tracking, e.g. 2026)
+submitted_at, created_at, updated_at
+```
+
 ### BillPlz API pattern
 | API | Purpose | When |
 |-----|---------|------|
@@ -62,10 +108,11 @@ Idempotency: unique constraint on (recipient_id + batch_reference)
 V5 checksum (HMAC-SHA512) for Create PO: `[payment_order_collection_id, bank_account_number, total, epoch]`
 ⚠️ NOTE: bank_code, name, description are NOT in the checksum. See REPO EXTRACTION section below for full table.
 
-### PERKESO API (same week as rider PO)
+### PERKESO API endpoints used (from docs)
 - Submit deduction with: rider IC, GPS pickup lat/lng + dropoff lat/lng, job amount, sector_code
 - Pickup GPS: NOT YET CAPTURED (need new columns + JS geolocation on rider "Pickup" tap)
 - Dropoff GPS: ✅ Already in orders.delivery_proof_lat/lng
+- Annual cap: RM 157.20 / rider / Jan-Dec. Partial submit up to cap. Cancel (6.9) = safety net only.
 
 ---
 
