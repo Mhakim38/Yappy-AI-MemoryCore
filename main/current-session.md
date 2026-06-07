@@ -1,3 +1,147 @@
+# 🌤️ Jun 7, 2026 (Sunday afternoon) — Weekend check-in · switching to PT mode
+*💜 Hakim back after weekend break. Toenail trim done ✅. Saved ap_jksm + iPayment deep-dive to MemoryCore. Now PT mode.*
+
+## 🔔 ACTIVE REMINDERS (updated Jun 7)
+- ✅ **TOENAIL TRIM** — DONE Jun 7 ✂️
+- **🔴 OVERDUE: Clear test order data from ONDW PROD** — Hakim's deadline was Jun 5, still not done. Do this PT session.
+- **🟡 Email BillPlz** — rate limit clarification + e-wallet activation (SSM + KYC)
+- **🟡 Payout timing** — weekly vs daily, CFO confirmation pending
+- **🟡 E-wallets at launch** — Touch'n Go + Boost TBC
+
+---
+
+## 🏛️ ap_jksm — DEEP DIVE NOTES (Jun 5–7, 2026)
+
+### Hakim's task on ap_jksm
+```
+pembayaran (hakim)
+- ipayment
+- generate LO, sebut harga & invois
+```
+**Branch**: `Hakim-test` (currently = main, no unique commits yet)
+**Open question before starting iPayment**: Which package? Collection Channel (pay at iPayment) or Gateway Channel (pay at JKSM)? Need to confirm with team/PM.
+
+---
+
+### 🔑 Test Credentials (all password: `password`, login via IC number)
+
+| Role | Email | IC/Username |
+|------|-------|-------------|
+| PTS (super admin) | pts@example.com | 900101011111 |
+| PJE (editorial coord) | pje@example.com | 900101022222 |
+| HKM (judge) | hkm1@example.com | 9001010300001 |
+| PE (editor) | PE1@example.com | 9001010400001 |
+| PLJH (JH panel) | PLJH1@example.com | 9001010500001 |
+| PPU (PUUMAS coord) | ppu1@example.com | 9001010600001 |
+| PLB (library) | plb1@example.com | 9001010700001 |
+| AJK (PUUMAS committee) | ajk1@example.com | 9001010800001 |
+| KWN (finance) | kwn1@example.com | 9001010900001 |
+| UJ (sales) | uj1@example.com | 9001011000001 |
+| KPU (head PUUMAS) | kpu1@example.com | 9001011100001 |
+| OA (public individual) | oa1@example.com | 9001011200001 |
+| OA (agency/syarikat) | ahmad@tekno-maju.com.my | 202301012345-A1 |
+| PJH (JH coord) | pjh1@example.com | 9001011300001 |
+| FPU (PUUMAS facilitator) | fpu1@example.com | 9001011400001 |
+
+Login uses IC number as username, NOT email. `is_mydigitalid = 0` → local auth (no Keycloak needed for dev).
+
+---
+
+### 📊 Role Hierarchy + Nav Access (simplified)
+```
+PTS → everything
+KPU → almost everything (no AP mgt, no admin)
+PJE → AP full pipeline (mgt→select→screen→edit) + carian dalaman + laporan
+PJH → AP + pemilihan + saringan + laporan
+PE  → pemilihan(AP) + saringan P1 + suntingan + laporan AP
+PLJH → pemilihan + saringan P2 + suntingan PUUMAS + terbitan + laporan
+PPU → pemilihan + saringan + suntingan + PUUMAS full + carian awam + laporan
+PLB → terbitan + carian + laporan
+AJK → PUUMAS saringan 1 + carian
+HKM → AP mgt + carian + laporan AP
+UJ  → carian + pengurusan LO + laporan
+KWN → pengesahan bayaran (LO) + laporan
+OA  → carian awam + khidmat langganan + troli pembelian
+FPU → pemilihan + saringan + suntingan + PUUMAS S2 + carian dalaman + laporan
+```
+
+🐛 Bugs found in seeder:
+- PJE has typo `'terbiat'` instead of `'terbit'` → PJE silently loses Terbitan access
+- PLB uses hyphen keys (`carian-dalam`) but PermissionSeeder uses underscores (`carian_dalam`) → PLB Carian children may not work
+
+---
+
+### 🔄 LO Flow (Local Order — for Agensi/government agency buyers)
+
+**Official flow (from draw.io flowchart):**
+```
+Agensi: View cart → Print Sebut Harga → Select LO payment
+  → Fill LO details + upload LO doc
+  [Unit Jualan] Review → LULUS or BATAL
+  [Sistem] Generate Invoice + Delivery Note + upload stamped LO
+  [Sistem] Grant full access
+  [Agensi] Make manual payment (offline)
+```
+
+**Code reality:**
+- `TroliPembelian.php` → `saveButiranPembayranLO()` → creates `BillInvoice (INV-LO-{uniqid})` + `LoRequest (status=SEMAKAN=15)`
+- `PengurusanLocalOrder/Semakan.php` → UJ approves/rejects → status LULUS(13) / TOLAK(14)
+- `PengesahanPembayaran/Catatan.php` → KWN confirms payment → creates `BillPayment`, marks Order paid
+- 🐛 **BUG**: `Catatan::sahkan()` does NOT create `ReceiptDetail` → LO customers get no receipt
+
+**LO statuses**: DRAF(12) → SEMAKAN(15) → LULUS(13)/TOLAK(14) → BAYARAN_DITERIMA(16)/GAGAL(17)/DIKEMBALIKAN(18)
+
+**Document generation:**
+| Doc | Method | Persisted? | Issue |
+|-----|--------|-----------|-------|
+| Sebut Harga | `downloadSebutHargaPdf()` (manual) | ❌ No | `no_rujukan` = ephemeral `SH-{uniqid}` each time |
+| Invois | `downloadInvois()` (manual) | ❌ No | Regenerated on every call, no `pdf_path` saved |
+| Resit | `saveButiranPembayaran()` (Individu) | ✅ Yes | Works for Individu, but missing for LO path |
+
+---
+
+### 🏛️ iPayment — What It Is
+
+**Official name**: Sistem Terimaan Elektronik Kerajaan Persekutuan
+**Developed by**: JANM (Jabatan Akauntan Negara Malaysia), launched Feb 12 2025
+**Purpose**: Federal government's electronic payment gateway for ALL government agencies
+
+**Payment methods**: DuitNow DOBW (FPX replacement), Debit/Credit card, E-wallet (CardBiz/Fiuu), DuitNow QR
+
+**Critical notes from slides:**
+- ⚠️ "iPayment TIDAK mengeluarkan invois" — agency must generate own invoices
+- ⚠️ iPayment is NOT an accounting system — receipts auto-sent to **iGFMAS** (government accounting)
+- iPayment does NOT store subsidiary info
+
+**Packages (2 currently live):**
+| Package | Where payment happens | Integration | Available |
+|---------|----------------------|-------------|-----------|
+| Online Marketplace | iPayment only | None | ✅ Now |
+| **Collection Channel** | **iPayment only** | **API** | **✅ Now ← likely JKSM** |
+| **Gateway Channel** | **Agency system** | **API** | **✅ Now** |
+| Gateway Channel Plus | Both | API | 🔴 Dec 2027 |
+| Second Window | Both | API | 🔴 Jun 2028 |
+
+**Gateway Channel flow (if chosen):**
+```
+1. Customer at JKSM → select payment
+2. JKSM → send Maklumat Terimaan → iPayment
+3. iPayment → RMA (Affin/RHB) → PayNet/Cybersource/MPGS
+4. iPayment → returns Status + Resit → JKSM
+5. iPayment → auto sends receipt → iGFMAS
+6. JKSM: create BillPayment + ReceiptDetail + grant access
+```
+
+---
+
+### ⚡ Current Stripe State (mostly a stub)
+- `CheckoutController` creates a Stripe session but success callback does NOTHING to DB
+- `saveButiranPembayaran()` in TroliPembelian is the ONLY working payment path (manual, no gateway)
+- `PaymentGatewayTxn` model exists but is NEVER populated — ready to use for iPayment
+- Stripe amount hardcoded to RM 60.00, not linked to actual `Order->total_amount`
+
+---
+
 # ☀️ Jun 5, 2026 (Friday morning) — FT mode · efokus → ap_jksm project onboarding
 *💜 Hakim finished ikes audit (Reza 🔐 + Hana 🌸), now shifting focus to ap_jksm project. First time on this project — Yappy did repo read & saved context.*
 
