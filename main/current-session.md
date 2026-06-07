@@ -1,12 +1,197 @@
-# 🌤️ Jun 7, 2026 (Sunday afternoon) — Weekend check-in · switching to PT mode
-*💜 Hakim back after weekend break. Toenail trim done ✅. Saved ap_jksm + iPayment deep-dive to MemoryCore. Now PT mode.*
+# 🌤️ Jun 7, 2026 (Sunday afternoon) — PT mode · ONDW architecture tally
+*💜 Hakim back after weekend. Toenail trim done ✅. Tallied ONDW BillPlz+PERKESO decisions. Added UIUX staff member Mira 🎨. Sora extracting repos.*
 
 ## 🔔 ACTIVE REMINDERS (updated Jun 7)
 - ✅ **TOENAIL TRIM** — DONE Jun 7 ✂️
-- **🔴 OVERDUE: Clear test order data from ONDW PROD** — Hakim's deadline was Jun 5, still not done. Do this PT session.
-- **🟡 Email BillPlz** — rate limit clarification + e-wallet activation (SSM + KYC)
-- **🟡 Payout timing** — weekly vs daily, CFO confirmation pending
-- **🟡 E-wallets at launch** — Touch'n Go + Boost TBC
+- **🔴 OVERDUE: Clear test order data from ONDW PROD** — still not done. Do this session.
+- ✅ **Rate limit (BillPlz)** — RESOLVED. Only GET endpoints limited (100/5min). ONDW uses POST + webhooks → NOT a blocker.
+- **🟡 Email BillPlz** — e-wallet activation only (SSM + KYC). Rate limit concern dropped.
+- **🟡 E-wallets for launch** — enable ALL channels, admin can disable per channel in admin panel.
+
+---
+
+## ✅ ONDW PAYMENT ARCHITECTURE — LOCKED (Jun 7, 2026)
+
+### All confirmed decisions (cumulative)
+| Decision | Value | Locked |
+|----------|-------|--------|
+| Payout timing | **WEEKLY batch** (auto every week) | ✅ Jun 7 |
+| Manual payout | **Admin button** per vendor/rider (via WhatsApp request for now) | ✅ Jun 7 |
+| Safety check before payout | **Check pending claimable balance** (sum of delivered, un-disbursed orders) before creating PO | ✅ Jun 7 |
+| Platform fee | RM 1.00 flat per order | ✅ Jun 1 |
+| PERKESO deduction | 1.25% of delivery_fee, rider absorbs | ✅ Jun 1 |
+| COD | Not applicable | ✅ Jun 1 |
+| Payment channels at launch | Enable ALL, admin can disable per-channel | ✅ Jun 7 (reconfirmed) |
+| Rate limit concern | Resolved — GET only, ONDW uses POST+webhooks | ✅ Jun 7 |
+| BillPlz plan | Standard (RM 999/yr) | ✅ Jun 1 |
+
+### Unit economics (why weekly batch matters)
+```
+Per-order payout:
+  Platform fee:        +RM 1.00
+  Vendor PO (RM 0.70): -RM 0.70
+  Rider  PO (RM 0.70): -RM 0.70
+  Net:                 -RM 0.40/order ← LOSING MONEY
+
+Weekly batch (7 orders/week example):
+  Platform fee (×7):   +RM 7.00
+  1× Vendor PO:        -RM 0.70
+  1× Rider  PO:        -RM 0.70
+  Net:                 +RM 5.60 → +RM 0.80/order ← profitable
+```
+Key: BillPlz PO fee is FLAT RM 0.70 regardless of disbursement amount.
+More orders per batch = better economics.
+
+### Manual payout safety check logic
+```
+pending_balance = SUM of delivered orders not yet in disbursements table
+Admin sees: "Vendor X has RM 245.00 pending (23 orders). Disburse?"
+Admin confirms → PO created → disbursements row written → balance zeroed
+Idempotency: unique constraint on (recipient_id + batch_reference)
+```
+
+### BillPlz API pattern
+| API | Purpose | When |
+|-----|---------|------|
+| POST /v4/bills | Create payment bill | Customer checkout |
+| Webhook + X-Signature verify | Confirm payment | BillPlz → ONDW callback |
+| POST /api/v5/payment_order_collections | One-time PO collection setup | Config only (ID in .env) |
+| POST /api/v5/payment_orders | Disburse to vendor | Weekly batch / manual |
+| POST /api/v5/payment_orders | Disburse to rider | Weekly batch / manual |
+
+V5 checksum (HMAC-SHA512) for Create PO: `[payment_order_collection_id, bank_account_number, total, epoch]`
+⚠️ NOTE: bank_code, name, description are NOT in the checksum. See REPO EXTRACTION section below for full table.
+
+### PERKESO API (same week as rider PO)
+- Submit deduction with: rider IC, GPS pickup lat/lng + dropoff lat/lng, job amount, sector_code
+- Pickup GPS: NOT YET CAPTURED (need new columns + JS geolocation on rider "Pickup" tap)
+- Dropoff GPS: ✅ Already in orders.delivery_proof_lat/lng
+
+---
+
+## 👥 STAFF UPDATES (Jun 7)
+New member added: **🎨 Mira** — UI/UX specialist
+Uses skills from: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git
+✅ Both repos fully extracted by Yappy directly (Jun 7)
+
+Payment gateway repo reference: https://github.com/afu-it/malaysia-payment-gateway.git
+
+---
+
+## 📦 REPO EXTRACTION — ui-ux-pro-max-skill (Jun 7, 2026)
+*Source: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git — extracted directly*
+
+### What it is
+AI design intelligence toolkit — searchable databases of UI styles, color palettes, font pairings, chart types, UX guidelines. Works as Claude Code skill.
+
+### Available skills inside the repo
+| Skill | Purpose |
+|-------|---------|
+| `ui-ux-pro-max` | **Main skill** — full design system generation |
+| `ui-styling` | shadcn/ui + Tailwind utilities, canvas fonts |
+| `design-system` | Token architecture, component specs, slide data |
+| `brand` | Brand guidelines, logo usage, color palette mgmt |
+| `design` | CIP design, logos, icons, slides |
+| `slides` | HTML slide creation, layout patterns |
+| `banner-design` | Banner sizes and styles |
+
+### How to invoke (for Mira 🎨)
+```bash
+# Full design system recommendation (START HERE):
+python3 src/ui-ux-pro-max/scripts/search.py "<product type> <industry> <keywords>" --design-system -p "Project Name"
+
+# Domain deep-dive:
+python3 src/ui-ux-pro-max/scripts/search.py "<query>" --domain <domain>
+
+# Stack-specific guidelines:
+python3 src/ui-ux-pro-max/scripts/search.py "<query>" --stack <stack>
+```
+
+### Available domains
+`product` · `style` · `color` · `typography` · `landing` · `chart` · `ux` · `google-fonts` · `react` · `web` · `prompt`
+
+### Available stacks
+`html-tailwind` · `react` · `nextjs` · `vue` · `nuxtjs` · `nuxt-ui` · `svelte` · `shadcn` · `react-native` · `flutter` · `swiftui` · `jetpack-compose` · `astro`
+
+### Top rule priorities (quick ref for Mira)
+1. **Accessibility** — CRITICAL (4.5:1 contrast, keyboard nav, aria-labels)
+2. **Touch & Interaction** — CRITICAL (min 44×44px targets, 8px spacing, loading feedback)
+3. **Performance** — HIGH (WebP/AVIF, lazy load, reserve space CLS < 0.1)
+4. **Style Selection** — HIGH (match product type, consistent, SVG icons NOT emoji)
+5. **Layout & Responsive** — HIGH (mobile-first, no horizontal scroll, breakpoints)
+
+### Install command (for a project)
+```bash
+npx skills@latest add nextlevelbuilder/ui-ux-pro-max-skill --skill ui-ux-pro-max
+```
+
+---
+
+## 📦 REPO EXTRACTION — malaysia-payment-gateway (Jun 7, 2026)
+*Source: https://github.com/afu-it/malaysia-payment-gateway.git — extracted directly*
+
+### What it is
+AI Agent Skills collection for Malaysian payment gateway integrations. NOT a Laravel package. Reference + AI skill docs.
+
+### Available skills
+| Skill | Purpose |
+|-------|---------|
+| `malaysia-payment-gateway` | Main gateway skill (provider choice, state machine, completion criteria) |
+| `setup-billplz` | **Most relevant for ONDW** — V3/V4/V5, X-Signature, PO checksum |
+| `setup-bayarcash` | Bayarcash portal/API |
+| `setup-bcl` | BCL Pay |
+| `setup-chip` | CHIP Collect (Malaysian checkout) |
+| `setup-curlec` | Curlec/Razorpay FPX |
+| `setup-fiuu` | Fiuu payment gateway |
+| `setup-hitpay` | HitPay |
+| `setup-senangpay` | SenangPay |
+| `setup-stripe-malaysia` | Stripe Malaysia |
+| `setup-toyyibpay` | ToyyibPay |
+| `setup-xendit` | Xendit Malaysia |
+
+### Install command (for ONDW)
+```bash
+npx skills@latest add afu-it/malaysia-payment-gateway --skill setup-billplz
+```
+
+### ✅ CORRECTED BillPlz V5 Checksum (from official billplz-docs.md)
+
+⚠️ **Previous MemoryCore entry was WRONG** — had extra fields. Correct values (strict order):
+
+| Endpoint | Checksum values (strict order) |
+|----------|-------------------------------|
+| Create PO Collection | `[title, callback_url*, epoch]` (* = only if supplied) |
+| Get PO Collection | `[payment_order_collection_id, epoch]` |
+| **Create Payment Order** | **`[payment_order_collection_id, bank_account_number, total, epoch]`** ← USE THIS |
+| Get Payment Order | `[payment_order_id, epoch]` |
+| Get PO Limit | `[epoch]` |
+| PO Callback verification | `[id, bank_account_number, status, total, reference_id, epoch]` |
+
+Algorithm: HMAC-SHA512 of concatenated values using **X Signature Key** (same key as X Signature).
+
+### BillPlz X Signature (separate from V5 checksum!)
+- Used for Bill callbacks + redirects (V4 and below)
+- HMAC-SHA256 (NOT SHA-512)
+- Source string: all key-value pairs except `x_signature`, sorted ascending case-insensitive, joined with `|`
+- For POST callback: concatenate key+value (no separator) before sorting
+- For GET redirect: prefix nested keys with `billplz` (e.g., `billplzid...`, `billplzpaid...`)
+- Use timing-safe comparison
+
+### BillPlz rate limits (CONFIRMED RESOLVED Jun 7)
+- **GET endpoints only**: 100 req / 5-min window
+- POST endpoints: NO rate limit
+- ONDW uses POST (create bill, create PO) + webhooks → **completely safe for launch**
+
+### Critical BillPlz rules
+1. `callback_url` COMPULSORY — return HTTP 200 within 20 seconds
+2. Callback retries: max 5 attempts. Failed attempts degrade account rank.
+3. NEVER mark paid from browser redirect alone — wait for verified callback
+4. `reference_id` on PO = idempotency key (prevents duplicate payouts)
+5. Amounts in CENTS (sen) — ONDW stores RM decimal(10,2) → MoneyHelper converts
+6. Sandbox bank code: `DUMMYBANKVERIFIED` (any other = fail in sandbox)
+7. Do NOT confuse V5 Checksum (HMAC-SHA512) with X Signature (HMAC-SHA256)
+
+---
 
 ---
 
