@@ -167,5 +167,127 @@ npm install && npm run dev
 
 ---
 
-**Last updated**: June 4, 2026 by Yappy
-**Analysed by**: 🌸 Hana (codebase sweep) + Yappy (audit + synthesis)
+## 🧾 LO (Local Order) Payment Flow — Detailed Findings
+*(Added Jun 8, 2026 — Hana deep-dive)*
+
+### Flow Summary
+```
+AGENSI submits LO → lo_status=15 (SEMAKAN)
+ADMIN reviews    → lo_status=13 (LULUS) or 14 (TOLAK)
+FINANCE confirms → lo_status=16 (BAYARAN_DITERIMA)
+RESIT viewed     → Resit.php → downloadResitPembayaranPdf()
+```
+
+### Key Files
+| Step | File | Method | Line |
+|------|------|--------|------|
+| Submit LO | `TroliPembelian.php` | `saveButiranPembayranLO()` | 123 |
+| Admin review | `Semakan.php` | `hantarSemakan()` | 30 |
+| Finance confirm | `Catatan.php` | `sahkan()` | 31 |
+| View receipt | `Resit.php` | `downloadResitPembayaranPdf()` | 30 |
+
+All under: `app/Http/Livewire/PembayaranDanKewangan/`
+
+### Status Codes (ref_status)
+`12=DRAF` | `13=LULUS` | `14=TOLAK` | `15=SEMAKAN` | `16=BAYARAN_DITERIMA` | `17=BAYARAN_GAGAL` | `18=BAYARAN_DIKEMBALIKAN`
+
+---
+
+## 🔴 Known Bugs
+
+### BUG #1 — CRITICAL: ReceiptDetail NOT created on LO payment confirmation
+**File**: `Catatan.php:31-75` (`PengesahanPembayaran/Catatan.php`)
+**Impact**: Receipt download crashes — `$receipt` is NULL, PDF generation fails
+**Cause**: `sahkan()` creates `BillPayment` + updates `Order`/`LoRequest` but never calls `ReceiptDetail::create()`
+**Fix needed** (add after BillPayment creation):
+```php
+$receiptNo = 'RCP-' . strtoupper(uniqid());
+ReceiptDetail::create([
+    'payable_type'      => BillPayment::class,
+    'payable_id'        => $billPayment->id,
+    'receipt_no'        => $receiptNo,
+    'receipt_date'      => now(),
+    'grand_total'       => $totalAmount,
+    'status_receipt_id' => ReceiptDetail::BAYARAN_DITERIMA,
+    'is_final'          => null,
+    'created_by'        => auth()->id(),
+    'updated_by'        => auth()->id(),
+]);
+```
+
+### BUG #2: Sebut Harga PDF never persisted
+**File**: `TroliPembelian.php:218` → `downloadSebutHargaPdf()`
+**Impact**: No audit trail, regenerated content may differ over time
+
+### BUG #3: Invois PDF never persisted
+**File**: `TroliPembelianPengesahanLo.php:169` → `downloadInvois()`
+**Impact**: No version control of what invoice was presented
+
+---
+
+## 🏦 iPayment Integration — Analysis (Jun 8, 2026)
+
+### What is iPayment?
+**Sistem Terimaan Elektronik Kerajaan Persekutuan** — JANM (Jabatan Akauntan Negara Malaysia) federal payment system.
+
+### Channels
+- **Collection Channel** (available now): Customer logs into iPayment portal. Agensi = data provider only.
+- **Gateway Channel** (under planning): Customer logs into JKSM system. Agensi handles full payment, sends data to iPayment.
+- **JKSM should use Gateway Channel** (customers already log into JKSM).
+
+### Key API Processes
+| Code | Direction | Purpose |
+|------|-----------|---------|
+| `BILEXT001` | JKSM → iPayment | Send bill/invoice info (real-time) |
+| `BILEXT101` | JKSM → iPayment | Send bill/invoice info (batch) |
+| `RECEXT001` | JKSM → iPayment | Confirm payment collected |
+| `RECEXT201` | iPayment → JKSM | **Receipt callback** (this is where JKSM creates ReceiptDetail) |
+| `RECEXT301` | iPayment → JKSM | Receipt batch |
+| `ERROR9999` | iPayment → JKSM | Error notification batch |
+
+### Auth & Security
+- HTTP Basic Auth (username/password from JANM)
+- IP whitelisting (JKSM server IPs must be registered)
+- GPG encryption for batch SFTP files
+- No HMAC signature (simpler than BillPlz)
+
+### API Envelope Format (all calls)
+```json
+{
+  "kod_proses": "BILEXT001",
+  "kod_perkhidmatan_iPayment": "S0000X",
+  "tarikh_dan_masa": "DDMMYYYYhh:mm:ss",
+  "nombor_rujukan_message": "BILEXT0010100010001S0000X17052026XXXXXXX",
+  "mesej": { ... }
+}
+```
+
+### Amount Constraint
+⚠️ **Amount must be multiple of RM 0.10 or RM 0.05 ONLY** — validation required before sending to iPayment.
+
+### ESB Server
+- **Domain**: `esb-ipayment.anm.gov.my`
+- **SFTP Port**: 2222
+- **HTTPS Port**: 443
+
+---
+
+## ❓ What We Need FROM JKSM/JANM (for iPayment integration)
+
+| Item | Description | Who to ask |
+|------|-------------|------------|
+| `kod_agensi` | Agency code format `{Ministry:2}{Dept:4}{Agency:4}` | JANM / JKSM IT |
+| `kod_perkhidmatan_iPayment` | Service code (S00001 format) | JANM |
+| HTTP Basic Auth credentials | Username + password for API | JANM |
+| JKSM server IP | For JANM to whitelist | DevOps / server admin |
+| JANM ESB IP list | For JKSM firewall to allow | JANM |
+| GPG public key | From JANM, to encrypt outgoing batch files | JANM |
+| Sandbox/staging URL | Testing environment endpoint | JANM |
+| `kod_lokasi` + `kod_sublokasi` | Location codes in master data | JKSM admin |
+| `kod_penjenisan` | Classification codes (charge lines) | JKSM admin |
+| `kumpulan_ptj_dan_ptj` | Department group codes | JKSM admin |
+
+---
+
+**Last updated**: June 8, 2026 by Yappy
+**Analysed by**: 🌸 Hana (codebase sweep) + Sora (iPayment docs) + Yappy (synthesis)
