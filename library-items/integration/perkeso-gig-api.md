@@ -108,6 +108,42 @@ Route::post('/integrations/perkeso/callback', [PerkesoCallbackController::class,
 - **One service method per endpoint** = clean + debuggable; an admin testing harness (one controller method per endpoint) lets you validate every call before automating.
 - Adding routes → `optimize:clear`. Deferred jQuery → wrap inline JS in `DOMContentLoaded`.
 
+## Production Pattern: Non-Blocking Deduction After Webhook Settlement
+
+PERKESO deduction runs **outside** the payment DB transaction, wrapped in `try/catch`. A PERKESO failure must **never** affect the 200 response back to BillPlz.
+
+```php
+// In BillplzWebhookController — AFTER DB::transaction() settles the order:
+try {
+    $order = Order::find($transaction->order_id);
+    if ($order && $order->rider_id) {
+        $order->loadMissing('rider');
+        $deduction = $this->perkesoDeduction->submitForOrder($order);
+
+        // Queue retry if submission failed (e.g. PERKESO timeout)
+        if ($deduction->isPending()) {
+            SubmitPerkesoDeductionJob::dispatch($deduction->id)
+                ->delay($deduction->next_retry_at ?? now()->addMinutes(15))
+                ->onQueue('default');
+        }
+    }
+} catch (\Throwable $e) {
+    Log::error('PERKESO deduction error (non-blocking)', [
+        'order_id' => $transaction->order_id,
+        'error'    => $e->getMessage(),
+    ]);
+    // Do NOT rethrow — BillPlz must still get 200
+}
+
+return response('OK', 200);
+```
+
+**Key rules:**
+- PERKESO runs after, never inside, the payment settlement transaction.
+- PERKESO failure → log + queue retry, never throws to the caller.
+- Use a `perkeso_deductions` table for idempotency + reconciliation.
+- `transaction_id` must be stable + idempotent across retries (e.g. `ONDW-{order_id}`).
+
 ---
 **Reusable For**: Any Laravel integration with a government / IP-whitelisted third-party REST API that needs a server-side client + admin testing harness.
-**ONDW refs**: branch `feature/push-notification`, commits `4adcf4a`→`d4f4ec6`. Testing UI at `/admin/integrations/perkeso`.
+**ONDW refs**: branch `feature/push-notification`, commits `4adcf4a`→`d4f4ec6`. Testing UI at `/admin/integrations/perkeso`. Non-blocking webhook pattern added June 9, 2026.

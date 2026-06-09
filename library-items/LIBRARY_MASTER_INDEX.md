@@ -13,7 +13,8 @@
 | **PWA Offline-First Setup** | `integration/pwa-offline-first.md` | 2️⃣ Proven | Universal | ✅ Active |
 | **PWA Push Notifications** | `integration/push-notifications.md` | 2️⃣ Proven | Next.js, Node.js | ✅ Active |
 | **Push Notifications (Laravel)** | `push-notifications-library.md` | 2️⃣ Proven | Laravel | ✅ Active |
-| **PERKESO GIG Workers API** | `integration/perkeso-gig-api.md` | 1️⃣ Emerging | Laravel | 🚧 In progress |
+| **BillPlz Payment Gateway** | `integration/billplz-integration.md` | 2️⃣ Proven | Laravel | ✅ Active |
+| **PERKESO GIG Workers API** | `integration/perkeso-gig-api.md` | 2️⃣ Proven | Laravel | ✅ Active |
 
 ### Database & Backend Patterns
 | Pattern | File | Level | Framework | Status |
@@ -128,9 +129,10 @@
 ### From UI Components (1)
 14. ✅ Floating Action Button (FAB)
 
-### From ONDW Integrations (2)
+### From ONDW Integrations (3)
 15. ✅ Push Notifications (Laravel) — incl. May-27 latency/reliability hardening
-16. 🚧 PERKESO GIG Workers API — IP-whitelisted gov API + admin testing harness
+16. ✅ PERKESO GIG Workers API — IP-whitelisted gov API + admin testing harness + non-blocking webhook pattern
+17. ✅ BillPlz Payment Gateway — V3 bills, V5 Payment Orders, X Signature fix (uksort bug)
 
 ---
 
@@ -333,7 +335,7 @@ Planned pattern additions:
 
 ---
 
-**Last Updated**: May 27, 2026 11:15 PM  
+**Last Updated**: June 9, 2026  
 **Curator**: Yappy (AI Memory System)  
 **Status**: 🟢 Growing library, actively maintained  
-**Total Patterns**: 16 (15 Proven + 1 Emerging)
+**Total Patterns**: 17 (17 Proven)
