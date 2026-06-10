@@ -289,5 +289,217 @@ ReceiptDetail::create([
 
 ---
 
-**Last updated**: June 8, 2026 by Yappy
-**Analysed by**: 🌸 Hana (codebase sweep) + Sora (iPayment docs) + Yappy (synthesis)
+## 📄 iPayment IDD V1.9.1 — Deep API Analysis (Jun 10, 2026)
+**Source**: `IDD - V 1.9.1.pdf` (108 pages) — JANM, dated 11 Mei 2026
+**Analysed by**: Yappy (full document sweep)
+
+### ⚙️ API Architecture — Important Notes
+- **NOT FastAPI** — Built on **WSO2 Enterprise Service Bus**
+- **ALL real-time calls use `POST`** — confirmed pg.83 testing section
+- **Routing by `kod_proses`** — Same URL, different payload tells iPayment what to do
+- **Auth**: HTTP Basic Auth (username + password supplied by JANM post-whitelist approval)
+- **IP Whitelist**: Mandatory both ways (JKSM → iPayment + iPayment → JKSM)
+- **Whitelist status**: 🔴 PENDING — Hakim to confirm with JKSM at 2:30pm meeting (Jun 10)
+
+### 🌐 Server Details
+| Item | Value |
+|------|-------|
+| Base URL | `https://esb-ipayment.anm.gov.my` |
+| SFTP server | `esb-ipayment.anm.gov.my` |
+| HTTPS Port | `443` |
+| SFTP Port | `2222` |
+
+### 📦 Universal Outer Wrapper (ALL real-time requests AND responses)
+```json
+{
+  "kod_proses": "BILEXT001",
+  "kod_perkhidmatan_iPayment": "S00001",
+  "tarikh_dan_masa": "DDMMYYYYhh:mm:ss",
+  "nombor_rujukan_message": "KodProses(9)+KodAgensi(10)+KodPerkhidmatan(6)+Tarikh(8)+RunNo(7)",
+  "mesej": { ... }
+}
+```
+Response adds: `kod_respond` (`00`=Berjaya, `01`=Business rules error, `02`=Destination not available) + `perihal_respond` (if not berjaya) + `mesej`
+
+### 🗂️ All 5 Endpoints / Processes
+
+| # | Process ID | Direction | Method | URL / Channel | Purpose |
+|---|-----------|-----------|--------|---------------|---------|
+| 1 | **BILEXT001** | JKSM → iPayment | `POST` | `https://esb-ipayment.anm.gov.my/api/maklumatterimaan-realtime-inv` | Submit bill records |
+| 2 | **RECEXT001** | JKSM → iPayment | `POST` | Same URL as BILEXT001 (routed by `kod_proses`) | Submit payment info |
+| 3 | **RECEXT201** | iPayment → JKSM | `POST` | JKSM's own URL (must register with JANM) | Receive receipts from iPayment |
+| 4 | **RECEXT302** | iPayment → JKSM | SFTP pull | `XXXX@esb-ipayment.anm.gov.my:2222/OUT` | Batch receipt report (GPG encrypted) |
+| 5 | **ERROR9999** | iPayment → JKSM | SFTP push | Batch to JKSM server | Error notifications |
+
+---
+
+### ENDPOINT 1: BILEXT001 — Maklumat Terimaan (Bill Submission)
+**URL:** `POST https://esb-ipayment.anm.gov.my/api/maklumatterimaan-realtime-inv`
+
+**5 Jenis Proses:** `01`=Baharu · `02`=Tambah Amaun · `03`=Kurang Amaun · `04`=Batal · `05`=Kemas Kini
+
+**4 Jenis Maklumat Terimaan** (from IDD; 5th type on pg.21 needs JKSM confirmation):
+- `01` = Bil (e.g. Sewa, Bill Hospital) — Multiple charge lines, requires jumlah amounts
+- `02` = Bil Tanpa Amaun (e.g. bayaran balik pinjaman) — Single charge line only
+- `03` = Bayaran Tanpa Bil dan Amaun (e.g. Sumbangan) — Single charge line
+- `04` = Bayaran Tanpa Kadar (e.g. Yuran Kursus, Tender) — Multiple charge lines, requires amounts
+
+⚠️ **Amount constraint**: `jumlah_amaun_perlu_dibayar` and `amaun` per charge line MUST be **multiples of 0.10 or 0.05**
+
+**Header Section (inside `mesej`):**
+| Field | Type | M/O |
+|-------|------|-----|
+| `kod_agensi` | VARCHAR(10) | **M** — KodKementerian(2)+KodJabatan(4)+KodAgensi(4) e.g. `0100010001` |
+| `kod_perkhidmatan_iPayment` | VARCHAR(6) | **M** — e.g. `S00001` |
+| `jumlah_maklumat_terimaan` | VARCHAR(7) | **M** — count of records |
+| `jumlah_amaun` | DECIMAL(13,2) | **M** if jenis `01`/`04` |
+
+**Detail Section 1 — Per Bill (1:1):**
+| Field | Type | M/O | Notes |
+|-------|------|-----|-------|
+| `jumlah_charge_line` | VARCHAR(7) | **M** | |
+| `jenis_proses` | VARCHAR(2) | **M** | 01-05 |
+| `jenis_maklumat_terimaan` | VARCHAR(2) | **M** | 01-04 |
+| `no_rujukan_1` | VARCHAR(25) | **M** if proses `01`,`02`,`03` | Bill ref no. Key field |
+| `tarikh_dan_masa_no_rujukan_1` | DATETIME | **M** | DDMMYYYYhh:mm:ss |
+| `no_rujukan_2` | VARCHAR(25) | **M** if proses `02`,`03`,`04`,`05` | Original ref for mapping |
+| `perihal` | VARCHAR(255) | **M** | e.g. "Bil sewa bangunan" |
+| `jumlah_tanpa_cukai` | DECIMAL(13,2) | **M** if jenis `01`/`04` | |
+| `jumlah_cukai` | DECIMAL(13,2) | **M** if jenis `01`/`04` with tax | |
+| `jumlah_dengan_cukai` | DECIMAL(13,2) | **M** if jenis `01`/`04` | tanpa_cukai + cukai |
+| `jumlah_amaun_perlu_dibayar` | DECIMAL(13,2) | **M** if jenis `01`/`04` | ⚠️ must be multiple of 0.10/0.05 |
+| `tarikh_dan_masa_batal_atau_kemaskini` | DATETIME | **M** if proses `04`/`05` | |
+| `tarikh_dan_masa_mula_bayaran` | DATETIME | **O** | Payment start date |
+| `tarikh_dan_masa_akhir_bayaran` | DATETIME | **O** | Must be > mula_bayaran |
+| `sebab` | VARCHAR(100) | **M** if proses `02`,`03`,`04`,`05` | |
+| `kategori` | VARCHAR(2) | **M** if proses `04`/`05` | 04: `01`=Hapus Kira,`02`=Lain. 05: `03`=Ubah Perkhidmatan,`04`=Ubah Master,`05`=Lain |
+| `kod_lokasi` | VARCHAR(5) | **M** | Transaction location code |
+| `kod_sublokasi` | VARCHAR(5) | **M** | |
+
+**Detail Section 2 — Pelanggan (1:1, wajib for jenis_proses `01` & `05`):**
+| Field | Type | M/O |
+|-------|------|-----|
+| `nombor_rujukan_pelanggan` | VARCHAR(25) | **O** |
+| `kategori_identiti_pelanggan` | VARCHAR(2) | **M** if jenis `01`/`02` — `01`=Individu,`02`=Organisasi |
+| `kod_identiti_pelanggan` | VARCHAR(10) | **M** — Individu: JIM/JPN/NA. Organisasi: ROS/SKM/SSM/NA |
+| `jenis_identiti_pelanggan` | VARCHAR(25) | **M** — JPN→MyKad/MyKAS/MyPR. JIM→Pasport. ROS→Organisasi. SSM→Syarikat. SKM→Koperasi |
+| `nombor_identiti_pelanggan` | VARCHAR(20) | **M** — JPN/SSM max 12, ROS/SKM max 20 |
+| `nama` | VARCHAR(100) | **M** if jenis `01`/`02` |
+| `alamat_1` | VARCHAR(35) | **M** if jenis `01`/`02` |
+| `alamat_2` | VARCHAR(35) | **O** |
+| `alamat_3` | VARCHAR(35) | **O** |
+| `poskod` | VARCHAR(10) | **M** if jenis `01`/`02` — local max 5 chars; overseas max 10 |
+| `bandar` | VARCHAR(35) | **M** if jenis `01`/`02` — Lampiran 8 |
+| `negeri` | VARCHAR(2) | **M** if jenis `01`/`02` — Lampiran 2 |
+| `negara` | VARCHAR(2) | **M** if jenis `01`/`02` — Lampiran 3, e.g. `MY` |
+| `no_tel` | VARCHAR(20) | **O** — for SMS notification |
+| `emel` | VARCHAR(100) | **O** — for email notification |
+
+**Detail Section 3 — Charge Line (1:N, Multiple for jenis `01`/`04`, Single for `02`/`03`):**
+| Field | Type | M/O |
+|-------|------|-----|
+| `no_rekod` | VARCHAR(7) | **M** — right-justified, leading zeros |
+| `kod_penjenisan` | VARCHAR(20) | **M** — unique per PTJ/PTJ Menyedia. e.g. `INV_H0161199` |
+| `kumpulan_ptj_dan_ptj_menyedia` | VARCHAR(8) | **M** — Kump.PTJ(2)+PTJ(6) e.g. `28020101` |
+| `vot_dana` | VARCHAR(5) | **M** if Vot Mengurus/Pembangunan/PFI/Amanah |
+| `pegawai_pengawal_dipertanggung` | VARCHAR(2) | **M** |
+| `kumpulan_ptj_dan_ptj_dipertanggung` | VARCHAR(8) | **M** |
+| `program_aktiviti` | VARCHAR(9) | **M** if Vot Mengurus |
+| `projek` | VARCHAR(16) | **M** if Vot Pembangunan/PFI — Vot(3)+Butiran(5)+Setia(3)+SubSetia(4)+CaraPembiayaan(1) |
+| `kod_akaun` | VARCHAR(8) | **M** — e.g. `H0171101` |
+| `amaun` | DECIMAL(13,2) | **M** if jenis `01`/`04` — ⚠️ must be multiple of 0.10/0.05 |
+
+---
+
+### ENDPOINT 2: RECEXT001 — Maklumat Pembayaran (Payment Submission)
+**URL:** `POST https://esb-ipayment.anm.gov.my/api/maklumatterimaan-realtime-inv` (same as BILEXT001)
+**Only for** `jenis_maklumat_terimaan = 01` (Bil). **2 Jenis Proses:** `01`=Bayaran, `02`=Batal.
+
+**Header:** `kod_agensi`, `kod_perkhidmatan_iPayment`, `jumlah_bilangan_maklumat_pembayaran`, `jumlah_amaun_maklumat_pembayaran`
+
+**Detail Section 1 (1:1):**
+| Field | Type | M/O |
+|-------|------|-----|
+| `jenis_resit` | VARCHAR(1) | **M** — `N`=Normal |
+| `jenis_proses_maklumat_pembayaran` | VARCHAR(2) | **M** — `01`=Bayaran,`02`=Batal |
+| `no_rujukan_maklumat_pembayaran` | VARCHAR(25) | **M** — Receipt no from JKSM system |
+| `tarikh_dan_masa_maklumat_pembayaran` | DATETIME | **M** |
+| `amaun_maklumat_pembayaran` | DECIMAL(13,2) | **M** |
+| `sebab_batal_maklumat_pembayaran` | VARCHAR(100) | **M** if proses `02` |
+| `tarikh_dan_masa_batal_maklumat_pembayaran` | DATETIME | **M** if proses `02` |
+| `no_rujukan_maklumat_terimaan` | VARCHAR(25) | **M** — original bill ref (key) |
+
+**Detail Section 2 — Charge Line (1:N):** Same structure as BILEXT001 Sec 3
+
+---
+
+### ENDPOINT 3: RECEXT201 — Maklumat Resit (Receipt INCOMING to JKSM)
+**iPayment POSTs to JKSM's URL** — JKSM must register endpoint URL with JANM
+**2 Jenis Proses:** `01`=Bayaran, `02`=Batal/Ganti
+
+**Detail Section 1 (1:1) — Key fields iPayment sends:**
+| Field | Type | Notes |
+|-------|------|-------|
+| `jenis_resit` | VARCHAR(1) | `N`=Normal Receipt |
+| `jenis_proses_resit` | VARCHAR(2) | `01`=Bayaran,`02`=Batal/Ganti |
+| `nombor_rujukan_1` | VARCHAR(20) | iPayment receipt no. Format: `R{RCPTTYPE}{YY}{MM}{PTJID}{RN}` |
+| `tarikh_dan_masa_resit` | DATETIME | |
+| `saluran_pembayaran` | VARCHAR(1) | `1`=Portal,`2`=EDC,`3`=App |
+| `mod_pembayaran` | VARCHAR(2) | `01`=DuitNow DOBW,`02`=DuitNow QR,`03`=Debit Temp,`04`=Debit Intl,`05`=Kredit Temp,`06`=Kredit Intl,`07`=Prabayar,`08`=Caj,`09`=eDompet |
+| `rangkaian` | VARCHAR(3) | `001`=Semasa/Simpanan,`002`=KadKredit,`003`=eDompet,`004`=Visa,`005`=MasterCard,`006`=MyDebit,`007`=AmExpress |
+| `pengeluar` | VARCHAR(8) | Issuing bank — Lampiran 4 & 5 |
+| `nombor_rujukan_transaksi_iPayment` | VARCHAR(20) | iPayment txn ref |
+| `amaun_resit` | DECIMAL(13,2) | |
+| `no_rujukan_maklumat_terimaan` | VARCHAR(25) | JKSM's original bill no |
+| `no_rujukan_2` | VARCHAR(20) | **M** if proses `02` — cancelled receipt no |
+| `sebab_batal_resit` | VARCHAR(100) | **M** if proses `02` |
+| `kategori_batal_resit` | VARCHAR(25) | **M** if proses `02` — `01`=Ubah perkhidmatan,`02`=Ubah master,`03`=Lain |
+
+---
+
+### BATCH PROCESSES (SFTP — NOT HTTP API)
+
+**RECEXT302** — Laporan Resit (Batch via SFTP)
+- Format: Column Separator `|` (Single Pipe), GPG encrypted
+- Filename: `RECEXT302{KodAgensi:10}{KodPerkhidmatan:6}{DDMMYYYY:8}{RunNo:3}.GPG`
+- Key fields: section_indicator, no_rekod, nombor_resit, tarikh_dan_masa_resit, mod_pembayaran, rangkaian, pengeluar, amaun_resit
+
+**ERROR9999** — Notifikasi Ralat (Batch)
+- 3 error types: (1) Incoming Upfront (decrypt/filename wrong), (2) Incoming Data (validation fail), (3) Fund Transfer fail
+- Header: section_indicator`00`, nama_fail, tarikh_dan_masa_fail, kod_agensi, kod_proses, jumlah_bilangan_transaksi
+- Detail: section_indicator`01`, bilangan, no_rujukan, perihal, kod_ralat (Lampiran 6), keterangan_ralat
+
+---
+
+### ❓ Outstanding Questions for JKSM/JANM
+
+| # | Item | Status | Notes |
+|---|------|--------|-------|
+| 1 | **IP Whitelist** | 🔴 PENDING | Hakim to ask at 2:30pm meeting Jun 10. JKSM server IP for JANM + JANM ESB IP for JKSM firewall |
+| 2 | **`kod_agensi`** | 🔴 PENDING | VARCHAR(10). Format: KodKementerian(2)+KodJabatan(4)+KodAgensi(4). **See pg.35 of IDD** — this is registered in iPayment master data. JKSM + JANM must confirm |
+| 3 | **`kod_perkhidmatan_iPayment`** | 🔴 PENDING | VARCHAR(6). Format: KategoriPerkhidmatan(1)+NomborLarian(5). Issued by JANM after service registration |
+| 4 | **HTTP Basic Auth credentials** | 🔴 PENDING | Username + password from JANM |
+| 5 | **Which `jenis_maklumat_terimaan`** | 🟡 PARTIAL | Pg.21 lists 5 business types. IDD has 4 codes (01-04). JKSM to confirm which they use (affects charge line structure + mandatory fields). Likely `01` Bil + `04` Bayaran Tanpa Kadar at minimum |
+| 6 | **JKSM callback URL for RECEXT201** | 🔴 PENDING | URL JKSM exposes for iPayment to POST receipts to |
+| 7 | **`kod_lokasi` + `kod_sublokasi`** | 🔴 PENDING | From iPayment master data, ask JKSM admin |
+| 8 | **`kod_penjenisan`** | 🔴 PENDING | Classification codes, unique per PTJ. Must be set up in iPayment master data FIRST |
+| 9 | **`kumpulan_ptj_dan_ptj`** | 🔴 PENDING | JKSM department/PTJ codes |
+| 10 | **Sandbox/staging URL** | 🔴 PENDING | For testing before production |
+| 11 | **GPG public key** | 🔴 PENDING | For batch SFTP encryption |
+
+---
+
+## 📝 Integration Flow (Based on IDD Analysis)
+```
+1. JKSM creates invoice/bil → POST BILEXT001 → iPayment registers bill
+2. Citizen pays on JKSM portal
+3. JKSM confirms payment → POST RECEXT001 → iPayment records payment
+4. iPayment processes → POST RECEXT201 → JKSM receives official receipt
+5. iPayment sends batch report → SFTP RECEXT302 → JKSM reconciles
+6. Errors (if any) → SFTP ERROR9999 → JKSM handles errors
+```
+
+---
+
+**Last updated**: June 10, 2026 by Yappy — Full IDD V1.9.1 deep analysis
+**Analysed by**: Yappy (direct PDF sweep, 108 pages)
