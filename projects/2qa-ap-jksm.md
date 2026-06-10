@@ -298,7 +298,7 @@ ReceiptDetail::create([
 - **ALL real-time calls use `POST`** — confirmed pg.83 testing section
 - **Routing by `kod_proses`** — Same URL, different payload tells iPayment what to do
 - **Auth**: HTTP Basic Auth (username + password supplied by JANM post-whitelist approval)
-- **IP Whitelist**: Mandatory both ways (JKSM → iPayment + iPayment → JKSM)
+- **IP Whitelist**: Mandatory both ways. Hakim = vendor, NOT JKSM IT. Need: (A) JKSM IT gives server IP → register with JANM. (B) JANM gives ESB IP → JKSM IT opens in firewall for RECEXT201 callbacks. Status: 🔴 PENDING (2:30pm meeting Jun 10)
 - **Whitelist status**: 🔴 PENDING — Hakim to confirm with JKSM at 2:30pm meeting (Jun 10)
 
 ### 🌐 Server Details
@@ -475,7 +475,7 @@ Response adds: `kod_respond` (`00`=Berjaya, `01`=Business rules error, `02`=Dest
 
 | # | Item | Status | Notes |
 |---|------|--------|-------|
-| 1 | **IP Whitelist** | 🔴 PENDING | Hakim to ask at 2:30pm meeting Jun 10. JKSM server IP for JANM + JANM ESB IP for JKSM firewall |
+| 1 | **IP Whitelist** | 🔴 PENDING | **Vendor POV**: (A) JKSM IT must give Hakim the production+staging server IP → Hakim registers it with JANM so API calls are accepted. (B) JANM provides their ESB IP → Hakim passes to JKSM IT to open in their firewall so RECEXT201 receipt callbacks can reach the system. Ask JKSM at 2:30pm meeting Jun 10 to coordinate both sides. |
 | 2 | **`kod_agensi`** | 🔴 PENDING | VARCHAR(10). Format: KodKementerian(2)+KodJabatan(4)+KodAgensi(4). **See pg.35 of IDD** — this is registered in iPayment master data. JKSM + JANM must confirm |
 | 3 | **`kod_perkhidmatan_iPayment`** | 🔴 PENDING | VARCHAR(6). Format: KategoriPerkhidmatan(1)+NomborLarian(5). Issued by JANM after service registration |
 | 4 | **HTTP Basic Auth credentials** | 🔴 PENDING | Username + password from JANM |
