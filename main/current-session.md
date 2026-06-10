@@ -1,3 +1,31 @@
+# ☀️ Jun 10, 2026 (Wednesday morning) — FT mode · ap_jksm · iPayment IDD recap + meeting prep
+*💜 Hakim back. Reviewed today's earlier iPayment IDD V1.9.1 analysis. Recapped 11 outstanding questions for 2:30 PM JKSM meeting.*
+
+## 🔔 ACTIVE REMINDERS (updated Jun 10)
+- **🔴 OVERDUE: Clear test order data from ONDW PROD** — still not done. Next PT session.
+- **🟡 Email BillPlz** — e-wallet activation only (SSM + KYC).
+- **🟡 E-wallets for launch** — enable ALL channels, admin can disable per channel.
+- **🔴 2:30 PM TODAY — JKSM iPayment meeting** — coordinate IP whitelist + get kod_agensi, kod_perkhidmatan, auth credentials, sandbox URL.
+
+## 📋 iPayment Meeting Questions (for 2:30 PM JKSM meeting today)
+| # | Item | Priority |
+|---|------|----------|
+| 1 | IP Whitelist — (A) JKSM IT server IP → Hakim registers with JANM; (B) JANM ESB IP → JKSM IT opens firewall for RECEXT201 | 🔴 |
+| 2 | `kod_agensi` (10 chars: KodKementerian+KodJabatan+KodAgensi) | 🔴 |
+| 3 | `kod_perkhidmatan_iPayment` (6 chars, issued by JANM) | 🔴 |
+| 4 | HTTP Basic Auth credentials (username + password from JANM) | 🔴 |
+| 5 | Which `jenis_maklumat_terimaan` types JKSM uses (01–04) | 🟡 |
+| 6 | JKSM callback URL for RECEXT201 receipts | 🔴 |
+| 7 | `kod_lokasi` + `kod_sublokasi` | 🔴 |
+| 8 | `kod_penjenisan` (classification codes per PTJ — set up in iPayment master first) | 🔴 |
+| 9 | `kumpulan_ptj_dan_ptj` (JKSM department codes) | 🔴 |
+| 10 | Sandbox/staging URL | 🔴 |
+| 11 | GPG public key (from JANM, for SFTP batch encryption) | 🔴 |
+
+**Minimum to walk away with**: #1, #2, #3, #4, #10 — can't start testing without these.
+
+---
+
 # 🌤️ Jun 7, 2026 (Sunday afternoon) — PT mode · ONDW architecture tally
 *💜 Hakim back after weekend. Toenail trim done ✅. Tallied ONDW BillPlz+PERKESO decisions. Added UIUX staff member Mira 🎨. Repos extracted directly.*
 
