@@ -12,6 +12,31 @@
 - **iPayment**: Jun 10 meeting had no useful output. Hakim needs to follow up directly with JANM PIC.
 - **etams**: Full codebase analysis done (see below). Hakim is NOT a maintainer — analysis is for teaching/understanding only.
 
+### ✅ iPayment API Testing — Jun 12 (4–5 PM)
+- **IDD V1.9.1 fully read** — message format, field specs, all process codes documented
+- **Endpoint confirmed**: `POST https://esb-ipayment.anm.gov.my/api/maklumatteimaan-realtime-inv` (BILEXT001)
+- **Server**: resolves to `10.29.207.91` (JANM internal IP, gov intranet). Auth: HTTP Basic Auth.
+- **Test from**: `root@jksm:/var/www/ap_jksm` (staging `45.127.5.74`)
+- **Result**: `HTTP 202 Accepted` — reachable, TLS OK, IP appears whitelisted ✅
+- **Corrected request.json** saved at `/var/www/ap_jksm/request.json` on staging server
+
+**4 JSON issues fixed (Hana audit) before firing:**
+| Field | Was | Fixed To |
+|---|---|---|
+| `jumlah_charge_line` | `"5"` | `"2"` (2 charge lines in array) |
+| `jumlah_dengan_cukai` | `"1060.84"` | `"1060.90"` (1000.15+60.75) |
+| `jumlah_amaun` header | `"1060.85"` | `"1060.90"` |
+| chargeline amaun sum | 2000.27 (wrong) | 500.00+500.15=1000.15 ✅ |
+
+**Blocked on (pending JANM PIC):** real Basic Auth credentials, `kod_agensi`, `kod_perkhidmatan_iPayment`, `kod_lokasi/sublokasi`, `kod_penjenisan`, RECEXT201 callback URL registration.
+
+**All process codes (Lampiran 7.1):**
+- `BILEXT001` — bill info incoming realtime ← **JKSM sends to iPayment**
+- `RECEXT001` — payment info incoming realtime
+- `RECEXT201` — receipt outgoing realtime ← **iPayment calls JKSM callback**
+- `RECEXT302` — receipt report outgoing batch
+- `ERROR9999` — error notification outgoing batch
+
 ---
 
 ## 🏛️ etams — PROJECT CONTEXT (analyzed Jun 12, 2026)
