@@ -10,26 +10,24 @@
 These must appear EVERY time user greets Yappy (non-negotiable protocol).
 
 ### 1. 📲 **Order Notifications System - ONDW**
-- **Status**: TO DO (CRITICAL)
-- **Priority**: HIGH
-- **Date Added**: April 11, 2026 (This Session!)
-- **Task**: Create push notification system for order updates
-- **Scope**:
-  - Rider: New order incoming (Do you want to take it?)
-  - Rider: Order status from Vendor (Did vendor accept?)
-  - Vendor: New order incoming
-  - Customer: Order status updates throughout delivery
-- **Implementation**: Use existing push notification infrastructure
-- **Reference**: `push-notifications-library.md` (ONDW patterns)
-- **Why Missing Before**: Was in memory but not being extracted/displayed in reminder output
+- **Status**: ✅ DONE — push notifications working across all roles (latency fixed, dead-sub pruning active)
+- **Date Completed**: May–Jun 2026
+- **Branch**: `feature/push-notification`
 
 ### 2. 🔧 **Remove Admin from User Registration - ONDW**
-- **Status**: TO DO
+- **Status**: ✅ DONE — removed in Aiman's Jun 14 commit (`f699549`)
+
+### 3. 🔴 **ONDW Pre-Launch Checklist** (ACTIVE — Jun 2026)
 - **Priority**: HIGH
-- **Date Added**: April 8, 2026
-- **Task**: Remove "admin" option from user registration form
-- **File to Edit**: `register.blade.php` or user creation controller
-- **Why**: Prevent non-admin users from creating admin accounts
+- **Tasks**:
+  - [ ] Run `php artisan migrate` on preprod (`create_chat_order_ai_usage_table`)
+  - [ ] Add 3 keys to preprod `.env`: `PAYMENT_GATEWAY_ENABLED=true`, `CHAT_ORDER_AI_ENABLED=false`, `OPENAI_API_KEY=`
+  - [ ] E2E test: checkout → BillPlz → webhook → `pending` → riders notified → `perkeso_deductions` populated
+  - [ ] Clear test order data from PROD (overdue since Jun 5)
+  - [ ] Email BillPlz for e-wallet activation (SSM + KYC docs)
+  - [ ] Enable all payment channels in admin
+  - [ ] Legacy data migration on PROD at launch day
+  - [ ] Merge `feature/push-notification` → `main`
 
 ### 3. 🕌 **Prayer Reminders** (ACTIVE DAILY)
 - **Status**: ACTIVE

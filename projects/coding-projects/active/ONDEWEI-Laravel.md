@@ -324,3 +324,89 @@ ALTER TABLE conversations ADD deleted_at TIMESTAMP NULL;
 
 ---
 *Yappy AI Project Entry - ChatBox Integration Planning & Deployment Setup (May 2, 2026)*
+
+---
+
+## 🆕 Major Update — Jun 2026 (Last Updated: Jun 16, 2026 · 03:00 MYT)
+
+### Environment Change
+- **No longer WSL** — Hakim now on macOS
+- **Local path**: `/Users/hakim/holeeMonth/ONDEWEI-LARAVEL-HAKIM`
+- **Local dev**: Docker (`docker-compose exec app php artisan ...`)
+- **Service name**: `app` (NOT `php`) in docker-compose
+
+### Branch Structure (Jun 2026)
+| Branch | Purpose |
+|---|---|
+| `feature/push-notification` | **Preprod deploy branch** — Hostinger pulls this |
+| `main` | Production (`ondewei.my`) |
+| `origin/AI-integration` | Aiman's dev branch — merged into feature/push-notification Jun 16 |
+| `preprod` | DEAD — 150+ commits behind, ignore |
+
+**Important**: Hostinger shared hosting has NO Node.js. Vite build artifacts must be committed to git (`git add -f public/build/`).
+
+### Team (Jun 2026)
+- **Hakim** — lead / owner (PT mode alongside FT job at 2Q Alliance)
+- **AimanDhaifullah** — team dev. Handles AI features + admin overhaul.
+
+---
+
+### ✅ Payment Integration — COMPLETE (Jun 7–16, 2026)
+
+#### BillPlz (fully live on preprod)
+- **V3 bills** — customer checkout. `POST /api/v3/bills`, form-encoded.
+- **V5 Payment Orders** — vendor/rider disbursements (weekly batch + manual)
+- **X-Signature fix** (Jun 8, commit `7780573`): `ksort` → `uksort` comparator. See `library-items/integration/billplz-integration.md` for full details.
+- **`PAYMENT_GATEWAY_ENABLED`** master switch: `false` = demo mode (instant settlement, no BillPlz call). Must be `true` on preprod/prod.
+
+#### PERKESO (fully integrated Jun 14)
+- 1.25% of `delivery_fee` per order, per rider
+- Annual cap: RM 157.20 / rider / year
+- Fires at BillPlz webhook (`paid=true`) — not at delivery, not at PO payout
+- Retries via `SubmitPerkesoDeductionJob` if API fails
+- See `library-items/integration/perkeso-gig-api.md` for full details.
+
+#### Order Lifecycle (updated)
+```
+pending_payment → (BillPlz webhook paid=true) → pending → (rider accepts) → processing → delivered
+```
+- Delivery chat created AFTER payment confirmed
+- `scopeActive()` excludes `pending_payment` — riders/vendors never see unpaid orders
+- Weekly disbursement: Monday 09:00 MYT (`disbursements:process-weekly`)
+
+---
+
+### ✅ AI Chat-Ordering (Aiman, Jun 14, commit `f699549`)
+- Customer orders via AI chat using OpenAI
+- `CHAT_ORDER_AI_ENABLED`, `OPENAI_API_KEY`, `CHAT_ORDER_AI_MODEL=gpt-5.4-mini`
+- Chat messages auto-pruned every 24 hours (`chat-order:prune` at 03:30 MYT)
+- Keep `CHAT_ORDER_AI_ENABLED=false` on preprod until ready to enable
+
+---
+
+### ✅ Push Notifications (complete, earlier 2026)
+- VAPID web push — working across all roles
+- Latency fixed, dead subscription pruning active (HTTP 404/410)
+- `feature/push-notification` branch name is from this feature
+
+---
+
+### 🔴 Pre-Launch Outstanding
+1. E2E test on preprod: checkout → BillPlz → webhook → `pending` → riders notified → `perkeso_deductions` populated
+2. Run `php artisan migrate` on preprod (`create_chat_order_ai_usage_table`)
+3. Add 3 keys to preprod `.env`: `PAYMENT_GATEWAY_ENABLED=true`, `CHAT_ORDER_AI_ENABLED=false`, `OPENAI_API_KEY=`
+4. Clear test order data from PROD (overdue since Jun 5)
+5. Email BillPlz for e-wallet activation (SSM + KYC docs)
+6. Enable all payment channels in admin
+7. Run legacy data migration on PROD at launch
+8. Merge `feature/push-notification` → `main`
+
+---
+
+### Key Commits (Jun 2026)
+| Commit | Date | What |
+|---|---|---|
+| `7780573` | Jun 8 | X-Signature uksort fix (BillplzService.php) |
+| `f699549` | Jun 14 | Aiman: AI chat + admin overhaul + BillPlz/PERKESO (162 files) |
+| `caf06b2` | Jun 16 | Merge AI-integration → feature/push-notification (7 conflicts resolved) |
+| `dda7e4f` | Jun 16 | Vite build artifacts committed (fixed preprod 500) |
