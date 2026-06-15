@@ -1,0 +1,124 @@
+# 🍱 ONDW — Project Reference
+*Last updated: Jun 16, 2026 · 03:00 MYT*
+
+---
+
+## 📌 What Is ONDW?
+**ONDEWEI** — a food delivery PWA for Malaysia. Hakim's part-time (PT mode) project.
+- **URL (preprod)**: `https://preprod.ondewei.my`
+- **URL (prod)**: `https://ondewei.my`
+- **Repo**: `/Users/hakim/holeeMonth/ONDEWEI-LARAVEL-HAKIM`
+- **Hosting**: Hostinger shared hosting (no Node.js, no persistent workers, no cron — use Laravel scheduler via cPanel)
+
+---
+
+## 🧱 Tech Stack
+| Layer | Detail |
+|---|---|
+| Backend | Laravel 10.10 |
+| Frontend | Blade + Vite (built locally, committed to git — Hostinger has no Node.js) |
+| Database | MySQL |
+| Queue | `QUEUE_CONNECTION=sync` (no persistent workers on shared hosting) |
+| Auth | Email + Google OAuth |
+| Roles | Customer, Vendor, Rider, Admin |
+| PWA | Active (service worker, VAPID push notifications) |
+
+---
+
+## 👥 Team
+- **Hakim** — lead / owner (PT mode)
+- **AimanDhaifullah** — team dev. His branch: `origin/AI-integration`. Big Jun 14, 2026 commit `f699549` (AI chat-ordering, admin overhaul, full BillPlz + PERKESO).
+
+---
+
+## 🌿 Branch Structure
+| Branch | Purpose |
+|---|---|
+| `feature/push-notification` | **Preprod deploy branch** — server pulls this |
+| `main` | Production |
+| `origin/AI-integration` | Aiman's dev branch — **merged into feature/push-notification on Jun 16** |
+| `preprod` | OLD — 150+ commits behind, ignore |
+
+**Deploy flow**: push to `feature/push-notification` → SSH preprod → `git pull` → `php artisan migrate` → `php artisan config:cache`
+
+---
+
+## 💳 Payment Architecture (locked Jun 7–16, 2026)
+
+### BillPlz
+- **V3 bills** — customer checkout (`POST /api/v3/bills`, form-encoded)
+- **V5 Payment Orders** — vendor/rider disbursements (weekly batch + manual)
+- **Webhook**: `POST https://preprod.ondewei.my/webhooks/billplz` (CSRF-exempt)
+- **X-Signature fix** (Jun 8, commit `7780573`): replaced `ksort` with `uksort` comparator in `BillplzService.php` — BillPlz uses longer-key-wins prefix ordering
+
+### PAYMENT_GATEWAY_ENABLED
+- `true` = real BillPlz flow (preprod/prod)
+- `false` = demo mode: checkout settles instantly, order goes straight to `pending`, no BillPlz call. Used by Aiman for dev.
+- **Preprod must be `true`**
+
+### Order Lifecycle
+```
+pending_payment → (BillPlz webhook paid=true) → pending → (rider accepts) → processing → delivered
+```
+- Delivery chat created AFTER payment confirmed (not at order creation)
+- `scopeActive()` excludes `pending_payment` — rider/vendor never see unpaid orders
+
+### PERKESO
+- 1.25% of `delivery_fee` per order, per rider
+- Annual cap: RM 157.20 / rider / calendar year
+- Fires at BillPlz webhook (`paid=true`) — NOT at delivery, NOT at PO payout
+- If API fails: `SubmitPerkesoDeductionJob` retries with delay
+- `perkeso_deductions` table tracks every submission
+
+### Disbursements (BillPlz V5 PO)
+- Weekly batch: Monday 09:00 MYT (`disbursements:process-weekly` in Kernel)
+- Manual: admin can trigger per-vendor or per-rider from `/admin/disbursements`
+- `DisbursementService::pendingBalances()` — batch query (no N+1)
+
+---
+
+## 🤖 AI Chat-Ordering (Aiman, Jun 14)
+- Customer can order via AI chat (OpenAI)
+- Config: `CHAT_ORDER_AI_ENABLED`, `CHAT_ORDER_AI_MODEL=gpt-5.4-mini`, `OPENAI_API_KEY`
+- **Disable on preprod** until ready: `CHAT_ORDER_AI_ENABLED=false`
+- Chat messages auto-pruned every 24 hours (`chat-order:prune` at 03:30 MYT)
+
+---
+
+## ⚙️ Key `.env` Keys (preprod)
+```
+PAYMENT_GATEWAY_ENABLED=true        ← must be true
+BILLPLZ_ENV=sandbox                 ← or production when live
+BILLPLZ_SANDBOX_URL=https://www.billplz-sandbox.com
+BILLPLZ_PRODUCTION_URL=https://www.billplz.com
+BILLPLZ_SECRET_KEY=                 ← production key
+BILLPLZ_X_SIGNATURE_KEY=           ← production X-Signature key
+BILLPLZ_COLLECTION_ID=             ← bill collection
+BILLPLZ_PO_COLLECTION_ID=          ← payment order collection
+CHAT_ORDER_AI_ENABLED=false        ← keep false until ready
+OPENAI_API_KEY=                    ← blank until enabling AI chat
+CHAT_ORDER_AI_MODEL=gpt-5.4-mini
+```
+
+---
+
+## 🔴 Outstanding (pre-launch checklist)
+1. Run `php artisan migrate` on preprod (for `create_chat_order_ai_usage_table`)
+2. Add 3 env keys to preprod `.env` (`PAYMENT_GATEWAY_ENABLED`, `CHAT_ORDER_AI_ENABLED`, `OPENAI_API_KEY`)
+3. E2E test on preprod: checkout → BillPlz → webhook → `pending` → riders notified → `perkeso_deductions` populated
+4. Clear test order data from PROD (overdue since Jun 5) — orders, order_items, status_history, conversations, notifications, delivery proofs
+5. Email BillPlz for e-wallet activation (SSM + KYC docs)
+6. Enable all payment channels in admin (admin can disable per channel)
+7. Run legacy data migration on PROD at launch day
+8. Merge `feature/push-notification` → `main` (production deploy)
+
+---
+
+## 📜 Key Commits (Jun 2026)
+| Commit | Date | What |
+|---|---|---|
+| `aff2513` | Jun 8 | ENUM fix: `pending_payment` to `order_status_history.status` |
+| `7780573` | Jun 8 | **X-Signature fix**: ksort → uksort in BillplzService.php |
+| `f699549` | Jun 14 | Aiman: AI chat, admin overhaul, full BillPlz + PERKESO (162 files) |
+| `caf06b2` | Jun 16 | Merge: AI-integration → feature/push-notification (7 conflicts resolved) |
+| `dda7e4f` | Jun 16 | Vite build artifacts committed (fixed preprod 500) |

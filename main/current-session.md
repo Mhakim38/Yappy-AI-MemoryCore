@@ -1,11 +1,68 @@
 # 🌤️ Jun 12, 2026 (Friday) — FT mode · etams · full codebase analysis + bug investigation
 *💜 Hakim back. Deep-dived etams project (MOH attendance system). Analyzed full codebase + 2 support cases with exact bug locations.*
 
-## 🔔 ACTIVE REMINDERS (updated Jun 12)
+## 🔔 ACTIVE REMINDERS (updated Jun 16, 03:00 MYT)
 - **🔴 OVERDUE: Clear test order data from ONDW PROD** — still not done. Next PT session.
 - **🟡 Email BillPlz** — e-wallet activation only (SSM + KYC).
 - **🟡 E-wallets for launch** — enable ALL channels, admin can disable per channel.
 - **🔴 Follow up iPayment PIC (JANM)** — Jun 10 meeting had no output. Contact PIC to get: sandbox URL, kod_agensi, kod_perkhidmatan, HTTP Basic Auth credentials, IP whitelist. See 11-question list below.
+- **🔴 ONDW preprod e2e test** — verify full order flow: checkout → BillPlz → webhook → order `pending` → riders notified. Verify `perkeso_deductions` table populates. Also add 3 keys to preprod `.env` if not done: `PAYMENT_GATEWAY_ENABLED=true`, `CHAT_ORDER_AI_ENABLED=false`, `OPENAI_API_KEY=`.
+- **🟡 ONDW preprod migrate** — run `php artisan migrate` on preprod for `create_chat_order_ai_usage_table`.
+
+## 📋 Jun 16 Session Notes — late night (01:00–03:01 MYT) · PT mode · ONDW merge
+
+### ✅ ONDW — origin/AI-integration merged into feature/push-notification
+**Merge commit `caf06b2`** + **Vite build commit `dda7e4f`** — pushed to origin.
+
+**7 conflicts resolved:**
+| File | Resolution |
+|------|-----------|
+| `OrderController.php` | Took Aiman's (superset; our `amount_sen` fix already inside) |
+| `DisbursementController.php` | Took Aiman's (batch query, eliminates N+1) |
+| `DisbursementService.php` | Took Aiman's (`pendingBalances()` batch method) |
+| `Kernel.php` | Took Aiman's (our disbursement scheduler + his `chat-order:prune` daily 03:30) |
+| `config/services.php` | Manual merge — added `billplz.enabled` + `openai` block |
+| `.env.example` | Manual merge — added `PAYMENT_GATEWAY_ENABLED` + 3 OpenAI keys |
+| `ai-order-card.blade.php` | Manual merge — kept AJAX handler, took Aiman's `@include` partial |
+
+**PAYMENT_GATEWAY_ENABLED** = master BillPlz on/off switch. `false` = demo mode (instant settlement, no BillPlz call). Must be `true` on preprod.
+
+**PERKESO deduction** fires at BillPlz webhook (`paid=true`), deducts 1.25% of `delivery_fee`, annual cap RM 157.20/rider/year. Per-order, synchronous. Already fully implemented.
+
+**AI Chatbox** — messages pruned automatically every 24 hours (`chat-order:prune` at 03:30 MYT). Aiman confirmed.
+
+**Vite build** — `npm install` + `npm run build` done locally, artifacts force-committed (Hostinger has no Node.js). Fixed preprod 500 `ViteManifestNotFoundException`.
+
+**preprod `.env` — 3 keys to add manually on server:**
+```
+PAYMENT_GATEWAY_ENABLED=true
+CHAT_ORDER_AI_ENABLED=false
+OPENAI_API_KEY=
+```
+
+### PERKESO — How It Works (documented Jun 16)
+- Triggers: `BillplzWebhookController::callback()` after `paid=true` + signature verified
+- Amount: `MoneyHelper::perkesoDeductionSen($order->delivery_fee)` — 1.25% of delivery fee
+- Cap: RM 157.20/rider/year (`perkeso_annual_caps` table)
+- On API fail: retries via `SubmitPerkesoDeductionJob` with delay
+- Does NOT fire at delivery, NOT at PO payout — only at payment confirmation
+
+---
+
+## 📋 Jun 16 Session Notes (earlier — ONDW status review)
+
+### ✅ ONDW BillPlz X-Signature — CONFIRMED FIXED (Jun 8, commit `7780573`)
+Root cause was `ksort(SORT_STRING)` vs BillPlz's official `uksort` comparator. `ksort` puts shorter prefix keys first (`paid` → `paid_amount` → `paid_at`). BillPlz expects longer key wins prefix ties (`paid_amount` → `paid_at` → `paid`). Different order = different HMAC = always invalid. Fix: replaced `ksort` with matching `uksort` comparator in both `verifyCallbackSignature()` and `verifyRedirectSignature()` in `app/Services/Billplz/BillplzService.php`.
+
+### 📦 Aiman's Jun 14 Merge — `f699549` (162 files, +12,453 lines)
+- AI chat-ordering system (OpenAI integration — prompts, cart, conversation services)
+- Admin overhaul (reports, user management, rider approvals, order management)
+- BillPlz V3 bills + V5 payment orders — **full integration merged** ✅
+- PERKESO deduction flow — **full integration merged** ✅
+- Test suites included
+- **No further payment plumbing needed** — just e2e test on preprod
+
+---
 
 ## 📋 Jun 12 Session Notes
 - **efokus**: `iKes-Hakim` branch pushed to origin. MR → GitLab web UI at `https://gitlab.com/2QSC/efokus/-/merge_requests/new?merge_request[source_branch]=iKes-Hakim&merge_request[target_branch]=main`
