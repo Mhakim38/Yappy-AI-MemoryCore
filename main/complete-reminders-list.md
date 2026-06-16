@@ -20,8 +20,8 @@ These must appear EVERY time user greets Yappy (non-negotiable protocol).
 ### 3. 🔴 **ONDW Pre-Launch Checklist** (ACTIVE — Jun 2026)
 - **Priority**: HIGH
 - **Tasks**:
-  - [ ] Run `php artisan migrate` on preprod (`create_chat_order_ai_usage_table`)
-  - [ ] Add 3 keys to preprod `.env`: `PAYMENT_GATEWAY_ENABLED=true`, `CHAT_ORDER_AI_ENABLED=false`, `OPENAI_API_KEY=`
+  - [x] Run `php artisan migrate` on preprod (`create_chat_order_ai_usage_table`) ✅ Jun 16
+  - [x] Add 3 keys to preprod `.env`: `PAYMENT_GATEWAY_ENABLED=true`, `CHAT_ORDER_AI_ENABLED=false`, `OPENAI_API_KEY=` ✅ Jun 16
   - [ ] E2E test: checkout → BillPlz → webhook → `pending` → riders notified → `perkeso_deductions` populated
   - [ ] Clear test order data from PROD (overdue since Jun 5)
   - [ ] Email BillPlz for e-wallet activation (SSM + KYC docs)
