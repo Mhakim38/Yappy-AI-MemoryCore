@@ -128,19 +128,19 @@ HMAC-SHA256: `hash_hmac('sha256', MERCHANT_ID . SECRET_KEY . ORDER_ID . AMOUNT .
 
 ## 🔴 Known Bugs & Issues
 
-### BUG #1 — FIXED Jun 16, 2026: `network_info` undefined — 500 after SenangPay FPX payment
-**File**: `app/Helpers/Helper.php` lines 168–170
-**Trigger**: FPX payment via SenangPay — API response does not include `network_info` key
-**Fix**: Null-safety guard:
+### BUG #1 — FIXED Jun 16, 2026: `network_info` undefined — 500 after SenangPay FPX/Touch N Go payment
+**File**: `app/Helpers/Helper.php` lines 165–179
+**Trigger**: FPX and Touch N Go payments via SenangPay — API response does not include `network_info` key for these payment modes. The redirect block tries to access `$dataSenangPay['network_info']['referer']` → undefined array key crash.
+**Root cause**: `$redirectInfo` was already an empty array (all redirect entries commented out lines 50–72) making the entire redirect block dead code. The crash was still happening because the array key access happens before the `->count() != 0` check.
+**Fix applied by Hakim**: Entire redirect block commented out (lines 165–179):
 ```php
-// Before (crashes):
-if($redirectInfo->where('url', $dataSenangPay['network_info']['referer'])->count() != 0)
-
-// After (safe):
-$referer = $dataSenangPay['network_info']['referer'] ?? null;
-if($referer !== null && $redirectInfo->where('url', $referer)->count() != 0)
+//redirect here, if from other platform
+// $redirectInfo = collect($redirectInfo);
+// if($redirectInfo->where('url',$dataSenangPay['network_info']['referer'])->count() != 0)
+// { ... }
+// end redirect
 ```
-**Side note**: `$redirectInfo` is an empty array (all entries commented out lines 50–72) — this block is currently dead code, but the null guard is still needed because PHP evaluates arguments eagerly.
+**Status**: Fix applied, NOT committed (FT mode). Payment now completes successfully without 500 error.
 
 ### LATENT BUG #2: `explode('?', $request->fullUrl())[1]` — Helper.php:174
 Crashes if URL has no query string. Currently unreachable (blocked by empty `$redirectInfo`). Fix when re-enabling redirect block.
@@ -183,6 +183,46 @@ Defined twice (lines 628–658 and 641–658). Second block is superset. Functio
 - Roles: Super Admin, Admin, HR, Staff, Klinik Panel company, Contractor (Perolehan)
 - `FasilitiKategori::permissionName()` — dynamically generates permission strings per facility category
 - `kawalan_paparan` table — feature-flag system for showing/hiding UI sections
+
+---
+
+## 💻 Local Dev Setup (Jun 16, 2026)
+
+### Prerequisites
+- ONDW Docker MySQL (`ondw-mysql` container) must be running: `docker start ondw-mysql`
+- Database `mpaj_icomm2` exists inside it (created Jun 16, 2026)
+
+### .env (local overrides)
+```
+APP_ENV=local                  # IMPORTANT: must be local, NOT prod (prod loads submodule Blade views)
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=mpaj_icomm2
+DB_USERNAME=root
+DB_PASSWORD=root_password
+```
+
+### To run locally
+```bash
+cd ~/holeeMonth/2qa_projects/mpaj-icomm
+php artisan serve
+# Opens at http://127.0.0.1:8000
+```
+
+### Local-only code changes (DO NOT deploy these)
+These are workarounds for fresh local install — they are fine on staging/prod:
+
+1. **`app/Models/FasilitiKategori.php`** — `Schema::hasTable()` guard at top of `scopePermissionName()`. Prevents boot crash when `fasiliti_kategori` table doesn't exist yet.
+
+2. **`app/Providers/AppServiceProvider.php`** — Doctrine DBAL `geometry` type mapping registered in `boot()`. Required because `misys_kompaun` has a `geometry` column that Doctrine doesn't understand when doing `renameColumn`.
+
+3. **`config/app.php`** — `Oci8ServiceProvider` + all 4 submodule providers commented out:
+   - `Yajra\Oci8\Oci8ServiceProvider` (ext-oci8 not installed locally)
+   - `Epelesenan`, `Etempahan`, `Poslite`, `Stla` service providers (submodule dirs are empty)
+
+4. **6 migration files** — Added `Schema::hasTable()`/`hasColumn()` guards to migrations that assume tables exist (true on staging, not on fresh local install). Migrations affected: jabatan_unit, procure_allocation_form, intranet_kursus, rename_statuses, rename_forms, and 4 stla_* migrations.
+
+5. **`app/Http/Livewire/Login.php` line 78** — Null check on `Attribute::kategoryTempatMenarik()`. On empty local DB, scope returns null which would crash when accessing `->ref_attributeValue`.
 
 ---
 
