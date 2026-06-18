@@ -55,7 +55,15 @@ These must appear EVERY time user greets Yappy (non-negotiable protocol).
 
 ## 🟡 IN PROGRESS / PENDING
 
-### 5. 📱 **Mobile UX Fixes - ONDW**
+### 5. 🧹 **Consolidate MemoryCore Structure** (PENDING — Weekend/Jun 19+)
+- **Status**: PENDING — Hakim flagged Jun 18, 2026
+- **Priority**: MEDIUM
+- **Date Added**: Jun 18, 2026
+- **Task**: Restructure MemoryCore so project information is stored efficiently. Current structure is redundant — `master-memory.md`, `main/`, `projects/coding-projects/active/` all have overlapping project info with no clear ownership. Hakim wants a clean, consolidated system.
+- **When**: Tomorrow (Jun 19) or weekend (Jun 21-22)
+- **Scope**: Full audit of what's in MemoryCore, decide one canonical location per info type, archive/remove duplicates, update all cross-references
+
+### 6. 📱 **Mobile UX Fixes - ONDW**
 - **Status**: MOSTLY COMPLETE - TESTING PENDING
 - **Priority**: MEDIUM-HIGH
 - **Date Started**: April 4, 2026
