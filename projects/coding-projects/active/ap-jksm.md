@@ -1,5 +1,6 @@
 # ⚖️ AP JKSM — Project Reference
 *First documented: Jun 16, 2026 by Yappy*
+*Last updated: Jun 19, 2026 — BILEXT001 + RECEXT001 complete*
 *Status: 🟢 Active FT development — Hakim is developer (2Q Alliance)*
 
 ---
@@ -20,125 +21,191 @@
 |---|---|
 | Framework | Laravel 10 |
 | PHP | ^8.1 |
-| Frontend | Blade + **Livewire 3.5** (Hakim confirmed Livewire 3, NOT 2) |
+| Frontend | Blade + **Livewire 3.5** |
 | CSS | Bootstrap |
-| Payment | iPayment (JANM) integration — BILEXT001 in progress |
+| Payment | iPayment (JANM) integration — BILEXT001 + RECEXT001 complete |
 | Auth | Standard Laravel Auth |
 
 ---
 
-## 💳 iPayment (JANM) Integration — BILEXT001
+## 💳 iPayment (JANM) Integration
 
-### What is BILEXT001?
-External billing submission to **iPayment** (Jabatan Akauntan Negara Malaysia / JANM) for government agency payment processing. Government agencies pay through this channel instead of SenangPay/FPX.
+### IDD Reference
+`/Users/hakim/Sweet/2Q Alliance/Projects/JKSM/iPayment/IDD - V 1.9.1.pdf`
 
-### Payment Method
+### Payment Methods
 - Option 1 = FPX
 - Option 2 = Visa
-- Option 3 = iPayment (BILEXT001) ← new
+- Option 3 = iPayment (BILEXT001 + RECEXT001) ← in progress
 
-### Config File
-`config/ipayment.php` — all env-driven:
+### Flow Sequence
 ```
-IPAYMENT_ENDPOINT=
-IPAYMENT_AUTH_USER=
-IPAYMENT_AUTH_PASS=
-IPAYMENT_KOD_AGENSI=
-IPAYMENT_KOD_PERKHIDMATAN=
-IPAYMENT_KOD_LOKASI=
-IPAYMENT_KOD_SUBLOKASI=
-IPAYMENT_KOD_PENJENISAN=
-IPAYMENT_CALLBACK_URL=
-# TBD from iPayment team at UAT:
-IPAYMENT_KUMPULAN_PTJ_MENYEDIA=
-IPAYMENT_PEGAWAI_PENGAWAL=
-IPAYMENT_KUMPULAN_PTJ_DIPERTANGGUNG=
-IPAYMENT_VOT_DANA=         # B/T = Vot Mengurus, P/S = Vot Pembangunan
-IPAYMENT_PROGRAM_AKTIVITI= # Only if VOT_DANA = B or T
-IPAYMENT_PROJEK=           # Only if VOT_DANA = P or S
-IPAYMENT_KOD_AKAUN=
+User clicks "Hantar" (iPayment)
+    → BILEXT001  (3.2.1) — Submit bill to iPayment
+        → HTTP 202 → if JMT=01 → RECEXT001 auto-called (3.2.2)
+        → swal:success
+    → RECEXT201  (3.3.1) — iPayment calls back to us (future)
 ```
 
-### BILEXT001 Payload Structure (3 Layers)
+---
 
-**Outer Layer:**
-- `kod_proses` = "BILEXT001"
-- `kod_perkhidmatan_ipayment`
-- `tarikh_dan_masa` = "ddMMYYYY HH:mm:ss" (confirm space vs no-space with iPayment team)
-- `no_rujukan_mesej` = "BILEXT001" + kod_agensi + kod_perkhidmatan + ddMMYYYY + 7-digit order ID
-- `mesej` = [Layer 1]
+## 📐 BILEXT001 — Maklumat Terimaan Sistem Luar (3.2.1)
 
-**Layer 1 (inside mesej):**
-- `kod_agensi`, `kod_perkhidmatan_ipayment`
-- `jumlah_maklumat_terimaan` = "1"
-- `jumlah_amaun` = formatted 2dp
-- `maklumat_terimaan` = [Layer 2]
+**Direction:** We call iPayment  
+**Trigger:** User clicks Hantar when `$jenisPembayaran == '3'`
 
-**Layer 2 (inside maklumat_terimaan) — built for JP:01, JMT:01:**
-- `jumlah_charge_line`, `jenis_proses`="01", `jenis_maklumat_terimaan`="01"
-- `no_rujukan_1` = order_no (JP:01)
-- `tarikh_dan_masa_rujukan_1` = from loDate (Tarikh LO) or fallback now()
-- `perihal` = item names joined with ", "
-- Tax fields: `jumlah_tanpa_cukai`, `jumlah_cukai`="0.00", `jumlah_dengan_cukai`, `jumlah_amaun_perlu_dibayar`
-- `tarikh_dan_masa_akhir_bayaran` = from supplyDeadline (optional, only if set)
-- `kod_lokasi`, `kod_sublokasi` = from config (Layer 2, NOT Layer 3)
-- Customer identity (usertype='1'→IC, usertype='2'→SSM/company):
-  - `kategori_identiti_pelanggan`, `kod_identiti_pelanggan`, `jenis_identiti_pelanggan`
-  - `nombor_identiti_pelanggan` = ic_number ?? username (individual)
-  - `nama` = full_name (individual) or company name
-- Address: `alamat_1`, `alamat_2`(opt), `alamat_3`(opt), `poskod`, `bandar`, `negeri`, `negara`
-- `no_tel`, `emel` = from user/company
-- `no_rujukan_pelanggan` = loNo (optional LO number)
-- `maklumat_chargeline` = [Layer 3] × N (one per orderDetail)
+### Dictionary
+- **JP** = Jenis Proses: 01=Baharu, 02=Penambahan Amaun, 03=Pengurangan Amaun, 04=Batal, 05=Kemas Kini
+- **JMT** = Jenis Maklumat Terimaan: 01=Bil, 02=Bil Tanpa Amaun, 03=Bayaran Tanpa Bil & Amaun, 04=Bayaran Tanpa Kadar
+- **JIP** = Kategori Identiti Pelanggan: 01=Individu, 02=Organisasi
+- **KIP** = Kod Identiti Pelanggan: JIP:01→JPN/JIM/NA; JIP:02→ROS/SKM/SSM/NA
 
-**Layer 3 (inside maklumat_chargeline) — one per order item:**
-- `no_rekod`, `kod_penjenisan`
-- `kumpulan_ptj_dan_ptj_menyedia` = $this->ptj (from UI) or config
-- `vot_dana` = from config (B/T/P/S/Amanah)
-- `pegawai_pengawal_dipertanggung`, `kumpulan_ptj_dan_ptj_dipertanggung`
-- `program_aktiviti` = only if vot_dana B or T
-- `projek` = only if vot_dana P or S
-- `kod_akaun`
-- `amaun` = harga_perunit × quantity, 2dp
+### Payload Structure (3 layers)
+- **Outer**: `kod_proses=BILEXT001`, `kod_perkhidmatan_iPayment`, `tarikh_dan_masa`, `no_rujukan_mesej`, `mesej`
+- **Layer 1 (mesej)**: `kod_agensi`, `kod_perkhidmatan_iPayment`, `jumlah_maklumat_terimaan`, `jumlah_amaun`, `maklumat_terimaan`
+- **Layer 2 (maklumat_terimaan)**: JP/JMT-conditional fields + customer identity + address + `no_rujukan_1=order_no`
+- **Layer 3 (maklumat_chargeline)**: 1 per OrderDetail — all config-driven
+
+### Conditional Rules
+- JMT:01/02 → address fields (alamat1, poskod, bandar, negeri, negara) required
+- JP:01/02/03 → `no_rujukan_1` + `tarikh_dan_masa_no_rujukan_1`
+- JP:02/03/04/05 → `no_rujukan_2` + `sebab`
+- JMT:01/04 → amount fields (`jumlah_tanpa_cukai` etc.)
+- JP:04/05 → `tarikh_dan_masa_batal_atau_kemaskini` + `kategori`
 
 ### Key Files
 | File | Purpose |
 |---|---|
-| `app/Http/Livewire/PembayaranDanKewangan/TroliPembelian.php` | Main cart/payment Livewire component. Has `sendIPaymentBilext001()` method |
-| `resources/views/livewire/pembayaran-dan-kewangan/troli-pembelian.blade.php` | Cart blade view, iPayment UI section under `@if($jenisPembayaran == '3')` |
-| `config/ipayment.php` | iPayment config, all env-driven |
+| `app/Http/Livewire/PembayaranDanKewangan/TroliPembelian.php` | Main component — `sendIPaymentBilext001()` |
+| `resources/views/livewire/pembayaran-dan-kewangan/troli-pembelian.blade.php` | Cart blade — iPayment UI block under `@if($jenisPembayaran == '3')` |
+| `config/ipayment.php` | All env-driven config |
 
-### Current Status (Jun 16, 2026)
-- ✅ `config/ipayment.php` — complete with all keys (TBD keys default to '')
-- ✅ `sendIPaymentBilext001()` — complete 3-layer payload built
-- ✅ `troli-pembelian.blade.php` — iPayment UI with wire:model bindings + address fields
-- ⚠️ `dd($payload)` still in method — intentional, for UAT debugging. REMOVE before go-live.
-- ⏳ UAT credentials expected Thu/Fri Jun 18-19, 2026 from JKSM + iPayment team
+---
 
-### Pending at UAT
-1. Confirm `tarikh_dan_masa` format: with or without space between date and time
-2. Fill all `IPAYMENT_*` env keys (endpoint, auth, kod values)
-3. Fill TBD keys (vot_dana, kumpulan_ptj, pegawai_pengawal, kod_akaun)
-4. Remove `dd($payload)` from `sendIPaymentBilext001()`
-5. Test full flow end-to-end
+## 📐 RECEXT001 — Maklumat Pembayaran Sistem Luar (3.2.2)
+
+**Direction:** We call iPayment  
+**Trigger:** Auto-called from `sendIPaymentBilext001()` when JMT=01 (Bil) AND HTTP 202  
+**NOT a button** — no blade UI, purely internal
+
+### Dictionary
+- **JPMP** = Jenis Proses Maklumat Pembayaran: 01=Bayaran, 02=Batal Maklumat Pembayaran
+
+### Payload Structure (3 layers)
+- **Outer**: `kod_proses=RECEXT001`, `kod_perkhidmatan_iPayment`, `tarikh_dan_masa`, `no_rujukan_mesej`, `mesej`
+- **Layer A (mesej)**: `kod_agensi`, `kod_perkhidmatan_iPayment`, `jumlah_bilangan_maklumat_pembayaran`, `jumlah_amaun_maklumat_pembayaran`, `maklumat_pembayaran`
+- **Layer B (maklumat_pembayaran)**:
+  - `jenis_resit` = 'N' (hardcoded)
+  - `jenis_proses_maklumat_pembayaran` = JPMP param
+  - `no_rujukan_maklumat_pembayaran` = `$order->billPayment->receipt->receipt_no`
+  - `tarikh_dan_masa_maklumat_pembayaran` = `$receipt->receipt_date` or `now()`
+  - `amaun_maklumat_pembayaran` = `$receipt->grand_total`
+  - `no_rujukan_maklumat_terimaan` = `$order->order_no` ← **linkback to BILEXT001**
+  - JPMP:02 only → `sebab_batal_maklumat_pembayaran`, `tarikh_dan_masa_batal_maklumat_pembayaran`
+- **Layer C (maklumat_chargeline)**: JPMP:01 only — identical to BILEXT001
+
+### Function Signature (reusable)
+```php
+// Normal flow (auto-called internally):
+$this->sendIPaymentRecext001();                        // JPMP=01
+
+// Cancellation (future use):
+$this->sendIPaymentRecext001('02', $sebab, $tarikh);   // JPMP=02
+```
+
+---
+
+## 🖥️ Blade UI — iPayment Section (`@if($jenisPembayaran == '3')`)
+
+### Form Fields (in order)
+1. **Jenis Proses** — `wire:model.live="jenisProses"` select (JP 01-05)
+2. **Jenis Maklumat Terimaan** — `wire:model.live="jenisMaklumatTerimaan"` select (JMT 01-04)
+3. **Sebab** — text input, shows only JP:02/03/04/05
+4. **Kategori** — select, shows only JP:04/05
+5. PTJ, LO No, Tarikh LO, Tarikh Akhir Pembekalan, Dokumen LO
+6. **Perihal Bil** — text input
+7. **Kod Identiti Pelanggan** — `wire:model.live`, options from `$userType`
+8. **Jenis Identiti Pelanggan** — cascading from KIP
+9. **No. Identiti Pelanggan** — Alpine.js `x-data` on wrapper div:
+   - `:maxlength="({'JPN':12,'SSM':12}[$wire.kodIndentitiPelanggan]) ?? 20"`
+   - `x-text` hint: "Maksimum X aksara"
+10. Alamat 1/2/3, Poskod, Bandar — `*`/`(Pilihan)` conditional on JMT:01/02
+11. **Negeri** — select with 17 IDD codes (01-16 + 98)
+12. **Negara** — readonly, default MALAYSIA, plain label
+13. Info notice: "Maklumat diperlukan untuk penghantaran ke iPayment (JANM)."
+
+### Submit Buttons
+- **Hantar / Sahkan Pembayaran** (teal `#00C8B3`) — `wire:click="sendIPaymentBilext001"` or `saveButiranPembayaran`
+- Both buttons have `wire:loading.attr="disabled"` + Bootstrap `spinner-border-sm`
+
+---
+
+## 🗃️ Livewire Properties (TroliPembelian.php)
+
+```php
+public string $perananPembeli = '';
+public ?Order $order = null;
+public string $userType = '';
+public ?float $jumlahHargaPembelian = 0.00;
+public ?int $jenisPembayaran = null;
+public string $ptj = '';
+public string $loNo = '';
+public ?string $loDate = null;
+public ?string $supplyDeadline = null;
+public $loFile = null;
+public string $alamat1 = '';
+public string $alamat2 = '';
+public string $alamat3 = '';
+public string $poskod = '';
+public string $bandar = '';
+public string $negeri = '';
+public string $negara = 'MALAYSIA';
+public string $perihal = '';
+public string $sebab = '';
+public string $kategori = '';
+public string $kodIndentitiPelanggan = '';
+public string $jenisIdentitiPelanggan = '';
+public string $noIdentitiPelanggan = '';
+public string $jenisProses = '01';
+public string $jenisMaklumatTerimaan = '01';
+```
 
 ---
 
 ## 🐛 Known Issues / Pending Work
 
-### ✅ FIXED (Jun 16, 2026): ic_number not saving on registration
-`ic_number` and `ssm_number` were missing from `User.php $fillable`. Fix applied, NOT committed.
-- File: `app/Models/User.php`
-- Added: `'ic_number'` to `$fillable` array
+### ⬜ PENDING: Remove dd($payload)
+Both `sendIPaymentBilext001()` and `sendIPaymentRecext001()` have `dd($payload)` for UAT debugging. Remove before go-live.
 
-### ⬜ PENDING: BILEXT001 go-live
-Remove `dd($payload)` after UAT credential testing passes.
+### ⬜ PENDING: UAT credentials
+All `IPAYMENT_*` env keys are empty. iPayment team to provide at UAT. Key TBD values: `vot_dana`, `kumpulan_ptj_*`, `pegawai_pengawal`, `program_aktiviti`, `projek`, `kod_akaun`.
 
-### ⬜ PENDING: BILEXT001 RECEXT201 callback
-After BILEXT001 sends the bill, iPayment will call back RECEXT201 (payment received notification). Controller for this NOT YET BUILT.
+### ⬜ PENDING: RECEXT201 callback controller (3.3.1)
+iPayment calls back to our `IPAYMENT_CALLBACK_URL` after payment. Needs:
+- `Route::post()` outside `auth` middleware
+- Add to `VerifyCsrfToken::$except`
+- Plain Laravel controller (not Livewire)
+- Reconcile via `no_rujukan_maklumat_terimaan` → `order_no`
+- Update `orders.payment_status_id`, create `BillPayment`, `ReceiptDetail`, PDF
 
-### ⬜ PENDING: Remove dd($payload) in TroliPembelian.php
-Line ~207. Remove when confirmed payload format is accepted by iPayment sandbox.
+### ✅ FIXED (Jun 19, 2026 — NOT committed)
+All changes below are applied but NOT committed (FT mode — Hakim commits manually):
+- All 25 Livewire properties declared
+- Full BILEXT001 3-layer payload with JP/JMT conditional builder
+- Conditional validate (JMT:01/02 → address required)
+- All selects with `wire:model.live` (JP, JMT, KIP, Negeri)
+- Negara readonly + default MALAYSIA
+- Alamat 1/2/3 + address conditional `*`/(Pilihan) per JMT
+- No. Identiti Alpine.js maxlength + visible hint (`x-text`)
+- Sebab + Kategori positioned after JMT (JP-related, not address-related)
+- Bootstrap `spinner-border-sm` on both submit buttons
+- `$jumlahAmaun` fix — removed invalid `* $this->quantity`
+- Git divergent branches — merged cleanly (`75a3dc8`)
+- RECEXT001 `sendIPaymentRecext001()` — auto-called from BILEXT001 when JMT=01
+- RECEXT001 reusable for JPMP=02 via function params
+
+### ✅ FIXED (Jun 16, 2026 — NOT committed)
+- `ic_number` added to `User.php $fillable`
 
 ---
 
@@ -146,23 +213,27 @@ Line ~207. Remove when confirmed payload format is accepted by iPayment sandbox.
 
 ### Order
 - Table: `orders`
-- Key fields: `order_no`, `customer_id`, `payment_method_id`, `payment_status_id`, `remarks`
-- Accessors: `total_amount` (sum of orderDetails), `is_paid`, `is_failed`, `is_pending`
-- Relationships: `customer()→User`, `orderDetails()→OrderDetail`, `loRequest()`, `billInvoice()`
+- Key fields: `order_no`, `customer_id`, `payment_method_id`, `payment_status_id`
+- Relationships: `customer()→User`, `orderDetails()→OrderDetail`, `billPayment()→BillPayment`
 
 ### OrderDetail
 - Table: `order_details`
-- Key fields: `item_id`, `item_name`, `harga_perunit`, `quantity`
-- Accessors: `subtotal`, `item_type`, `item_title`
+- Key fields: `item_name`, `harga_perunit`, `quantity`
 
 ### User
 - Table: `users`
-- Key fields: `username` (IC/login), `full_name`, `phone`, `email`, `usertype` ('1'=individual, '2'=company), `ic_number`, `ssm_number`
-- **No address fields on User** — address must be entered via UI for iPayment
+- Key fields: `username`, `full_name`, `phone`, `email`, `usertype` ('1'=individual, '2'=company), `ic_number`, `ssm_number`
+- **No address fields** — address entered via UI for iPayment
 
-### UserCompany
-- Table: `user_companies`
-- Key fields: `user_company_name`, `user_company_phone`, `user_company_email`, `user_ssmno`
+### BillPayment
+- Table: `bill_payments`
+- Key fields: `order_id`, `payment_method_id`, `total_bill`, `paid_amount`, `payment_date`
+- Relationship: `morphOne(ReceiptDetail, 'payable')` → `receipt()`
+
+### ReceiptDetail
+- Table: `receipt_details` (polymorphic)
+- Key fields: `receipt_no`, `receipt_date`, `grand_total`, `pdf_path`
+- `receipt_no` = `no_rujukan_maklumat_pembayaran` source for RECEXT001
 
 ---
 
