@@ -66,8 +66,9 @@ pending_payment → (BillPlz webhook paid=true) → pending → (rider accepts) 
 ### PERKESO
 - 1.25% of `delivery_fee` per order, per rider
 - Annual cap: RM 157.20 / rider / calendar year
-- Fires at BillPlz webhook (`paid=true`) — NOT at delivery, NOT at PO payout
-- If API fails: `SubmitPerkesoDeductionJob` retries with delay
+- **Intended**: fire at `delivered` status — `rider_id`, `ic_no`, and `delivery_proof_lat/lng` all available only at delivery
+- **Bug (Jun 16)**: currently placed in BillPlz webhook where `rider_id` is NULL → silently skipped. `perkeso_deductions` table stays empty. Fix planned: move to `Rider/OrderController::deliver()`.
+- If API fails: `SubmitPerkesoDeductionJob` retries with delay (5 attempts)
 - `perkeso_deductions` table tracks every submission
 
 ### Disbursements (BillPlz V5 PO)
@@ -103,14 +104,17 @@ CHAT_ORDER_AI_MODEL=gpt-5.4-mini
 ---
 
 ## 🔴 Outstanding (pre-launch checklist)
-1. Run `php artisan migrate` on preprod (for `create_chat_order_ai_usage_table`)
-2. Add 3 env keys to preprod `.env` (`PAYMENT_GATEWAY_ENABLED`, `CHAT_ORDER_AI_ENABLED`, `OPENAI_API_KEY`)
-3. E2E test on preprod: checkout → BillPlz → webhook → `pending` → riders notified → `perkeso_deductions` populated
-4. Clear test order data from PROD (overdue since Jun 5) — orders, order_items, status_history, conversations, notifications, delivery proofs
-5. Email BillPlz for e-wallet activation (SSM + KYC docs)
-6. Enable all payment channels in admin (admin can disable per channel)
-7. Run legacy data migration on PROD at launch day
-8. Merge `feature/push-notification` → `main` (production deploy)
+- [x] Run `php artisan migrate` on preprod ✅ Jun 16
+- [x] Add 3 env keys to preprod `.env` (`PAYMENT_GATEWAY_ENABLED=true`, `CHAT_ORDER_AI_ENABLED=false`, `OPENAI_API_KEY=`) ✅ Jun 16
+- [ ] **TONIGHT — Fix bill_url redirect**: `PaymentController::pending()` → add PaymentTransaction lookup → redirect to `bill_url` when status=pending. See `ondw-tonight-plan-jun16.md`
+- [ ] **TONIGHT — Fix PERKESO lifecycle**: Remove PERKESO from BillPlz webhook (dead code), move to `Rider/OrderController::deliver()`. See `ondw-tonight-plan-jun16.md`
+- [ ] **TONIGHT — Fix rider history earnings**: `history.blade.php` lines 64+115 change `$order->total_amount` → `$order->delivery_fee`
+- [ ] E2E test on preprod: checkout → BillPlz → webhook → `pending` → riders notified → `perkeso_deductions` populated
+- [ ] Clear test order data from PROD (overdue since Jun 5)
+- [ ] Email BillPlz for e-wallet activation (SSM + KYC docs)
+- [ ] Enable all payment channels in admin
+- [ ] Legacy data migration on PROD at launch day
+- [ ] Merge `feature/push-notification` → `main` (production deploy)
 
 ---
 
