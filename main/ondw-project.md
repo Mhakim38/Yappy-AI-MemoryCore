@@ -106,15 +106,21 @@ CHAT_ORDER_AI_MODEL=gpt-5.4-mini
 ## 🔴 Outstanding (pre-launch checklist)
 - [x] Run `php artisan migrate` on preprod ✅ Jun 16
 - [x] Add 3 env keys to preprod `.env` (`PAYMENT_GATEWAY_ENABLED=true`, `CHAT_ORDER_AI_ENABLED=false`, `OPENAI_API_KEY=`) ✅ Jun 16
-- [ ] **TONIGHT — Fix bill_url redirect**: `PaymentController::pending()` → add PaymentTransaction lookup → redirect to `bill_url` when status=pending. See `ondw-tonight-plan-jun16.md`
-- [ ] **TONIGHT — Fix PERKESO lifecycle**: Remove PERKESO from BillPlz webhook (dead code), move to `Rider/OrderController::deliver()`. See `ondw-tonight-plan-jun16.md`
-- [ ] **TONIGHT — Fix rider history earnings**: `history.blade.php` lines 64+115 change `$order->total_amount` → `$order->delivery_fee`
+- [ ] **Fix bill_url redirect**: `PaymentController::pending()` → add PaymentTransaction lookup → redirect to `bill_url` when status=pending
+- [ ] **Fix rider history earnings**: `history.blade.php` lines 64+115 change `$order->total_amount` → `$order->delivery_fee`
 - [ ] E2E test on preprod: checkout → BillPlz → webhook → `pending` → riders notified → `perkeso_deductions` populated
 - [ ] Clear test order data from PROD (overdue since Jun 5)
 - [ ] Email BillPlz for e-wallet activation (SSM + KYC docs)
 - [ ] Enable all payment channels in admin
 - [ ] Legacy data migration on PROD at launch day
 - [ ] Merge `feature/push-notification` → `main` (production deploy)
+
+## 🟡 Feature / Fix Backlog (added Jun 20, 2026)
+- [ ] **Payout** — vendor/rider payout flow (BillPlz V5 PO, review full cycle)
+- [ ] **Cancellation customer process** — customer-side order cancellation flow (rules, refund trigger, status update)
+- [ ] **PERKESO deduction bug** — remove from BillPlz webhook (rider_id is NULL there), move to `Rider/OrderController::deliver()` where rider_id + IC + delivery coords are available
+- [ ] **New pricing fee system** — implement updated delivery fee pricing model
+- [ ] **Register rider & vendor: new inputs** — add fields required by PERKESO (IC no, etc.) and BillPlz (bank acc, etc.) to registration forms
 
 ---
 
