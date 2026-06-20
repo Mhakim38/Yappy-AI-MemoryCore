@@ -106,8 +106,8 @@ CHAT_ORDER_AI_MODEL=gpt-5.4-mini
 ## 🔴 Outstanding (pre-launch checklist)
 - [x] Run `php artisan migrate` on preprod ✅ Jun 16
 - [x] Add 3 env keys to preprod `.env` (`PAYMENT_GATEWAY_ENABLED=true`, `CHAT_ORDER_AI_ENABLED=false`, `OPENAI_API_KEY=`) ✅ Jun 16
-- [ ] **Fix bill_url redirect**: `PaymentController::pending()` → add PaymentTransaction lookup → redirect to `bill_url` when status=pending
-- [ ] **Fix rider history earnings**: `history.blade.php` lines 64+115 change `$order->total_amount` → `$order->delivery_fee`
+- [x] **Fix bill_url redirect**: `PaymentController::pending()` + `BillplzWebhookController` session flag ✅ Jun 20 (commit `40709c1`)
+- [x] **Fix rider history earnings**: `history.blade.php` lines 64+115 `total_amount` → `delivery_fee` ✅ Jun 20 (commit `40709c1`)
 - [ ] E2E test on preprod: checkout → BillPlz → webhook → `pending` → riders notified → `perkeso_deductions` populated
 - [ ] Clear test order data from PROD (overdue since Jun 5)
 - [ ] Email BillPlz for e-wallet activation (SSM + KYC docs)
@@ -118,9 +118,10 @@ CHAT_ORDER_AI_MODEL=gpt-5.4-mini
 ## 🟡 Feature / Fix Backlog (added Jun 20, 2026)
 - [ ] **Payout** — vendor/rider payout flow (BillPlz V5 PO, review full cycle)
 - [ ] **Cancellation customer process** — customer-side order cancellation flow (rules, refund trigger, status update)
-- [ ] **PERKESO deduction bug** — remove from BillPlz webhook (rider_id is NULL there), move to `Rider/OrderController::deliver()` where rider_id + IC + delivery coords are available
-- [ ] **New pricing fee system** — implement updated delivery fee pricing model
-- [ ] **Register rider & vendor: new inputs** — add fields required by PERKESO (IC no, etc.) and BillPlz (bank acc, etc.) to registration forms
+- [x] **PERKESO deduction bug** — moved from BillPlz webhook → `Rider/OrderController::deliver()` ✅ Jun 20 (commit `93204fd`)
+- [x] **PERKESO contribution widget** — added beside today's earnings on rider available page ✅ Jun 20
+- [ ] **New pricing fee system** — implement updated delivery fee pricing model (details pending from Hakim)
+- [x] **Register rider & vendor: new inputs** — ic_no, ic_type, bank_code, bank_account_number added to normal + Google registration + profile edit ✅ Jun 20 (commit `e0daddf`)
 
 ---
 
