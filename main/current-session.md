@@ -1,3 +1,51 @@
+# 🌙 Jun 21, 2026 (Sunday) — PT mode · ONDW · GPS location bug fix
+*💜 Hakim back Sunday evening. Reviewed full ONDW history, caught Jun 20–21 commits missing from memory, fixed GPS location not saving to DB.*
+
+## 🔔 ACTIVE REMINDERS (updated Jun 21, 22:00 MYT)
+- **🔴 OVERDUE: Clear test order data from ONDW PROD** — still not done. Next PT session.
+- **🟡 Email BillPlz** — e-wallet activation only (SSM + KYC).
+- **🟡 E-wallets for launch** — enable ALL channels, admin can disable per channel.
+- **🔴 Follow up iPayment PIC (JANM)** — Jun 10 meeting had no output. Contact PIC to get: sandbox URL, kod_agensi, kod_perkhidmatan, HTTP Basic Auth credentials, IP whitelist.
+- **🔴 ONDW preprod e2e test** — re-run full order flow NOW that GPS is fixed: checkout → BillPlz → webhook → pending → riders notified → rider pickup (GPS captured) → deliver → PERKESO deduction fires. Verify `pickup_lat`, `pickup_lng`, `delivery_proof_lat`, `delivery_proof_lng` all populate in DB.
+- **🟡 ONDW preprod migrate** — run `php artisan migrate` + `billplz:sync-fpx-banks` on preprod (Jun 20 migrations not yet applied).
+
+## 📋 Jun 21 Session Notes — evening (20:44–22:00 MYT) · PT mode · GPS bug fix
+
+### Memory sync — Jun 20–21 commits logged
+ondw-status.md in Claude memory updated with 15 commits from Jun 20–21 that were missing. Full ONDW progress picture now current as of Jun 21.
+
+### 🐛 GPS location not saving to DB — TWO root causes found + fixed
+
+**Bug 1 — `pickup_lat` / `pickup_lng` never saved (commit `baeecf7`)**
+Root cause: `pickup_lat`, `pickup_lng`, `pickup_captured_at` were added by migration on Jun 7 (`2026_06_07_000003`) but were NEVER added to `$fillable` in `Order.php`. Laravel silently ignores fields not in `$fillable` on `$order->update()` — no error, no warning. JS was sending correct coords all along; backend just discarded them.
+Fix: Added all three to `$fillable` + `$casts` in `Order.php`.
+
+**Bug 2 — delivery proof GPS race condition (commit `baeecf7`)**
+Root cause: `captureLocation()` fires async when delivery proof modal opens (up to 8s for GPS). Submit button was enabled as soon as photo was selected, independent of GPS state. Rider selects photo → taps submit → form posts before `getCurrentPosition()` resolves → empty inputs → null saved.
+Fix: Two-flag pattern (`photoReady` + `locationReady`). Submit only enables when BOTH are true. GPS error path keeps `locationReady = false` + shows Retry button (don't unlock submit on GPS failure).
+
+**GPS made REQUIRED (Hakim's explicit decision)**
+- `pickup()`: `pickup_lat` + `pickup_lng` changed from `nullable` → `required`. Conditional save removed (always saves).
+- `deliver()`: `proof_lat` + `proof_lng` changed from `nullable` → `required`. Custom error messages added.
+- Frontend delivery modal: error path stays `locationReady = false` → submit stays locked → Retry button shows.
+
+### 📦 Commits this session
+| Commit | What |
+|--------|------|
+| `baeecf7` | fix(location): GPS required + fillable bug + race condition fix — ONDW |
+| `41d7346` | feat(library): geolocation-mobile-pattern.md — MemoryCore |
+
+### 📚 MemoryCore library saved
+`library-items/integration/geolocation-mobile-pattern.md` — full iOS/Android geolocation pattern:
+- Direct gesture requirement (what breaks vs what works)
+- iOS Permissions API lying about 'prompt' → localStorage workaround
+- Two-flag race condition fix
+- Silent `$fillable` trap
+- Admin debug page pattern
+- Trap summary table
+
+---
+
 # 🌤️ Jun 12, 2026 (Friday) — FT mode · etams · full codebase analysis + bug investigation
 *💜 Hakim back. Deep-dived etams project (MOH attendance system). Analyzed full codebase + 2 support cases with exact bug locations.*
 
