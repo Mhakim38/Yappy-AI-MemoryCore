@@ -417,6 +417,10 @@ pending_payment → (BillPlz webhook paid=true) → pending → (rider accepts) 
 | `6e7f862` | Jun 21 | fix(available): static Delivered button + pickup AJAX (2 missed bugs) |
 | `022d0e7` | Jun 21 | fix(ios): replace .flat() with [].concat.apply() for iOS 11 compat |
 | `bb71d71` | Jun 22 | fix(deliver): submit interceptor for cached old form + filemtime cache-busting |
+| `79400a3` | Jun 22 | fix(pickup): 422 root cause (type=submit in Blade) + pickup submit interceptor + flicker HTML-diff fix |
+| `192c993` | Jun 22 | feat(chat-order): remove ORDER TEMPLATE pre-fill, add Load Template pill button |
+| `bd9eb39` | Jun 22 | fix(vendor): pending_payment filter, status polling, call button, Preparing pill sync |
+| `ac2431c` | Jun 22 | fix(pickup+deliver): replace ondwForcePoll with page reload — eliminates requestInFlight race |
 
 ---
 
@@ -454,6 +458,26 @@ pending_payment → (BillPlz webhook paid=true) → pending → (rider accepts) 
 - Root cause NOT yet investigated (was pre-existing before this session)
 - `last_error` column migration not yet run on preprod — run `php artisan migrate`
 
+#### Jun 22 2026 — Second Session (2 AM MYT)
+
+**Additional fixes committed this session:**
+- Vendor orders page — 4 bugs fixed:
+  - `pending_payment` orders now filtered from vendor API response
+  - `processPendingOrders()` re-renders card when status changes (e.g. → `rider_accepted`)
+  - `initializeOrderStatuses()` reads real status from `data-order-status` attribute
+  - `buildOrderCardHTML()` now has `isCooking` branch + call button (rider phone) on both pending+cooking cards
+  - `updateHeaderPills()` syncs Pending/Preparing pill counts live after every card change
+- Rider available page — pickup + deliver stuck "Locating…" fixed:
+  - Root cause: `requestInFlight` guard in `checkForNewOrders()` silently dropped both `ondwForcePoll()` calls if a poll was mid-flight
+  - Fix: `window.location.reload()` after 800ms on pickup success and deliver success — reliable, no race conditions
+- Deliver button flicker — definitive fix:
+  - HTML string comparison always failed (browser normalises whitespace differently from template literals)
+  - Fix: `lastRenderedStatus{}` object tracks per-order status; DOM only updated on actual status transition
+- Chat page — ORDER TEMPLATE removed from textarea pre-fill; "Load template" pill button added (same row as "Repeat last")
+
+**CEO confirmation pending (do not implement until confirmed):**
+- "Terima Order" call button: confirm with CEO whether to call RIDER or CUSTOMER
+
 #### Still Pending (Pre-Launch)
 1. Run `php artisan migrate` on preprod (`last_error` column + AI chat table)
 2. Set preprod `.env`: `PAYMENT_GATEWAY_ENABLED=true`, `CHAT_ORDER_AI_ENABLED=false`
@@ -461,4 +485,5 @@ pending_payment → (BillPlz webhook paid=true) → pending → (rider accepts) 
 4. E2E test: checkout → BillPlz → webhook → rider pickup (GPS) → deliver (GPS + photo) → confirm PERKESO fires
 5. Clear test order data from PROD
 6. Email BillPlz for e-wallet activation (SSM + KYC)
-7. Merge `feature/push-notification` → `main`
+7. CEO confirmation: "Terima Order" call button — rider or customer?
+8. Merge `feature/push-notification` → `main`
