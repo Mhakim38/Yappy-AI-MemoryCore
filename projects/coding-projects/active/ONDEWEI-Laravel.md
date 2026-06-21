@@ -410,3 +410,55 @@ pending_payment → (BillPlz webhook paid=true) → pending → (rider accepts) 
 | `f699549` | Jun 14 | Aiman: AI chat + admin overhaul + BillPlz/PERKESO (162 files) |
 | `caf06b2` | Jun 16 | Merge AI-integration → feature/push-notification (7 conflicts resolved) |
 | `dda7e4f` | Jun 16 | Vite build artifacts committed (fixed preprod 500) |
+| `6012c64` | Jun 21 | fix(location): skip modal if flag set; fix button label "Picked Up" → "Pick Up" |
+| `3da6862` | Jun 21 | fix(pickup): GPS on all 4 pickup surfaces, localStorage-first, no repeated modal |
+| `1e11d1d` | Jun 21 | fix(pickup): eliminate 422 race on available page; pill shape fix in chat (display:contents) |
+| `f83e613` | Jun 21 | feat(deliver): proof modal on available page — photo + GPS like chat deliver |
+| `6e7f862` | Jun 21 | fix(available): static Delivered button + pickup AJAX (2 missed bugs) |
+| `022d0e7` | Jun 21 | fix(ios): replace .flat() with [].concat.apply() for iOS 11 compat |
+| `bb71d71` | Jun 22 | fix(deliver): submit interceptor for cached old form + filemtime cache-busting |
+
+---
+
+### ✅ Rider GPS + Delivery Proof Flow — COMPLETE (Jun 21–22, 2026)
+
+**Branch**: `feature/push-notification` | All commits pushed to origin.
+
+#### New Files Created
+| File | Purpose |
+|---|---|
+| `public/customJS/ondw-pickup-gps.js` | Shared GPS utility for ALL pickup surfaces. MutationObserver + localStorage-first + AJAX submit. |
+| `public/customJS/ondw-deliver-proof.js` | Delivery proof modal driver. Photo + GPS capture + AJAX. Delegated click + submit interceptor. |
+| `resources/views/partials/_rider-proof-modal.blade.php` | Proof modal HTML (photo input, GPS status, confirm). IDs: `ondw-proof-*`. |
+
+#### Key Architecture Decisions
+- **iOS Permissions API is broken** — `navigator.permissions.query({name:'geolocation'})` always returns `'prompt'` on iOS Safari, even after user grants. NEVER use as a gate. Use `localStorage.getItem('ondw_location_granted')` instead (set on profile page first grant).
+- **`getCurrentPosition()` must be synchronous inside click handler** — not inside a Promise/async chain. iOS/Android won't count it as a user gesture otherwise — system dialog won't appear.
+- **`display:contents` on pickup form** — `<form>` is block-level and breaks the inline-flex rounded-full pill in chat. `class="contents"` makes the form invisible to flex layout.
+- **`rider-orders-realtime.js` re-renders every 1200ms** — any GPS inputs injected by JS get wiped on next poll. Solution: AJAX submit (not `form.submit()`), GPS captured in the click handler payload sent immediately.
+- **Pickup form: `type="button"` in JS template** — prevents native form submit racing MutationObserver on injection.
+- **Deliver form: `data-ondw-deliver-btn` + `data-deliver-url`** — replaces the old plain `<form POST>` in both static Blade and JS-rendered templates. Delegated click on `document` catches dynamically injected buttons.
+- **Submit interceptor (defensive)** — capture-phase `submit` listener in `ondw-deliver-proof.js` catches old cached `rider-orders-realtime.js` (Hostinger server-side HTTP cache) that might still inject old form POST. Any form matching `/orders/{id}/deliver` is hijacked → proof modal.
+- **`filemtime()` cache-busting** — `?v=<unix_mtime>` on all three `customJS/` script URLs. Forces new URL on file change → bypasses both browser cache and Hostinger's HTTP layer cache.
+- **`[].concat.apply([], Object.values(errors))` NOT `.flat()`** — `.flat()` is ES2019 and fails on iOS 11/Chrome 68 and below.
+- **`ondwForcePoll()`** — exposed as `window.ondwForcePoll = checkForNewOrders` in `rider-orders-realtime.js`. Lets GPS/deliver handlers trigger immediate re-render without page reload.
+
+#### 4 Pickup Surfaces — All Fixed
+1. **Chat page** (`conversations/show.blade.php` + `delivery-conversation-realtime.js`) — `wireRiderActions()` intercepts submit, `requestPickupGPS()` localStorage-first
+2. **Available page static Blade** (`rider/orders/available.blade.php`) — `class="ondw-pickup-form"`, wired by `ondw-pickup-gps.js` MutationObserver
+3. **Available page JS-render** (`rider-orders-realtime.js` `activeActionsHtml()`) — `class="ondw-pickup-form"`, `type="button"` at birth, wired by MutationObserver
+4. **Order detail page** (`rider/orders/show.blade.php` + `order-status-detail-realtime.js`) — `ondw-pickup-form` class, `ondw-pickup-gps.js` included
+
+#### PERKESO Status
+- `perkeso_deductions` table shows `status=pending` on preprod
+- Root cause NOT yet investigated (was pre-existing before this session)
+- `last_error` column migration not yet run on preprod — run `php artisan migrate`
+
+#### Still Pending (Pre-Launch)
+1. Run `php artisan migrate` on preprod (`last_error` column + AI chat table)
+2. Set preprod `.env`: `PAYMENT_GATEWAY_ENABLED=true`, `CHAT_ORDER_AI_ENABLED=false`
+3. PERKESO pending root cause investigation
+4. E2E test: checkout → BillPlz → webhook → rider pickup (GPS) → deliver (GPS + photo) → confirm PERKESO fires
+5. Clear test order data from PROD
+6. Email BillPlz for e-wallet activation (SSM + KYC)
+7. Merge `feature/push-notification` → `main`
