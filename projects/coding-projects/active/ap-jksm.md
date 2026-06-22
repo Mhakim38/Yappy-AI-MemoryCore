@@ -1,6 +1,6 @@
 # ⚖️ AP JKSM — Project Reference
 *First documented: Jun 16, 2026 by Yappy*
-*Last updated: Jun 19, 2026 — BILEXT001 + RECEXT001 complete*
+*Last updated: Jun 22, 2026 — RECEXT201 callback controller complete*
 *Status: 🟢 Active FT development — Hakim is developer (2Q Alliance)*
 
 ---
@@ -41,10 +41,12 @@
 ### Flow Sequence
 ```
 User clicks "Hantar" (iPayment)
-    → BILEXT001  (3.2.1) — Submit bill to iPayment
+    → BILEXT001  (3.2.1) — We call iPayment (submit bill)
         → HTTP 202 → if JMT=01 → RECEXT001 auto-called (3.2.2)
         → swal:success
-    → RECEXT201  (3.3.1) — iPayment calls back to us (future)
+    ← RECEXT201  (3.3.1) — iPayment calls US (official receipt callback) ✅
+        → POST /ipayment/recext201
+        → reconcile order → BAYARAN_DITERIMA
 ```
 
 ---
@@ -180,13 +182,26 @@ Both `sendIPaymentBilext001()` and `sendIPaymentRecext001()` have `dd($payload)`
 ### ⬜ PENDING: UAT credentials
 All `IPAYMENT_*` env keys are empty. iPayment team to provide at UAT. Key TBD values: `vot_dana`, `kumpulan_ptj_*`, `pegawai_pengawal`, `program_aktiviti`, `projek`, `kod_akaun`.
 
-### ⬜ PENDING: RECEXT201 callback controller (3.3.1)
-iPayment calls back to our `IPAYMENT_CALLBACK_URL` after payment. Needs:
-- `Route::post()` outside `auth` middleware
-- Add to `VerifyCsrfToken::$except`
-- Plain Laravel controller (not Livewire)
-- Reconcile via `no_rujukan_maklumat_terimaan` → `order_no`
-- Update `orders.payment_status_id`, create `BillPayment`, `ReceiptDetail`, PDF
+### ✅ DONE: RECEXT201 callback controller (3.3.1) — Jun 22 2026, NOT committed
+**Files changed:**
+- `app/Http/Controllers/IPaymentCallbackController.php` — NEW (pure inbound, no auth)
+- `routes/web.php` — added `POST /ipayment/recext201` with `->withoutMiddleware(VerifyCsrfToken)`
+- `app/Http/Middleware/VerifyCsrfToken.php` — added `'ipayment/recext201'` to `$except`
+
+**How it works:**
+- iPayment POSTs JSON to `/ipayment/recext201` (Section 3.3.1 — Outgoing from iPayment)
+- Reconciles via `mesej[0].maklumat_resit[].no_rujukan_maklumat_terimaan` → `orders.order_no`
+- `jenis_proses_resit = '01'` (Bayaran): `BillPayment::updateOrCreate` + `ReceiptDetail::updateOrCreate`, order → BAYARAN_DITERIMA (16)
+- `jenis_proses_resit = '02'` (Batal): order → BAYARAN_DIKEMBALIKAN (18), receipt → cancelled
+- Returns `kod_respond: '00'` (Berjaya) or `'01'` (error) per IDD spec (page 71–72)
+- Date format: `DDMMYYYYhh:mm:ss` parsed with `Carbon::createFromFormat('dmYH:i:s', ...)`
+
+### ✅ FIXED (Jun 22, 2026 — NOT committed)
+All changes below are applied but NOT committed (FT mode — Hakim commits manually):
+- **RECEXT201 controller** — `app/Http/Controllers/IPaymentCallbackController.php` (new)
+- **Route** — `POST /ipayment/recext201` in `routes/web.php` with `->withoutMiddleware(VerifyCsrfToken)`
+- **CSRF** — `VerifyCsrfToken::$except` → `'ipayment/recext201'`
+- **UAT reminder** — set `IPAYMENT_CALLBACK_URL=https://yourdomain/ipayment/recext201` in `.env` and share with iPayment team
 
 ### ✅ FIXED (Jun 19, 2026 — NOT committed)
 All changes below are applied but NOT committed (FT mode — Hakim commits manually):
