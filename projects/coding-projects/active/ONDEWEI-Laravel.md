@@ -479,11 +479,35 @@ pending_payment → (BillPlz webhook paid=true) → pending → (rider accepts) 
 - "Terima Order" call button: confirm with CEO whether to call RIDER or CUSTOMER
 
 #### Still Pending (Pre-Launch)
-1. Run `php artisan migrate` on preprod (`last_error` column + AI chat table)
-2. Set preprod `.env`: `PAYMENT_GATEWAY_ENABLED=true`, `CHAT_ORDER_AI_ENABLED=false`
-3. PERKESO pending root cause investigation
-4. E2E test: checkout → BillPlz → webhook → rider pickup (GPS) → deliver (GPS + photo) → confirm PERKESO fires
-5. Clear test order data from PROD
-6. Email BillPlz for e-wallet activation (SSM + KYC)
-7. CEO confirmation: "Terima Order" call button — rider or customer?
+1. Add `PERKESO_EMPLOYER_CODE` + `PERKESO_EMPLOYER_NAME=ONDW` to preprod `.env` + `php artisan config:cache`
+2. Retry PERKESO deduction from `/admin/integrations/perkeso` — verify `last_error` clears
+3. E2E test: checkout → BillPlz → webhook → rider pickup (GPS) → deliver (GPS + photo) → confirm PERKESO fires
+4. Clear test order data from PROD (overdue since Jun 5)
+5. Email BillPlz for e-wallet activation (SSM + KYC)
+6. CEO confirmation: "Terima Order" call button — rider or customer?
+7. Run `billplz:sync-fpx-banks` on preprod/prod
 8. Merge `feature/push-notification` → `main`
+
+---
+
+## Jun 24, 2026 — Bug Fix + UX Session (commits 2fe7554, f05e841, e20ab24)
+
+### Bugs Fixed
+| Bug | Root Cause | Fix |
+|---|---|---|
+| All orders cancelled after payment | `PaymentTransaction.amount_sen` missing platform fee → webhook mismatch | Added `+ PLATFORM_FEE_SEN` to stored amount |
+| Rider Pick Up button stuck | `lastRenderedStatus[orderId]` — `orderId` was undefined, wrote `"undefined"` key, never re-rendered | Fixed to `order.order_id` in `rider-orders-realtime.js` |
+| Proof delivery 404 | Disk mismatch — saved to `'public'`, served from `'local'` | `Storage::disk('local')` → `'public'` in `routes/web.php` (3 occurrences) |
+| Proof modal under navbar | Modal inside `@section('content')` → inside `<main overflow-y:auto>` → iOS clips fixed children | Moved to `@push('modals')` stack, `@stack('modals')` added to `app.blade.php` |
+| PERKESO never auto-retried | `markFailed()` set `next_retry_at` but never re-dispatched job; no scheduled sweep | `markFailed()` now re-dispatches job; 10-min Kernel sweep via `pendingRetry` scope |
+| PERKESO missing API fields | `transacted_at`, `end_date`, `employer_name`, `employer_code` all absent from payload | All fields added to `PerkesoDeductionService::attemptSubmit()` payload |
+
+### New Feature
+- **Customer orders infinite scroll** — `OrderController::index()` JSON branch + `customer-orders-infinite.js` (IntersectionObserver, 200px early trigger, paginate 20 per load)
+
+### Key Commits
+| Commit | What |
+|---|---|
+| `2fe7554` | PERKESO missing fields fix (transacted_at + employer fields) |
+| `f05e841` | Rider polling, proof 404, modal body-append, onerror on dynamic img |
+| `e20ab24` | Drawer @stack('modals') fix, PERKESO auto-retry, customer orders infinite scroll |
