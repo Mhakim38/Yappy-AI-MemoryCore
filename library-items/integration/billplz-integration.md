@@ -254,5 +254,88 @@ Each failed attempt degrades your account's callback rank — respond 200 fast.
 
 ---
 
+## ⚠️ Three Completely Different Bank Code Systems (DO NOT MIX)
+
+This trips everyone up. BillPlz has three separate sets of bank codes for three different purposes:
+
+| Code Type | Used As | Example | Purpose |
+|---|---|---|---|
+| FPX code | `reference_1` on Bill creation | `MB2U0227`, `BCBB0235` | Customer pays via FPX online banking |
+| SWIFT/IBG code | `bank_code` on Payment Order | `MBBEMYKL`, `CIBBMYKL` | Vendor/rider payout disbursement |
+| Staging FPX code | `reference_1` on sandbox Bills | `BP-FKR01`, `TEST0021` | Sandbox FPX simulation ONLY |
+
+**`BP-FKR01`, `TEST0021` etc. are FPX staging codes — they CANNOT be used as Payment Order `bank_code`.** Using them for PO will return 422 "Bank code is not included in the list."
+
+---
+
+## ⚠️ #2 Gotcha: Payment Order Sandbox `bank_code`
+
+> **"For sandbox testing, use `bank_code: DUMMYBANKVERIFIED` for a successful Payment Order result. Any other `bank_code` used in Sandbox will result in a transaction failure."** — BillPlz official docs
+
+- Real SWIFT codes (`MBBEMYKL` etc.) on sandbox → PO created but immediately **refunded**
+- `DUMMYBANKVERIFIED` → PO goes through, eventually becomes `completed`
+- BillPlz sandbox PO callbacks are unreliable — status may stay `processing` forever unless callback URL is properly configured
+- **Callback URL** is on the **Payment Order Collection** settings (not main account). BillPlz Dashboard → Payment Orders → your collection → Edit/Settings → set Callback URL
+
+---
+
+## Payment Order `bank_code` — Official SWIFT Codes (Production)
+
+Source: BillPlz official API docs (verified Jun 26, 2026)
+
+| Bank | SWIFT Code |
+|---|---|
+| Affin Bank | `PHBMMYKL` |
+| Agrobank | `AGOBMYKL` |
+| Alliance Bank | `MFBBMYKL` |
+| Al Rajhi | `RJHIMYKL` |
+| AmBank | `ARBKMYKL` |
+| Bank Islam | `BIMBMYKL` |
+| Bank Rakyat | `BKRMMYKL` |
+| Bank Muamalat | `BMMBMYKL` |
+| BSN | `BSNAMYK1` ← digit **1** NOT letter L |
+| CIMB | `CIBBMYKL` |
+| Citibank | `CITIMYKL` |
+| Hong Leong | `HLBBMYKL` |
+| HSBC | `HBMBMYKL` |
+| Kuwait Finance House | `KFHOMYKL` |
+| Maybank | `MBBEMYKL` |
+| OCBC | `OCBCMYKL` |
+| Public Bank | `PBBEMYKL` |
+| RHB | `RHBBMYKL` |
+| Standard Chartered | `SCBLMYKX` |
+| UOB | `UOVBMYKL` |
+
+Common mistakes found in ONDW seeder (Jun 26): CIMB was `CIMBCLKL`, Affin was `AFBQMYKL`, Alliance was `ABMB0212` (FPX code), AmBank was `AMMBKLKL`, BSN was `BSNAMYKL` (L not 1).
+
+---
+
+## Payment Order `description` Field Rules
+- ASCII characters **only** — no em dashes `—`, no special Unicode
+- Max **200 characters**
+- Violation returns 422 "Description contains invalid characters"
+- Safe format: `"ONDW payout - {$batchRef}"` (plain hyphen, alphanumeric + hyphens only)
+
+---
+
+## Payment Order `reference_id` Rules
+- Scoped per PO Collection — must be **unique within that collection**
+- BillPlz **permanently retains** reference_ids even after `refunded`/`cancelled` status
+- Reusing a reference_id (even days later) returns 422 "Reference ID has already been taken"
+- **Best practice**: include a timestamp in the ref for manual payouts — e.g. `manual-YmdHis-vendor-3` so every trigger gets a fresh ID
+
+---
+
+## Payment Order Callback — POST Fields
+`id`, `payment_order_collection_id`, `bank_code`, `bank_account_number`, `name`,
+`description`, `email`, `status`, `notification`, `recipient_notification`,
+`reference_id`, `display_name`, `total`, `epoch`, `checksum`
+
+**Status values**: `processing`, `completed`, `refunded`, `cancelled`
+**Timeout**: 20 seconds. BillPlz retries once after 1 hour. 2 failures = permanently removed + account rank degraded.
+
+---
+
 **Reusable For**: Any Laravel app needing Malaysian FPX / e-wallet checkout + vendor disbursement.
 **ONDW refs**: `app/Services/Billplz/BillplzService.php`, `app/Http/Controllers/Webhooks/BillplzWebhookController.php`, branch `feature/push-notification`, fix commit `7780573`.
+**ONDW seeder**: `database/seeders/BillplzPaymentChannelSeeder.php` — stores both FPX codes (`code`) and SWIFT codes (`po_bank_code`) per bank.
