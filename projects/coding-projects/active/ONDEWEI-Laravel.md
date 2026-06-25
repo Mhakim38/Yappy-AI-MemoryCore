@@ -511,3 +511,77 @@ pending_payment → (BillPlz webhook paid=true) → pending → (rider accepts) 
 | `2fe7554` | PERKESO missing fields fix (transacted_at + employer fields) |
 | `f05e841` | Rider polling, proof 404, modal body-append, onerror on dynamic img |
 | `e20ab24` | Drawer @stack('modals') fix, PERKESO auto-retry, customer orders infinite scroll |
+
+---
+
+## Jun 26, 2026 — BillPlz Payment Order (Payout) Deep Dive (03:00+ MYT)
+
+### 🔑 Critical BillPlz PO Knowledge (hard-won tonight)
+
+#### Sandbox Testing
+- **`bank_code: DUMMYBANKVERIFIED`** — the ONLY bank_code that produces a successful PO in BillPlz sandbox. Every other code (real SWIFT, TEST0021, ABB0234, BP-FKR01) results in transaction failure or rejection.
+- Staging FPX codes (`BP-FKR01`, `TEST0021` etc.) are for FPX bill payment (`reference_1`), NOT for Payment Order `bank_code`. These are completely different fields.
+- BillPlz sandbox does NOT reliably fire PO callbacks. Status stays `processing` forever unless callback URL is configured AND BillPlz sandbox actually sends it.
+
+#### PO Callback URL
+- Must be set on the **Payment Order Collection** (not main account settings)
+- BillPlz Dashboard → Payment Orders → your collection → Edit/Settings → Callback URL
+- Our endpoint: `POST /webhooks/billplz/po` (CSRF-exempt, X-Signature verified)
+- Checksum field order (strict): `[id, bank_account_number, status, total, reference_id, epoch]`
+- BillPlz retries once after 1 hour on failure. 2 failures = permanently removed. Account rank degraded per failed callback.
+
+#### Create PO — Required Fields
+```
+payment_order_collection_id, bank_code, bank_account_number, name,
+description (ASCII only, max 200 chars, NO special chars), total (sen),
+epoch (unix), checksum
+```
+- Checksum order for creation: `[payment_order_collection_id, bank_account_number, total, epoch]`
+- Our implementation in `BillplzService::createPaymentOrder()` ✅ matches exactly
+
+#### SWIFT Bank Codes (production po_bank_code) — Corrected Jun 26
+| Bank | Correct SWIFT |
+|---|---|
+| Maybank | `MBBEMYKL` |
+| CIMB | `CIBBMYKL` ← was `CIMBCLKL` (wrong) |
+| Hong Leong | `HLBBMYKL` |
+| RHB | `RHBBMYKL` |
+| Affin | `PHBMMYKL` ← was `AFBQMYKL` (wrong) |
+| Alliance | `MFBBMYKL` ← was `ABMB0212` (FPX code used by mistake) |
+| AmBank | `ARBKMYKL` ← was `AMMBKLKL` (wrong) |
+| Bank Islam | `BIMBMYKL` |
+| Bank Rakyat | `BKRMMYKL` |
+| BSN | `BSNAMYK1` ← digit 1 NOT letter L (official BillPlz doc confirmed) |
+| Agrobank | `AGOBMYKL` (added) |
+| Bank Muamalat | `BMMBMYKL` (added) |
+| HSBC | `HBMBMYKL` (added) |
+| Citibank | `CITIMYKL` (added) |
+| Kuwait Finance House | `KFHOMYKL` (added) |
+| OCBC | `OCBCMYKL` |
+| Public Bank | `PBBEMYKL` |
+| Standard Chartered | `SCBLMYKX` |
+| UOB | `UOVBMYKL` |
+
+### Bugs Fixed Tonight (all on `feature/push-notification`)
+
+| Commit | Bug | Fix |
+|---|---|---|
+| `51de36c` | BillPlz PO 422 "invalid characters" | Em dash `—` in description → ASCII hyphen `-` |
+| `03dc0a6` | Wrong SWIFT codes in seeder, 5 banks missing | Full `BillplzPaymentChannelSeeder` rewrite from official docs |
+| `fcbab2f` | Same-day retry blocked by DB unique constraint | `disburseManual()` cleans `failed`/`refunded` records before retry |
+| `fb0a6da` | Payout button dead — no network request | Browser silently blocking `confirm()` → replaced with inline 2-click amber confirm pattern |
+| `86c446a` | Orders reappear in pending balance after payout | Flawed `disbursements.created_at >= orders.updated_at` timestamp join → 30-day window instead |
+| `78d69b3` | "Reference ID already taken" on retry | BillPlz permanently holds reference_ids → added `HHmmss` to `manual-YmdHis-type-id` batch_ref |
+
+### Architecture Notes — DisbursementService
+- **Pending balance query**: `whereNotExists` with 30-day window on `processing`/`completed` disbursements
+- **Manual batch_ref**: `manual-YmdHis-vendor-3` (timestamp in seconds, unique per attempt)
+- **Weekly batch_ref**: `week-2026-26-vendor-3` (date-week, idempotent per week)
+- **Retry safety**: failed/refunded records auto-deleted before new attempt; processing records block new attempts via pending balance = 0
+- **Double-pay protection**: `processing` status blocks pending balance → no second payout possible while first is in flight
+
+### Still Pending
+1. Set `DUMMYBANKVERIFIED` on staging vendor/rider for sandbox E2E test
+2. Configure PO callback URL on BillPlz sandbox PO collection
+3. Verify webhook fires and local status flips `processing` → `completed`
+4. On production: use real SWIFT codes (corrected in seeder) + real vendor/rider bank details
