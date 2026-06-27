@@ -585,3 +585,129 @@ epoch (unix), checksum
 2. Configure PO callback URL on BillPlz sandbox PO collection
 3. Verify webhook fires and local status flips `processing` → `completed`
 4. On production: use real SWIFT codes (corrected in seeder) + real vendor/rider bank details
+
+---
+
+## Jun 27, 2026 — FIUU DuitNow QR Integration (COMPLETE + Security Hardened)
+
+### Branch
+`feature/push-notification` — all code applied, **NOT yet committed** (Hakim commits manually in PT mode)
+
+### What Was Built
+Full FIUU DuitNow QR payment gateway integration — replaces BillPlz as the **customer checkout gateway** (BillPlz kept for rider/vendor disbursements only).
+
+#### New Files
+| File | Purpose |
+|---|---|
+| `app/Services/Fiuu/FiuuService.php` | Core FIUU service — vcode, skey, `normalizePayload()`, `buildPaymentParams()`, `getPaymentUrl()` |
+| `app/Http/Controllers/Webhooks/FiuuWebhookController.php` | `notify()` (webhook), `redirect()` (return URL), `cancel()` (cancel URL) |
+| `resources/views/customer/payment/fiuu-redirect.blade.php` | Auto-submit hidden form page — "Redirecting to DuitNow QR…" |
+| `app/Console/Commands/ExpirePendingPayments.php` | Expire orders stuck in `pending_payment` for >30 min; schedule: every 15 min |
+
+#### Modified Files
+| File | What Changed |
+|---|---|
+| `config/services.php` | Added `fiuu` config block (merchant_id, verify_key, secret_key, env, channel) |
+| `app/Http/Middleware/VerifyCsrfToken.php` | Added `webhooks/fiuu` to `$except` |
+| `routes/web.php` | FIUU webhook route + customer auth group: launch, return, cancel |
+| `app/Http/Controllers/Customer/PaymentController.php` | `fiuuLaunch()` + `pending()` now checks `from_fiuu_redirect` |
+| `app/Http/Controllers/Customer/OrderController.php` | `placeOrder()` + `placeFromChatContext()` route to FIUU/BillPlz based on `FIUU_ENABLED` flag |
+| `resources/views/customer/checkout.blade.php` | Payment method pills (DuitNow QR default / FPX Online Banking) + hidden input |
+| `app/Console/Kernel.php` | `payments:expire-pending` every 15 min |
+
+### Critical Architecture Notes
+
+#### FIUU field naming — two conventions
+FIUU's API has legacy field names (`amount`, `tranID`, `orderid`, `status`, `domain`) used in the skey formula, AND new API names (`TxnAmount`, `TransactionID`, `ReferenceNo`, `TxnStatus`, `MerchantID`). **Always call `$fiuuService->normalizePayload($request->all())` first** in every handler — maps both to legacy names. Signature formula and amount check use normalised keys.
+
+#### skey formula
+```
+pre_skey = md5(tranID + orderid + status + domain + amount + currency)
+skey     = md5(paydate + domain + pre_skey + appcode + secret_key)
+```
+- `hash_equals()` used for timing-safe comparison ✅
+- Paydate freshness check: reject if >300 seconds old (anti-replay) ✅
+
+#### vcode formula (request)
+```
+vcode = md5(amount + merchantID + orderid + verify_key)
+```
+
+#### Order reference
+`ONDW-{orderId}` (max 40 chars, alphanumeric). Parse back with `FiuuService::parseOrderId()`.
+
+#### Status codes
+- `00` = success → settle
+- `11` = failed → cancel
+- `22` = pending (bank processing) → hold, wait for another notify
+
+#### Payment flow
+```
+Checkout → placeOrder() → createFiuuPaymentForOrder()
+  → stores params in session("fiuu_params.{orderId}")
+  → creates PaymentTransaction (provider='fiuu', status='pending')
+  → redirects to /customer/payment/fiuu/pay/{orderId}
+→ fiuuLaunch() → pulls session params (one-time pull, deleted) → renders auto-submit form
+→ Customer browser POSTs to FIUU hosted page
+→ FIUU fires notify() → verifies skey + paydate → checks idempotency → DB::transaction + lockForUpdate → settles order → fires OrderPlaced
+→ Customer browser returns to redirect() → if settled, go to conversation; else pending screen
+```
+
+#### Cancel flows
+- **Customer cancels on FIUU page** → `cancel()` → marks order `cancelled`, transaction `failed/customer_cancelled`
+- **Customer manual cancel** → `OrderController::cancel()` — now accepts `pending_payment` status, marks transaction `failed/customer_cancelled`
+- **Auto-expiry** → `ExpirePendingPayments` artisan command every 15 min — marks transaction `expired/session_timeout`, order `cancelled`
+
+### .env Variables Required (Hakim adds manually to preprod/prod)
+```
+FIUU_MERCHANT_ID=
+FIUU_VERIFY_KEY=
+FIUU_SECRET_KEY=
+FIUU_ENV=sandbox
+FIUU_ENABLED=true
+FIUU_CHANNEL=DQR
+```
+After adding: `php artisan config:cache && php artisan route:cache`
+
+### Davai 🧪 Test Findings — 9 Bugs Found, 3 Critical Fixed
+
+| Bug | Severity | Status | Description |
+|---|---|---|---|
+| BUG-01 | High | ✅ Fixed | `verifyCallbackSignature` used `$payload['amount']` but FIUU sends `TxnAmount` → fixed by `normalizePayload()` |
+| BUG-09 | Medium | ✅ Fixed | `PaymentController::pending()` only checked `from_billplz_redirect`, not `from_fiuu_redirect` |
+| BUG-05 | Medium | ✅ Fixed | `placeFromChatContext()` always called `createBillForOrder()`, bypassing FIUU routing |
+| BUG-02 | Low | Open | Session expiry UX gap on cancel URL when no orderid |
+| BUG-03 | Low | Open | Session expiry UX gap on return URL when no orderid |
+| BUG-06 | Medium | Open | `ExpirePendingPayments` may cancel status-22 in-flight transactions |
+
+### Reza 🔐 Security Audit — All Mediums Fixed
+
+| ID | Severity | Status | Finding |
+|---|---|---|---|
+| SEC-01 | Medium | ✅ Fixed | Full raw payload logged on unknown orderid — now logs only orderid/status/tranID |
+| SEC-02 | Medium | ✅ Fixed | No paydate freshness check — added 300s window, rejects stale callbacks |
+| SEC-03 | Low | Open | No payload size cap (mitigated by shared hosting php.ini) |
+| SEC-04 | Low | ✅ Fixed | `payment_method` not in validation allowlist — added `Rule::in(['fiuu','billplz'])` |
+| SEC-05 | Info | N/A | MD5 used per FIUU spec — cannot change |
+
+**Security properties verified green:**
+- Keys env-only, never hardcoded ✅
+- Amount server-computed, never from browser ✅
+- `hash_equals()` for timing-safe signature comparison ✅
+- DB transaction + `lockForUpdate()` on settlement ✅
+- Idempotency guard prevents double-settlement ✅
+- Webhook always returns HTTP 200 ✅
+- CSRF exemption scoped to webhook only ✅
+- IDOR: `firstOrFail()` scoped to `customer_id` on all routes ✅
+
+### New Staff
+- **Davai 🧪** — Software Tester. Tests end-to-end flows, reports bugs with root cause. Onboarded Jun 27.
+- **Zara ⚡🎛️** — already on staff (confirmed earlier)
+
+### Still Pending Before Going Live
+1. Hakim adds FIUU `.env` vars to preprod server
+2. Run `php artisan config:cache && php artisan route:cache` on preprod
+3. E2E sandbox test: checkout → DuitNow QR → webhook → conversation (Davai task)
+4. Set `FIUU_ENV=production` + real credentials when going live
+5. Later: remove payment method selector from checkout, hardcode FIUU only
+6. CEO confirmation: "Terima Order" call button — rider or customer?
