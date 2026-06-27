@@ -591,7 +591,7 @@ epoch (unix), checksum
 ## Jun 27, 2026 — FIUU DuitNow QR Integration (COMPLETE + Security Hardened)
 
 ### Branch
-`feature/push-notification` — all code applied, **NOT yet committed** (Hakim commits manually in PT mode)
+`feature/push-notification` — committed (`fe86ee4`) + pushed to `origin/feature/push-notification` (preprod)
 
 ### What Was Built
 Full FIUU DuitNow QR payment gateway integration — replaces BillPlz as the **customer checkout gateway** (BillPlz kept for rider/vendor disbursements only).
