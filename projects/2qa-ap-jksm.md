@@ -3,7 +3,7 @@
 **Role**: Hakim — Jr. Software Developer (Laravel)
 **Date Analysed**: June 4, 2026
 **Repo**: `gitlab.com/2QSC/ap_jksm` (GitLab, private)
-**Local path**: `/Users/hakim/holeeMonth/ap_jksm/ap_jksm`
+**Local path**: `/Users/hakim/holeeMonth/2qa_projects/ap_jksm/ap_jksm`
 **Status**: 🟢 Active development
 
 ---
@@ -480,7 +480,7 @@ Response adds: `kod_respond` (`00`=Berjaya, `01`=Business rules error, `02`=Dest
 | 3 | **`kod_perkhidmatan_iPayment`** | 🔴 PENDING | VARCHAR(6). Format: KategoriPerkhidmatan(1)+NomborLarian(5). Issued by JANM after service registration |
 | 4 | **HTTP Basic Auth credentials** | 🔴 PENDING | Username + password from JANM |
 | 5 | **Which `jenis_maklumat_terimaan`** | 🟡 PARTIAL | Pg.21 lists 5 business types. IDD has 4 codes (01-04). JKSM to confirm which they use (affects charge line structure + mandatory fields). Likely `01` Bil + `04` Bayaran Tanpa Kadar at minimum |
-| 6 | **JKSM callback URL for RECEXT201** | 🔴 PENDING | URL JKSM exposes for iPayment to POST receipts to |
+| 6 | **JKSM callback URL for RECEXT201** | 🟡 CODE DONE | `IPaymentCallbackController` committed (`37f8587`). URL still needs to be registered with JANM so iPayment knows where to POST. |
 | 7 | **`kod_lokasi` + `kod_sublokasi`** | 🔴 PENDING | From iPayment master data, ask JKSM admin |
 | 8 | **`kod_penjenisan`** | 🔴 PENDING | Classification codes, unique per PTJ. Must be set up in iPayment master data FIRST |
 | 9 | **`kumpulan_ptj_dan_ptj`** | 🔴 PENDING | JKSM department/PTJ codes |
@@ -501,5 +501,82 @@ Response adds: `kod_respond` (`00`=Berjaya, `01`=Business rules error, `02`=Dest
 
 ---
 
-**Last updated**: June 10, 2026 by Yappy — Full IDD V1.9.1 deep analysis
+---
+
+## 🔧 LO Feature Build — Jun 29, 2026 ✅ COMMITTED (`23c3040`)
+
+**Step 4 — Agensi Bukti Bayaran Upload** (was entirely missing)
+- Migration: `2026_06_29_000001_add_bukti_bayaran_path_to_lo_requests_table.php` — adds `bukti_bayaran_path` nullable string to `lo_requests`
+- `LoRequest.php` — `bukti_bayaran_path` added to `$fillable`
+- `TroliPembelianPengesahanLo.php` — `WithFileUploads` trait + `$buktiBayaran` prop + `uploadBuktiBayaran()` method (validates image/pdf, max 5MB, stores to `pembelian/lo/bukti_bayaran/{order_id}/`)
+- `troli-pembelian-pengesahan-lo.blade.php` — upload block embedded INSIDE "Butiran Pembayaran" sidebar card, shown UNDER the Status badge as a yellow `alert-warning` when `is_lulus && !bukti_bayaran_path`. Uses Bootstrap `input-group` for side-by-side [Choose File] [Muat Naik]. When already uploaded: shows "Lihat" btn-light link.
+- `pengesahan-pembayaran/catatan.blade.php` — finance sees "Bukti Bayaran Agensi" field with Lihat link
+
+**sejarah-pembelian LO visibility fix**
+- `SejarahPembelian.php` — `orWhereHas('loRequest')` added, `loRequest` eager-loaded — LO orders in SEMAKAN/LULUS now appear
+- `sejarah-pembelian.blade.php` — LO status badge + "Semak LO" / "Lihat LO" action buttons added
+
+**Broken "MUAT TURUN LO YANG TELAH DILULUSKAN" button**
+- Wrapped in `@if($loRequest && $loRequest->upload_review_file_path)` — no more null crash at SEMAKAN
+
+**"Draf" default label bug fixed**
+- `troli-pembelian-pengesahan-lo.blade.php` — match now covers all 7 statuses (12 DRAF → 18 BAYARAN_DIKEMBALIKAN). Previously statuses 16/17/18 all showed "Draf".
+
+**ASAL/SALINAN variants — all 4 docs**
+
+| Doc | Who Gets It | Where |
+|---|---|---|
+| INVOIS SALINAN | Agensi/ROC | troli-pembelian-pengesahan-lo (button: "MUAT TURUN INVOIS") |
+| RESIT SALINAN | Agensi/ROC | Same page (only when `latestBillPayment` exists) |
+| INVOIS ASAL | JKSM | semakan.blade.php (button: "MUAT TURUN INVOIS", bottom right) |
+| INVOIS ASAL + RESIT ASAL | JKSM Finance | catatan.blade.php (RESIT only shown when `$isReadOnly && $billPayment`) |
+
+- `invois_pembayaran.blade.php` — `ASAL` subtitle → `{{ strtoupper($docType ?? 'ASAL') }}`
+- `resit_pembayaran.blade.php` — heavily overhauled (+280 lines in commit), `.doc-type` CSS + dynamic subtitle + MalayWords helper for Ringgit in words
+- `app/Helpers/MalayWords.php` — NEW: converts decimal amount to Ringgit Malaysia text (e.g. "LIMA PULUH RINGGIT MALAYSIA DAN LAPAN PULUH SEN")
+- `TroliPembelianPengesahanLo.php` — `downloadInvoisSalinan()`, `downloadResitAsal()`, `downloadResitSalinan()` methods added
+- `Semakan.php` — `use Barryvdh\DomPDF\Facade\Pdf` + `downloadInvoisAsal()` method
+- `Catatan.php` — `use Barryvdh\DomPDF\Facade\Pdf` + `downloadInvoisAsal()` + `downloadResitAsal()` methods
+
+### ⬜ Still Pending (LO)
+- `php artisan migrate` — needs to be run on server to create `bukti_bayaran_path` column
+- Role guards for download buttons — KIV (not yet implemented)
+
+### ⚠️ Known Bug (from Jun 8 analysis — still unresolved)
+- **BUG #1**: `ReceiptDetail` never created in `Catatan.php::sahkan()` — resit PDF will have null `$receipt`. Fix documented above in Known Bugs section.
+
+---
+
+## 🔧 iPayment — RECEXT201 Callback Endpoint — ✅ COMMITTED (`37f8587`)
+
+**What was built:**
+- `app/Http/Controllers/IPaymentCallbackController.php` (205 lines) — receives incoming JSON POST from iPayment when a payment receipt is issued
+- AP system validates the payload and responds with success/fail message
+- CSRF exclusion added for callback route in `VerifyCsrfToken.php`
+- Route registered in `routes/web.php`
+
+**Status**: Code committed. Still blocked on infra pending items (see Outstanding Questions table above — IP whitelist, kod_agensi, callback URL registration with JANM all still 🔴 PENDING).
+
+---
+
+## 🔧 iPayment — Bandar Dropdown — ✅ COMMITTED (`a11c7b2`)
+
+**What was built:**
+- `config/ipayment_bandar.php` — full bandar list keyed by negeri code (used in BILEXT001 pelanggan section)
+- `TroliPembelian.php` — wired up bandar field to filter by selected negeri
+- `troli-pembelian.blade.php` — dynamic bandar dropdown in checkout form
+
+---
+
+## 🔧 Carian Luaran — Post-Payment Doc Access — ✅ COMMITTED (`93a1853`)
+
+**What was built:**
+- After a successful payment (LO for now), users can access their purchased documents directly from the public Carian Awam/Luaran search page
+- `CarianInteraktif/CarianLuaran/Index.php` — access control logic added
+- `carian-luaran/index.blade.php` — download/view buttons shown for paid docs
+- `routes/ap_jksm.php` — 10 new routes added
+
+---
+
+**Last updated**: July 2, 2026 by Yappy — git history audit, post-LO progress sync
 **Analysed by**: Yappy (direct PDF sweep, 108 pages)
