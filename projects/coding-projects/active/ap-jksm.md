@@ -1,6 +1,6 @@
 # ⚖️ AP JKSM — Project Reference
 *First documented: Jun 16, 2026 by Yappy*
-*Last updated: Jun 22, 2026 — RECEXT201 callback controller complete*
+*Last updated: Jun 25, 2026 — iPayment flow confirmed, Bandar select implemented*
 *Status: 🟢 Active FT development — Hakim is developer (2Q Alliance)*
 
 ---
@@ -38,16 +38,24 @@
 - Option 2 = Visa
 - Option 3 = iPayment (BILEXT001 + RECEXT001) ← in progress
 
-### Flow Sequence
+### Flow Sequence (confirmed Jun 25 from sequence diagram in IDD V1.9.2)
 ```
-User clicks "Hantar" (iPayment)
-    → BILEXT001  (3.2.1) — We call iPayment (submit bill)
-        → HTTP 202 → if JMT=01 → RECEXT001 auto-called (3.2.2)
-        → swal:success
-    ← RECEXT201  (3.3.1) — iPayment calls US (official receipt callback) ✅
-        → POST /ipayment/recext201
+1 ↓  BILEXT001  (3.2.1) — We → iPayment  (register bill)
+2 ↓  iPayment   → Customer   (Maklumat Bil/Invois displayed on iPayment portal)
+3 ↓  Customer pays on iPayment portal (FPX/DuitNow/etc. — not our concern)
+4 ↓  RECEXT001  (3.2.2) — We → iPayment  (Maklumat Pembayaran — auto-called after BILEXT001 when JMT=01)
+5 ← RECEXT201  (3.3.1) — iPayment → Us  (official receipt callback — ends here)
+        → HTTP JSON response (kod_respond 00/01) is MANDATORY (Real-Time HTTP, connection waits)
         → reconcile order → BAYARAN_DITERIMA
+5a ← ERROR9999 (3.4.1) — iPayment → Us  (ONLY if error occurs — Batch SFTP)
+6 ← RECEXT302  (3.3.2) — iPayment → Us  (batch receipt report via SFTP — ends here, optional)
 ```
+
+### CRITICAL: RECEXT201 HTTP Response
+The response we return IS the HTTP response to iPayment's POST. This is NOT us "calling iPayment back".
+iPayment makes the POST and waits — if we don't return JSON, the connection hangs/times out.
+IDD page 71-72 explicitly defines the response format (kod_respond, perihal_respond, mesej).
+Our IPaymentCallbackController is correct and must stay.
 
 ---
 
@@ -170,6 +178,7 @@ public string $jenisIdentitiPelanggan = '';
 public string $noIdentitiPelanggan = '';
 public string $jenisProses = '01';
 public string $jenisMaklumatTerimaan = '01';
+public array $bandarOptions = [];    // loaded by updatedNegeri() — from config/ipayment_bandar.php
 ```
 
 ---
@@ -181,6 +190,19 @@ Both `sendIPaymentBilext001()` and `sendIPaymentRecext001()` have `dd($payload)`
 
 ### ⬜ PENDING: UAT credentials
 All `IPAYMENT_*` env keys are empty. iPayment team to provide at UAT. Key TBD values: `vot_dana`, `kumpulan_ptj_*`, `pegawai_pengawal`, `program_aktiviti`, `projek`, `kod_akaun`.
+
+### ✅ DONE: Bandar dropdown + field reorder + wire.live fix — Jun 25, 2026, NOT committed
+**Files changed:**
+- `config/ipayment_bandar.php` — NEW. 443 unique bandars from Lampiran_7_Bandar.xlsx, keyed by negeri code (01-16)
+- `TroliPembelian.php` — added `public array $bandarOptions = []` property + `updatedNegeri()` Livewire hook that loads bandars from config
+- `troli-pembelian.blade.php` — bandar changed to `<select>`; **negeri changed to `wire:model.live`** (was `wire:model` — deferred in Livewire 3, updatedNegeri() never fired); field order: Negeri → Bandar → Poskod → Alamat 1 → Alamat 2 → Alamat 3 → Negara; bandar shows `cursor:not-allowed + opacity:0.65 + "Pilih Negeri dahulu"` until negeri selected
+
+**Bandar purpose**: sent as customer billing address in BILEXT001 `maklumat_pelanggan` layer — printed on official government receipt (Resit Rasmi). Must match iPayment reference list exactly.
+
+**Poskod note**: Kota Bharu alone has 86 postcodes — a `<datalist>` autocomplete (not `<select>`) was proposed for cascading from bandar. Not yet implemented — pending Miyamura confirmation.
+- `troli-pembelian.blade.php` — bandar changed from `<input type="text">` to `<select>` (disabled when no negeri selected, options from `$bandarOptions`)
+
+**Source**: `Lampiran_7_Bandar.xlsx` in Integration Kit V1.9.2 — 2,784 rows (Negeri + Bandar + Poskod), deduplicated to 443 unique bandars grouped by negeri code
 
 ### ✅ DONE: RECEXT201 callback controller (3.3.1) — Jun 22 2026, NOT committed
 **Files changed:**
