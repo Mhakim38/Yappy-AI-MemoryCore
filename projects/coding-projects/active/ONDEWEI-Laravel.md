@@ -711,3 +711,158 @@ After adding: `php artisan config:cache && php artisan route:cache`
 4. Set `FIUU_ENV=production` + real credentials when going live
 5. Later: remove payment method selector from checkout, hardcode FIUU only
 6. CEO confirmation: "Terima Order" call button — rider or customer?
+
+---
+
+## Jul 4–5, 2026 — PERKESO + FIUU + Session Fix
+
+### PERKESO ensureRiderRegistered() — Multiple Bugs Fixed ✅
+- `checkUser` response: `status:"success"` means API call worked, NOT that user is registered. Real answer in `data.result`
+- Registered result string is `"REGISTERED_USER"` (not `"USER_REGISTERED"`) — confirmed from real API response
+- `"already been registered"` fail from registerUser → treat as registered, update flag, proceed
+- All deduction paths covered: admin raw form has its own `checkRegistration()` method that uses same logic
+
+### ic_type Selector — Added to All Rider Entry Points ✅ (commit e6c35e3)
+- `register.blade.php`, `google-complete.blade.php`, `profile/edit.blade.php`
+- `RegisteredUserController`, `GoogleAuthController`, `ProfileUpdateRequest`, `ProfileController`
+- Mapping: `mykad/mykid → 'B'`, `passport → 'PR'` (PERKESO API format)
+
+### Non-Blocking PERKESO on Deliver — `app()->terminating()` Applied ✅
+- PERKESO deduction moved out of synchronous deliver() path
+- `app()->terminating(fn() => ...)` — Laravel fires AFTER `$response->send()` flushes to rider's browser
+- Rider sees "Delivered" immediately; PERKESO HTTP calls happen in background
+- No queue worker needed — works on Hostinger shared hosting
+
+### FIUU Post-Payment Logout Bug — Fixed ✅ (tested on preprod)
+- Root cause: FIUU redirects customer back via POST form → SameSite=Lax blocks session cookie → `auth()->user()` null
+- Fix: `SESSION_SAME_SITE=none` + `SESSION_SECURE_COOKIE=true` in .env
+- `config/session.php` now env-driven: `env('SESSION_SAME_SITE', 'lax')`
+- BillPlz not affected (uses GET redirect — Lax allows cookies on GET)
+- **Prod .env reminder**: add `SESSION_SAME_SITE=none` + `SESSION_SECURE_COOKIE=true`
+
+### FIUU Refund isQueued Fix ✅
+- `initiateRefund()` wrongly returned `success=true` when FIUU served an HTML 404 page (HTTP 200)
+- Fix: `$isQueued = $response->successful() && !$hasError && $response->json() !== null`
+
+---
+
+## Jul 6, 2026 — Pickup Feature Architecture Analysis (00:00–01:00 MYT)
+
+### Context
+Miyamura wants pickup order type alongside delivery. Team (Hana/Sora/Mira) did parallel codebase audit. Full analysis produced — no code written yet, planning only.
+
+### Proposed Flows
+- **Delivery** (existing): `Customer → payment → Rider accepts → Vendor prepares → Rider delivers → Customer`
+- **Pickup** (new): `Customer → payment → Vendor prepares → Customer collects` (no rider)
+
+---
+
+### Confirmed Breakpoints
+
+#### 🔴 Critical — Hard Failures
+
+**1. No `order_type` column** — zero migration, zero model field. Everything else depends on this.
+- Fix: `ALTER TABLE orders ADD order_type ENUM('delivery','pickup') DEFAULT 'delivery'`
+
+**2. `delivery_location` fields are `required` + `NOT NULL`**
+- `app/Http/Controllers/Customer/OrderController.php` lines 109–124
+- Will 422 on every pickup order placement.
+- Fix: nullable migration + `required_if:order_type,delivery` validation
+
+**3. Status machine has no pickup path**
+- `app/Services/OrderStatusService.php` lines 24–57
+- Current: `pending → rider_accepted → accepted → preparing → ready_for_pickup → on_delivery → delivered`
+- Pickup needs: `pending → accepted (vendor direct) → preparing → ready_for_pickup → collected`
+
+**4. Vendor portal blind to pickup orders**
+- `Vendor/OrderController::accept()` guards on `status !== 'rider_accepted'`
+- `$vendorRelevantStatuses` starts at `rider_accepted` — pickup `pending` orders invisible
+
+**5. Rider push notifications fire for pickup orders**
+- `SendOrderNotifications` — no order_type guard; all riders notified
+
+**6. Rider available pool shows pickup orders**
+- `Rider/OrderController::available()` — no `order_type` filter; pickup appears in rider queue
+
+#### 🟡 Medium — New Flow Needed
+**7. Pickup confirmation** — no endpoint exists. Simplest: vendor "Mark Collected" button. Alt: QR/PIN.
+
+#### 🟢 Safe — No Changes
+| Area | Why |
+|---|---|
+| PERKESO | `if ($order->rider)` guard; pickup never reaches deliver() |
+| Disbursements | delivery_fee = 0, no rider → auto-excluded |
+| Payment gateway | Just pass delivery_fee = 0 — gateway charges correctly |
+| Delivery chat | null rider_id in meta is benign |
+
+---
+
+### Recommended Build Order (When Ready to Implement)
+
+```
+1 ↓ Migration — add order_type ENUM('delivery','pickup') DEFAULT 'delivery'
+2 ↓ Make delivery_location_* nullable + conditional validation
+3 ↓ Status machine — add pickup transition path in OrderStatusService
+4 ↓ Vendor portal — accept 'pending' pickup orders; add to vendorRelevantStatuses
+5 ↓ Rider notification guard — skip OrderPlaced blast for pickup
+6 ↓ Rider available pool — exclude pickup from query
+7 ↓ Pickup confirmation endpoint — vendor "Mark Collected" button (simplest)
+8 ↓ Checkout UI — order type toggle, conditional delivery section, fee logic
+9 ↓ Customer order show — pickup progress steps + hide rider panel
+10 ↓ Vendor/admin views — conditional copy, hide rider card for pickup
+```
+
+Steps 1–6 = system skeleton (orders flow end to end). Steps 7–10 = UX layer.
+
+---
+
+### Sunmi Companion App — ON HOLD
+- Plan: Android `.apk` — polls print queue API, auto-accepts, prints via Sunmi AIDL SDK
+- Components: BootReceiver, PrinterService, SunmiPrinterHelper, MainActivity
+- **Status**: ON HOLD until Aiman's Sunmi device arrives. Will revisit once in hand.
+
+---
+
+## Outstanding Tasks (as of Jul 6, 2026)
+
+### Pre-Launch Must-Do
+1. ⬜ FIUU refund ONDW-158 — stuck at `refund_pending`; FIUU sandbox won't send callback. Manual DB reset → `captured`, retry on prod
+2. ⬜ `verifyRefundNotifySignature()` — confirm formula when real prod callback arrives
+3. ⬜ Attachment image bug — remove `Content-Length` in `ConversationAttachmentController::show()`
+4. ⬜ Proof modal drawer — pull preprod + test on mobile
+5. ⬜ End-to-end preprod test (full order flow: checkout → payment → rider pickup GPS → deliver proof → PERKESO)
+6. ⬜ Email BillPlz for e-wallet activation (SSM + KYC docs)
+7. ⬜ Run `billplz:sync-fpx-banks` on preprod/prod
+8. ⬜ Test payout flow end-to-end on preprod
+9. ⬜ Legacy data migration on prod at launch
+10. ⬜ CEO confirmation: "Terima Order" call button — rider or customer?
+11. ⬜ Ask Aiman: KK distances (KM) + ETA (minutes) for rider available orders page
+12. ⬜ Chat order UI improvement (Hakim not satisfied with current design)
+13. ⬜ Merge `feature/push-notification` → `main`
+
+### New Features (Planned)
+14. ⬜ Pickup feature — analysis done, 10-step build plan above
+15. ⬜ Sunmi companion app — ON HOLD until device arrives
+
+### Prod .env Checklist (before going live)
+```
+SESSION_SAME_SITE=none
+SESSION_SECURE_COOKIE=true
+PERKESO_ENV=production
+PERKESO_SECTOR_CODE=G
+PERKESO_EMPLOYER_NAME=ONDW
+PERKESO_EMPLOYER_CODE=
+PERKESO_TOKEN=
+PERKESO_CLIENT_ID=
+PERKESO_CLIENT_SECRET=
+FIUU_ENV=production
+FIUU_MERCHANT_ID=
+FIUU_VERIFY_KEY=
+FIUU_SECRET_KEY=
+FIUU_CHANNEL=RPP_DuitNowQR
+php artisan migrate
+php artisan db:seed --class=DeliveryLocationsSeeder
+php artisan db:seed --class=BillplzPaymentChannelSeeder
+php artisan config:cache
+php artisan route:cache
+```
