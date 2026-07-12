@@ -866,3 +866,55 @@ php artisan db:seed --class=BillplzPaymentChannelSeeder
 php artisan config:cache
 php artisan route:cache
 ```
+
+---
+
+## Jul 12, 2026 — Pickup Feature COMPLETE + Reports/Fees Fixed
+
+### Branch: `feature/push-notification` — 9 commits pushed, latest: `ad755f3`
+
+### What Was Built & Fixed (9 commits)
+
+**Root cause of "same bug three rounds in a row":**
+1. `resources/js/delivery-conversation-realtime.js` is Vite-compiled → `public/build/assets/app-*.js`. The committed bundle was 10 days stale (built Jul 2) — pickup JS was never in the deployed bundle. All JS fixes for chat were committing to source but never reaching the browser.
+2. `public/build` is git-tracked. Preprod has no Node.js. ANY edit to `resources/js/*` MUST be followed by `npm run build` locally + commit the new bundle + push. MANDATORY RULE from this session forward.
+3. JS assets in vendor blade had no cache-busting — PWA kept serving old pre-pickup JS forever. Fixed with `?v={filemtime()}`.
+
+**Commit `0cad105`** — Vendor polling: `VendorOrderController::getOrdersStatusUpdates()` was including ALL terminal orders from last 24h in `other` payload. Now: terminal orders only sent if `updated_at >= now()->subMinutes(10)` (JS needs one terminal event to remove the card, then they drop off). Added `sweepStaleCards()` to remove rendered cards absent from both lists.
+
+**Commit `7d32c5c`** — Rebuilt Vite bundle (10-day stale). `DeliveryChatService::statusPillFor/statusLabelFor` made pickup-aware — polling was overwriting the blade-rendered pill with "Waiting for rider" on every tick.
+
+**Commit `c5722b6`** — Vendor history/stats/earnings: `whereIn(['delivered','collected'])` for all revenue/completed queries; "Dipungut" green label; blank location → "Ambil sendiri"; Pickup badge on server-rendered cards; stat cards renamed "Delivered" → "Completed".
+
+**Commit `7c9404b`** — `DisbursementService::pendingBalances()`: `where('status','delivered')` → `whereIn('status', ['delivered','collected'])`. Vendors were silently never getting paid for pickup orders via BillPlz disbursement.
+
+**Commit `c13f64d`** — Customer/Rider/Admin reports: collected in all completed counts; rider feeds sealed from pickup (`order_type=delivery`); customer history card "Waiting for rider" → "Pickup" badge; admin cancel guard fixed (collected is terminal now); `OrderController@repeatLast` now includes collected.
+
+**Commit `3f090d8`** — Platform fee display fixed. `MoneyHelper::platformFeeSen()` is TIERED (RM 0.50 → RM 1.80+, not flat RM 1.00). Old blades had hardcoded `+ 1` or omitted fee. Fixed: order detail, list card, payment pending, checkout initial paint. Fee is NEVER stored in DB — always computed at display time.
+
+**Commit `c505ca5`** — Chat: confirmation message pickup-aware ("Self pickup at the stall."); "Collect my order" button moved above chat composer (matches rider pattern, `data-pickup-collect-section` + `data-pickup-trigger` attributes unchanged so polling JS works without Vite rebuild); pickup drawer converted to AJAX with photo compression (mirrors rider drawer: fetch + FormData + AbortController 45s timeout + `ondwCompressImage`). `collect()` returns JSON when `expectsJson()`.
+
+**Commit `285ea3e`** — Chat receipt: "Platform support" fee row added (tiered); `DeliveryChatService::conversationPayload()` `total_amount_formatted` now includes tiered fee so JS polling can't regress the header. Label unified to **"Platform support"** (exact checkout.blade.php label) across all customer-facing breakdowns.
+
+**Commit `ad755f3`** — About page: "RM1 system fee" → "RM0.50+ platform support, from"; count-up JS made decimal-safe (was `parseInt`, now `parseFloat` with `toFixed(decimals)`).
+
+### Architecture Decisions — Locked
+- `MessageAttachment.attachment_type` = computed accessor (NOT DB column). `uploaded_by_user_id` IS DB NOT NULL — must always be set on `attachments()->create()`.
+- Platform fee: NEVER stored in DB. `MoneyHelper::platformFeeRm($total)` at display time, `MoneyHelper::platformFeeSen($total)` at charge time. Never hardcode RM 1.00.
+- `DeliveryChatService::ensureForOrder()` (not `forOrder()`) must be used in `collect()` — creates conversation + guarantees customer is a participant so `sendMessage()` doesn't 403.
+- Vendor disbursement: `whereIn('status', ['delivered', 'collected'])` — both terminal types paid out.
+
+### Updated Outstanding Tasks (as of Jul 12, 2026)
+1. ⬜ FIUU refund ONDW-158 — stuck at refund_pending; manually reset DB + retry on prod
+2. ⬜ Chat order UI improvement — Hakim wants polish (future session)
+3. ⬜ Attachment image bug — remove `Content-Length` from `ConversationAttachmentController::show()`
+4. ⬜ End-to-end preprod test: checkout → payment → pickup flow end-to-end
+5. ⬜ Clear test order data from PROD
+6. ⬜ Email BillPlz for e-wallet activation (SSM + KYC docs)
+7. ⬜ Run `billplz:sync-fpx-banks` on preprod/prod
+8. ⬜ Test payout flow end-to-end on preprod
+9. ⬜ Legacy data migration on prod at launch
+10. ⬜ CEO confirmation: "Terima Order" call button — rider or customer?
+11. ⬜ Ask Aiman: KK distances + ETA for rider available orders page
+12. ⬜ Merge `feature/push-notification` → `main`
+13. ⬜ Sunmi companion app — ON HOLD until Aiman's device arrives
