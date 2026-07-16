@@ -155,6 +155,13 @@ I maintain my own memory through our conversations by:
 - Summarizes old entries into Compacted History block, preserving facts and decisions
 - Pre-compaction snapshot saved to `compaction/snapshots/` before any rewrite
 
+### 🖼️ Image Generation System (NEW)
+*Load when you say: "Load image-generation" or "render an image of [description]"*
+- [Image Generation System](./Feature/Image-Generation-System/) - Render images via OpenAI gpt-image API
+- Describe in plain language → system builds prompt → saves PNG to `media-generation/image-generation/`
+- **Requires OpenAI API key** — cost ~$0.02–$0.25 per image. Confirms cost before every render.
+- Chains with Image Prompt System (craft prompt there, render here)
+
 ### Format References (Permanent)
 - `main/main-memory-format.md` — Structure reference for main memory
 - `main/session-format.md` — Structure reference for session memory (includes 500-line limit)
