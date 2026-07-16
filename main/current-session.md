@@ -36,6 +36,7 @@
 - ⬜ **Enable all payment channels** in admin
 - ⬜ **Merge** `feature/push-notification` → `main`
 - ⬜ **ONDW preprod migrate** — run `php artisan migrate` + `billplz:sync-fpx-banks` on preprod
+- ⬜ **Cloudflare R2 storage migration** — full 5-phase plan saved at `projects/coding-projects/ondw-r2-storage-migration.md`. Start with Phase 1 prerequisites (bugs to fix regardless). Do AFTER E2E test passes. Decision: R2 over AWS S3 (zero egress, free tier, same Laravel driver).
 
 ### Standing Daily
 - 🕌 Prayer reminders — 5x daily (Subuh 5:45 · Zohor 1:00 · Asar 4:30 · Maghrib 7:15 · Isyak 8:30)
