@@ -226,6 +226,53 @@ These are workarounds for fresh local install — they are fine on staging/prod:
 
 ---
 
+## 📋 Pending Tasks
+
+### TASK #1 — MyDigital ID Login Endpoint
+*Added: Jun 23, 2026 | Status: ⬜ Pending — spec sent to backend team*
+
+**Endpoint:** `POST /api/mobile/loginMyDigital`
+**Auth input:** `Authorization: Bearer <MyDigital access token>` (header only)
+
+#### Backend Requirements
+
+1. **Token validation** — validate using Keycloak OIDC issuer:
+   `https://sso.digital-id.my/realms/mpaj`
+
+2. **NRIC extraction** — retrieve from `preferred_username` claim in the verified token.
+   > 🔴 **Security**: Do NOT accept NRIC sent separately by the app. Only use identity claims from the verified MyDigital token.
+
+3. **Account lookup** — find corresponding MPAJ account by NRIC.
+
+4. **Success response** — return the same `token` + `userData` structure as `/api/mobile/loginMobile`.
+
+5. **Not found response** — return HTTP 404:
+```json
+{
+  "code": "MPAJ_ACCOUNT_NOT_FOUND",
+  "message": "Akaun MPAJ tidak dijumpai",
+  "mydigital_user": {
+    "ic": "...",
+    "name": "...",
+    "email": "..."
+  }
+}
+```
+
+#### Open Questions for Backend Team
+- [ ] Token expiry — how is it handled? Does the app need to refresh?
+- [ ] Logout — should this endpoint invalidate the MyDigital token or just the local Sanctum token?
+- [ ] Refresh-token behavior — does MyDigital SSO support refresh tokens?
+- [ ] Account registration/linking — if MPAJ account not found, is there a registration flow, or just 404?
+
+#### Flutter App Data Requirements
+The app needs to store from the success response:
+`token` · `entryID` · `IC` · `name` · `email` · `phone` · `citizenship` · `last name`
+
+> Request a **sample successful JSON response** from backend so Flutter team can map fields correctly.
+
+---
+
 ## 📜 Key Commits (Jun 2026)
 
 | Date | What |

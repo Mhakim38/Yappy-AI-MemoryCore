@@ -410,3 +410,511 @@ pending_payment → (BillPlz webhook paid=true) → pending → (rider accepts) 
 | `f699549` | Jun 14 | Aiman: AI chat + admin overhaul + BillPlz/PERKESO (162 files) |
 | `caf06b2` | Jun 16 | Merge AI-integration → feature/push-notification (7 conflicts resolved) |
 | `dda7e4f` | Jun 16 | Vite build artifacts committed (fixed preprod 500) |
+| `6012c64` | Jun 21 | fix(location): skip modal if flag set; fix button label "Picked Up" → "Pick Up" |
+| `3da6862` | Jun 21 | fix(pickup): GPS on all 4 pickup surfaces, localStorage-first, no repeated modal |
+| `1e11d1d` | Jun 21 | fix(pickup): eliminate 422 race on available page; pill shape fix in chat (display:contents) |
+| `f83e613` | Jun 21 | feat(deliver): proof modal on available page — photo + GPS like chat deliver |
+| `6e7f862` | Jun 21 | fix(available): static Delivered button + pickup AJAX (2 missed bugs) |
+| `022d0e7` | Jun 21 | fix(ios): replace .flat() with [].concat.apply() for iOS 11 compat |
+| `bb71d71` | Jun 22 | fix(deliver): submit interceptor for cached old form + filemtime cache-busting |
+| `79400a3` | Jun 22 | fix(pickup): 422 root cause (type=submit in Blade) + pickup submit interceptor + flicker HTML-diff fix |
+| `192c993` | Jun 22 | feat(chat-order): remove ORDER TEMPLATE pre-fill, add Load Template pill button |
+| `bd9eb39` | Jun 22 | fix(vendor): pending_payment filter, status polling, call button, Preparing pill sync |
+| `ac2431c` | Jun 22 | fix(pickup+deliver): replace ondwForcePoll with page reload — eliminates requestInFlight race |
+
+---
+
+### ✅ Rider GPS + Delivery Proof Flow — COMPLETE (Jun 21–22, 2026)
+
+**Branch**: `feature/push-notification` | All commits pushed to origin.
+
+#### New Files Created
+| File | Purpose |
+|---|---|
+| `public/customJS/ondw-pickup-gps.js` | Shared GPS utility for ALL pickup surfaces. MutationObserver + localStorage-first + AJAX submit. |
+| `public/customJS/ondw-deliver-proof.js` | Delivery proof modal driver. Photo + GPS capture + AJAX. Delegated click + submit interceptor. |
+| `resources/views/partials/_rider-proof-modal.blade.php` | Proof modal HTML (photo input, GPS status, confirm). IDs: `ondw-proof-*`. |
+
+#### Key Architecture Decisions
+- **iOS Permissions API is broken** — `navigator.permissions.query({name:'geolocation'})` always returns `'prompt'` on iOS Safari, even after user grants. NEVER use as a gate. Use `localStorage.getItem('ondw_location_granted')` instead (set on profile page first grant).
+- **`getCurrentPosition()` must be synchronous inside click handler** — not inside a Promise/async chain. iOS/Android won't count it as a user gesture otherwise — system dialog won't appear.
+- **`display:contents` on pickup form** — `<form>` is block-level and breaks the inline-flex rounded-full pill in chat. `class="contents"` makes the form invisible to flex layout.
+- **`rider-orders-realtime.js` re-renders every 1200ms** — any GPS inputs injected by JS get wiped on next poll. Solution: AJAX submit (not `form.submit()`), GPS captured in the click handler payload sent immediately.
+- **Pickup form: `type="button"` in JS template** — prevents native form submit racing MutationObserver on injection.
+- **Deliver form: `data-ondw-deliver-btn` + `data-deliver-url`** — replaces the old plain `<form POST>` in both static Blade and JS-rendered templates. Delegated click on `document` catches dynamically injected buttons.
+- **Submit interceptor (defensive)** — capture-phase `submit` listener in `ondw-deliver-proof.js` catches old cached `rider-orders-realtime.js` (Hostinger server-side HTTP cache) that might still inject old form POST. Any form matching `/orders/{id}/deliver` is hijacked → proof modal.
+- **`filemtime()` cache-busting** — `?v=<unix_mtime>` on all three `customJS/` script URLs. Forces new URL on file change → bypasses both browser cache and Hostinger's HTTP layer cache.
+- **`[].concat.apply([], Object.values(errors))` NOT `.flat()`** — `.flat()` is ES2019 and fails on iOS 11/Chrome 68 and below.
+- **`ondwForcePoll()`** — exposed as `window.ondwForcePoll = checkForNewOrders` in `rider-orders-realtime.js`. Lets GPS/deliver handlers trigger immediate re-render without page reload.
+
+#### 4 Pickup Surfaces — All Fixed
+1. **Chat page** (`conversations/show.blade.php` + `delivery-conversation-realtime.js`) — `wireRiderActions()` intercepts submit, `requestPickupGPS()` localStorage-first
+2. **Available page static Blade** (`rider/orders/available.blade.php`) — `class="ondw-pickup-form"`, wired by `ondw-pickup-gps.js` MutationObserver
+3. **Available page JS-render** (`rider-orders-realtime.js` `activeActionsHtml()`) — `class="ondw-pickup-form"`, `type="button"` at birth, wired by MutationObserver
+4. **Order detail page** (`rider/orders/show.blade.php` + `order-status-detail-realtime.js`) — `ondw-pickup-form` class, `ondw-pickup-gps.js` included
+
+#### PERKESO Status
+- `perkeso_deductions` table shows `status=pending` on preprod
+- Root cause NOT yet investigated (was pre-existing before this session)
+- `last_error` column migration not yet run on preprod — run `php artisan migrate`
+
+#### Jun 22 2026 — Second Session (2 AM MYT)
+
+**Additional fixes committed this session:**
+- Vendor orders page — 4 bugs fixed:
+  - `pending_payment` orders now filtered from vendor API response
+  - `processPendingOrders()` re-renders card when status changes (e.g. → `rider_accepted`)
+  - `initializeOrderStatuses()` reads real status from `data-order-status` attribute
+  - `buildOrderCardHTML()` now has `isCooking` branch + call button (rider phone) on both pending+cooking cards
+  - `updateHeaderPills()` syncs Pending/Preparing pill counts live after every card change
+- Rider available page — pickup + deliver stuck "Locating…" fixed:
+  - Root cause: `requestInFlight` guard in `checkForNewOrders()` silently dropped both `ondwForcePoll()` calls if a poll was mid-flight
+  - Fix: `window.location.reload()` after 800ms on pickup success and deliver success — reliable, no race conditions
+- Deliver button flicker — definitive fix:
+  - HTML string comparison always failed (browser normalises whitespace differently from template literals)
+  - Fix: `lastRenderedStatus{}` object tracks per-order status; DOM only updated on actual status transition
+- Chat page — ORDER TEMPLATE removed from textarea pre-fill; "Load template" pill button added (same row as "Repeat last")
+
+**CEO confirmation pending (do not implement until confirmed):**
+- "Terima Order" call button: confirm with CEO whether to call RIDER or CUSTOMER
+
+#### Still Pending (Pre-Launch)
+1. Add `PERKESO_EMPLOYER_CODE` + `PERKESO_EMPLOYER_NAME=ONDW` to preprod `.env` + `php artisan config:cache`
+2. Retry PERKESO deduction from `/admin/integrations/perkeso` — verify `last_error` clears
+3. E2E test: checkout → BillPlz → webhook → rider pickup (GPS) → deliver (GPS + photo) → confirm PERKESO fires
+4. Clear test order data from PROD (overdue since Jun 5)
+5. Email BillPlz for e-wallet activation (SSM + KYC)
+6. CEO confirmation: "Terima Order" call button — rider or customer?
+7. Run `billplz:sync-fpx-banks` on preprod/prod
+8. Merge `feature/push-notification` → `main`
+
+---
+
+## Jun 24, 2026 — Bug Fix + UX Session (commits 2fe7554, f05e841, e20ab24)
+
+### Bugs Fixed
+| Bug | Root Cause | Fix |
+|---|---|---|
+| All orders cancelled after payment | `PaymentTransaction.amount_sen` missing platform fee → webhook mismatch | Added `+ PLATFORM_FEE_SEN` to stored amount |
+| Rider Pick Up button stuck | `lastRenderedStatus[orderId]` — `orderId` was undefined, wrote `"undefined"` key, never re-rendered | Fixed to `order.order_id` in `rider-orders-realtime.js` |
+| Proof delivery 404 | Disk mismatch — saved to `'public'`, served from `'local'` | `Storage::disk('local')` → `'public'` in `routes/web.php` (3 occurrences) |
+| Proof modal under navbar | Modal inside `@section('content')` → inside `<main overflow-y:auto>` → iOS clips fixed children | Moved to `@push('modals')` stack, `@stack('modals')` added to `app.blade.php` |
+| PERKESO never auto-retried | `markFailed()` set `next_retry_at` but never re-dispatched job; no scheduled sweep | `markFailed()` now re-dispatches job; 10-min Kernel sweep via `pendingRetry` scope |
+| PERKESO missing API fields | `transacted_at`, `end_date`, `employer_name`, `employer_code` all absent from payload | All fields added to `PerkesoDeductionService::attemptSubmit()` payload |
+
+### New Feature
+- **Customer orders infinite scroll** — `OrderController::index()` JSON branch + `customer-orders-infinite.js` (IntersectionObserver, 200px early trigger, paginate 20 per load)
+
+### Key Commits
+| Commit | What |
+|---|---|
+| `2fe7554` | PERKESO missing fields fix (transacted_at + employer fields) |
+| `f05e841` | Rider polling, proof 404, modal body-append, onerror on dynamic img |
+| `e20ab24` | Drawer @stack('modals') fix, PERKESO auto-retry, customer orders infinite scroll |
+
+---
+
+## Jun 26, 2026 — BillPlz Payment Order (Payout) Deep Dive (03:00+ MYT)
+
+### 🔑 Critical BillPlz PO Knowledge (hard-won tonight)
+
+#### Sandbox Testing
+- **`bank_code: DUMMYBANKVERIFIED`** — the ONLY bank_code that produces a successful PO in BillPlz sandbox. Every other code (real SWIFT, TEST0021, ABB0234, BP-FKR01) results in transaction failure or rejection.
+- Staging FPX codes (`BP-FKR01`, `TEST0021` etc.) are for FPX bill payment (`reference_1`), NOT for Payment Order `bank_code`. These are completely different fields.
+- BillPlz sandbox does NOT reliably fire PO callbacks. Status stays `processing` forever unless callback URL is configured AND BillPlz sandbox actually sends it.
+
+#### PO Callback URL
+- Must be set on the **Payment Order Collection** (not main account settings)
+- BillPlz Dashboard → Payment Orders → your collection → Edit/Settings → Callback URL
+- Our endpoint: `POST /webhooks/billplz/po` (CSRF-exempt, X-Signature verified)
+- Checksum field order (strict): `[id, bank_account_number, status, total, reference_id, epoch]`
+- BillPlz retries once after 1 hour on failure. 2 failures = permanently removed. Account rank degraded per failed callback.
+
+#### Create PO — Required Fields
+```
+payment_order_collection_id, bank_code, bank_account_number, name,
+description (ASCII only, max 200 chars, NO special chars), total (sen),
+epoch (unix), checksum
+```
+- Checksum order for creation: `[payment_order_collection_id, bank_account_number, total, epoch]`
+- Our implementation in `BillplzService::createPaymentOrder()` ✅ matches exactly
+
+#### SWIFT Bank Codes (production po_bank_code) — Corrected Jun 26
+| Bank | Correct SWIFT |
+|---|---|
+| Maybank | `MBBEMYKL` |
+| CIMB | `CIBBMYKL` ← was `CIMBCLKL` (wrong) |
+| Hong Leong | `HLBBMYKL` |
+| RHB | `RHBBMYKL` |
+| Affin | `PHBMMYKL` ← was `AFBQMYKL` (wrong) |
+| Alliance | `MFBBMYKL` ← was `ABMB0212` (FPX code used by mistake) |
+| AmBank | `ARBKMYKL` ← was `AMMBKLKL` (wrong) |
+| Bank Islam | `BIMBMYKL` |
+| Bank Rakyat | `BKRMMYKL` |
+| BSN | `BSNAMYK1` ← digit 1 NOT letter L (official BillPlz doc confirmed) |
+| Agrobank | `AGOBMYKL` (added) |
+| Bank Muamalat | `BMMBMYKL` (added) |
+| HSBC | `HBMBMYKL` (added) |
+| Citibank | `CITIMYKL` (added) |
+| Kuwait Finance House | `KFHOMYKL` (added) |
+| OCBC | `OCBCMYKL` |
+| Public Bank | `PBBEMYKL` |
+| Standard Chartered | `SCBLMYKX` |
+| UOB | `UOVBMYKL` |
+
+### Bugs Fixed Tonight (all on `feature/push-notification`)
+
+| Commit | Bug | Fix |
+|---|---|---|
+| `51de36c` | BillPlz PO 422 "invalid characters" | Em dash `—` in description → ASCII hyphen `-` |
+| `03dc0a6` | Wrong SWIFT codes in seeder, 5 banks missing | Full `BillplzPaymentChannelSeeder` rewrite from official docs |
+| `fcbab2f` | Same-day retry blocked by DB unique constraint | `disburseManual()` cleans `failed`/`refunded` records before retry |
+| `fb0a6da` | Payout button dead — no network request | Browser silently blocking `confirm()` → replaced with inline 2-click amber confirm pattern |
+| `86c446a` | Orders reappear in pending balance after payout | Flawed `disbursements.created_at >= orders.updated_at` timestamp join → 30-day window instead |
+| `78d69b3` | "Reference ID already taken" on retry | BillPlz permanently holds reference_ids → added `HHmmss` to `manual-YmdHis-type-id` batch_ref |
+
+### Architecture Notes — DisbursementService
+- **Pending balance query**: `whereNotExists` with 30-day window on `processing`/`completed` disbursements
+- **Manual batch_ref**: `manual-YmdHis-vendor-3` (timestamp in seconds, unique per attempt)
+- **Weekly batch_ref**: `week-2026-26-vendor-3` (date-week, idempotent per week)
+- **Retry safety**: failed/refunded records auto-deleted before new attempt; processing records block new attempts via pending balance = 0
+- **Double-pay protection**: `processing` status blocks pending balance → no second payout possible while first is in flight
+
+### Still Pending
+1. Set `DUMMYBANKVERIFIED` on staging vendor/rider for sandbox E2E test
+2. Configure PO callback URL on BillPlz sandbox PO collection
+3. Verify webhook fires and local status flips `processing` → `completed`
+4. On production: use real SWIFT codes (corrected in seeder) + real vendor/rider bank details
+
+---
+
+## Jun 27, 2026 — FIUU DuitNow QR Integration (COMPLETE + Security Hardened)
+
+### Branch
+`feature/push-notification` — committed (`fe86ee4`) + pushed to `origin/feature/push-notification` (preprod)
+
+### What Was Built
+Full FIUU DuitNow QR payment gateway integration — replaces BillPlz as the **customer checkout gateway** (BillPlz kept for rider/vendor disbursements only).
+
+#### New Files
+| File | Purpose |
+|---|---|
+| `app/Services/Fiuu/FiuuService.php` | Core FIUU service — vcode, skey, `normalizePayload()`, `buildPaymentParams()`, `getPaymentUrl()` |
+| `app/Http/Controllers/Webhooks/FiuuWebhookController.php` | `notify()` (webhook), `redirect()` (return URL), `cancel()` (cancel URL) |
+| `resources/views/customer/payment/fiuu-redirect.blade.php` | Auto-submit hidden form page — "Redirecting to DuitNow QR…" |
+| `app/Console/Commands/ExpirePendingPayments.php` | Expire orders stuck in `pending_payment` for >30 min; schedule: every 15 min |
+
+#### Modified Files
+| File | What Changed |
+|---|---|
+| `config/services.php` | Added `fiuu` config block (merchant_id, verify_key, secret_key, env, channel) |
+| `app/Http/Middleware/VerifyCsrfToken.php` | Added `webhooks/fiuu` to `$except` |
+| `routes/web.php` | FIUU webhook route + customer auth group: launch, return, cancel |
+| `app/Http/Controllers/Customer/PaymentController.php` | `fiuuLaunch()` + `pending()` now checks `from_fiuu_redirect` |
+| `app/Http/Controllers/Customer/OrderController.php` | `placeOrder()` + `placeFromChatContext()` route to FIUU/BillPlz based on `FIUU_ENABLED` flag |
+| `resources/views/customer/checkout.blade.php` | Payment method pills (DuitNow QR default / FPX Online Banking) + hidden input |
+| `app/Console/Kernel.php` | `payments:expire-pending` every 15 min |
+
+### Critical Architecture Notes
+
+#### FIUU field naming — two conventions
+FIUU's API has legacy field names (`amount`, `tranID`, `orderid`, `status`, `domain`) used in the skey formula, AND new API names (`TxnAmount`, `TransactionID`, `ReferenceNo`, `TxnStatus`, `MerchantID`). **Always call `$fiuuService->normalizePayload($request->all())` first** in every handler — maps both to legacy names. Signature formula and amount check use normalised keys.
+
+#### skey formula
+```
+pre_skey = md5(tranID + orderid + status + domain + amount + currency)
+skey     = md5(paydate + domain + pre_skey + appcode + secret_key)
+```
+- `hash_equals()` used for timing-safe comparison ✅
+- Paydate freshness check: reject if >300 seconds old (anti-replay) ✅
+
+#### vcode formula (request)
+```
+vcode = md5(amount + merchantID + orderid + verify_key)
+```
+
+#### Order reference
+`ONDW-{orderId}` (max 40 chars, alphanumeric). Parse back with `FiuuService::parseOrderId()`.
+
+#### Status codes
+- `00` = success → settle
+- `11` = failed → cancel
+- `22` = pending (bank processing) → hold, wait for another notify
+
+#### Payment flow
+```
+Checkout → placeOrder() → createFiuuPaymentForOrder()
+  → stores params in session("fiuu_params.{orderId}")
+  → creates PaymentTransaction (provider='fiuu', status='pending')
+  → redirects to /customer/payment/fiuu/pay/{orderId}
+→ fiuuLaunch() → pulls session params (one-time pull, deleted) → renders auto-submit form
+→ Customer browser POSTs to FIUU hosted page
+→ FIUU fires notify() → verifies skey + paydate → checks idempotency → DB::transaction + lockForUpdate → settles order → fires OrderPlaced
+→ Customer browser returns to redirect() → if settled, go to conversation; else pending screen
+```
+
+#### Cancel flows
+- **Customer cancels on FIUU page** → `cancel()` → marks order `cancelled`, transaction `failed/customer_cancelled`
+- **Customer manual cancel** → `OrderController::cancel()` — now accepts `pending_payment` status, marks transaction `failed/customer_cancelled`
+- **Auto-expiry** → `ExpirePendingPayments` artisan command every 15 min — marks transaction `expired/session_timeout`, order `cancelled`
+
+### .env Variables Required (Hakim adds manually to preprod/prod)
+```
+FIUU_MERCHANT_ID=
+FIUU_VERIFY_KEY=
+FIUU_SECRET_KEY=
+FIUU_ENV=sandbox
+FIUU_ENABLED=true
+FIUU_CHANNEL=DQR
+```
+After adding: `php artisan config:cache && php artisan route:cache`
+
+### Davai 🧪 Test Findings — 9 Bugs Found, 3 Critical Fixed
+
+| Bug | Severity | Status | Description |
+|---|---|---|---|
+| BUG-01 | High | ✅ Fixed | `verifyCallbackSignature` used `$payload['amount']` but FIUU sends `TxnAmount` → fixed by `normalizePayload()` |
+| BUG-09 | Medium | ✅ Fixed | `PaymentController::pending()` only checked `from_billplz_redirect`, not `from_fiuu_redirect` |
+| BUG-05 | Medium | ✅ Fixed | `placeFromChatContext()` always called `createBillForOrder()`, bypassing FIUU routing |
+| BUG-02 | Low | Open | Session expiry UX gap on cancel URL when no orderid |
+| BUG-03 | Low | Open | Session expiry UX gap on return URL when no orderid |
+| BUG-06 | Medium | Open | `ExpirePendingPayments` may cancel status-22 in-flight transactions |
+
+### Reza 🔐 Security Audit — All Mediums Fixed
+
+| ID | Severity | Status | Finding |
+|---|---|---|---|
+| SEC-01 | Medium | ✅ Fixed | Full raw payload logged on unknown orderid — now logs only orderid/status/tranID |
+| SEC-02 | Medium | ✅ Fixed | No paydate freshness check — added 300s window, rejects stale callbacks |
+| SEC-03 | Low | Open | No payload size cap (mitigated by shared hosting php.ini) |
+| SEC-04 | Low | ✅ Fixed | `payment_method` not in validation allowlist — added `Rule::in(['fiuu','billplz'])` |
+| SEC-05 | Info | N/A | MD5 used per FIUU spec — cannot change |
+
+**Security properties verified green:**
+- Keys env-only, never hardcoded ✅
+- Amount server-computed, never from browser ✅
+- `hash_equals()` for timing-safe signature comparison ✅
+- DB transaction + `lockForUpdate()` on settlement ✅
+- Idempotency guard prevents double-settlement ✅
+- Webhook always returns HTTP 200 ✅
+- CSRF exemption scoped to webhook only ✅
+- IDOR: `firstOrFail()` scoped to `customer_id` on all routes ✅
+
+### New Staff
+- **Davai 🧪** — Software Tester. Tests end-to-end flows, reports bugs with root cause. Onboarded Jun 27.
+- **Zara ⚡🎛️** — already on staff (confirmed earlier)
+
+### Still Pending Before Going Live
+1. Hakim adds FIUU `.env` vars to preprod server
+2. Run `php artisan config:cache && php artisan route:cache` on preprod
+3. E2E sandbox test: checkout → DuitNow QR → webhook → conversation (Davai task)
+4. Set `FIUU_ENV=production` + real credentials when going live
+5. Later: remove payment method selector from checkout, hardcode FIUU only
+6. CEO confirmation: "Terima Order" call button — rider or customer?
+
+---
+
+## Jul 4–5, 2026 — PERKESO + FIUU + Session Fix
+
+### PERKESO ensureRiderRegistered() — Multiple Bugs Fixed ✅
+- `checkUser` response: `status:"success"` means API call worked, NOT that user is registered. Real answer in `data.result`
+- Registered result string is `"REGISTERED_USER"` (not `"USER_REGISTERED"`) — confirmed from real API response
+- `"already been registered"` fail from registerUser → treat as registered, update flag, proceed
+- All deduction paths covered: admin raw form has its own `checkRegistration()` method that uses same logic
+
+### ic_type Selector — Added to All Rider Entry Points ✅ (commit e6c35e3)
+- `register.blade.php`, `google-complete.blade.php`, `profile/edit.blade.php`
+- `RegisteredUserController`, `GoogleAuthController`, `ProfileUpdateRequest`, `ProfileController`
+- Mapping: `mykad/mykid → 'B'`, `passport → 'PR'` (PERKESO API format)
+
+### Non-Blocking PERKESO on Deliver — `app()->terminating()` Applied ✅
+- PERKESO deduction moved out of synchronous deliver() path
+- `app()->terminating(fn() => ...)` — Laravel fires AFTER `$response->send()` flushes to rider's browser
+- Rider sees "Delivered" immediately; PERKESO HTTP calls happen in background
+- No queue worker needed — works on Hostinger shared hosting
+
+### FIUU Post-Payment Logout Bug — Fixed ✅ (tested on preprod)
+- Root cause: FIUU redirects customer back via POST form → SameSite=Lax blocks session cookie → `auth()->user()` null
+- Fix: `SESSION_SAME_SITE=none` + `SESSION_SECURE_COOKIE=true` in .env
+- `config/session.php` now env-driven: `env('SESSION_SAME_SITE', 'lax')`
+- BillPlz not affected (uses GET redirect — Lax allows cookies on GET)
+- **Prod .env reminder**: add `SESSION_SAME_SITE=none` + `SESSION_SECURE_COOKIE=true`
+
+### FIUU Refund isQueued Fix ✅
+- `initiateRefund()` wrongly returned `success=true` when FIUU served an HTML 404 page (HTTP 200)
+- Fix: `$isQueued = $response->successful() && !$hasError && $response->json() !== null`
+
+---
+
+## Jul 6, 2026 — Pickup Feature Architecture Analysis (00:00–01:00 MYT)
+
+### Context
+Miyamura wants pickup order type alongside delivery. Team (Hana/Sora/Mira) did parallel codebase audit. Full analysis produced — no code written yet, planning only.
+
+### Proposed Flows
+- **Delivery** (existing): `Customer → payment → Rider accepts → Vendor prepares → Rider delivers → Customer`
+- **Pickup** (new): `Customer → payment → Vendor prepares → Customer collects` (no rider)
+
+---
+
+### Confirmed Breakpoints
+
+#### 🔴 Critical — Hard Failures
+
+**1. No `order_type` column** — zero migration, zero model field. Everything else depends on this.
+- Fix: `ALTER TABLE orders ADD order_type ENUM('delivery','pickup') DEFAULT 'delivery'`
+
+**2. `delivery_location` fields are `required` + `NOT NULL`**
+- `app/Http/Controllers/Customer/OrderController.php` lines 109–124
+- Will 422 on every pickup order placement.
+- Fix: nullable migration + `required_if:order_type,delivery` validation
+
+**3. Status machine has no pickup path**
+- `app/Services/OrderStatusService.php` lines 24–57
+- Current: `pending → rider_accepted → accepted → preparing → ready_for_pickup → on_delivery → delivered`
+- Pickup needs: `pending → accepted (vendor direct) → preparing → ready_for_pickup → collected`
+
+**4. Vendor portal blind to pickup orders**
+- `Vendor/OrderController::accept()` guards on `status !== 'rider_accepted'`
+- `$vendorRelevantStatuses` starts at `rider_accepted` — pickup `pending` orders invisible
+
+**5. Rider push notifications fire for pickup orders**
+- `SendOrderNotifications` — no order_type guard; all riders notified
+
+**6. Rider available pool shows pickup orders**
+- `Rider/OrderController::available()` — no `order_type` filter; pickup appears in rider queue
+
+#### 🟡 Medium — New Flow Needed
+**7. Pickup confirmation** — no endpoint exists. Simplest: vendor "Mark Collected" button. Alt: QR/PIN.
+
+#### 🟢 Safe — No Changes
+| Area | Why |
+|---|---|
+| PERKESO | `if ($order->rider)` guard; pickup never reaches deliver() |
+| Disbursements | delivery_fee = 0, no rider → auto-excluded |
+| Payment gateway | Just pass delivery_fee = 0 — gateway charges correctly |
+| Delivery chat | null rider_id in meta is benign |
+
+---
+
+### Recommended Build Order (When Ready to Implement)
+
+```
+1 ↓ Migration — add order_type ENUM('delivery','pickup') DEFAULT 'delivery'
+2 ↓ Make delivery_location_* nullable + conditional validation
+3 ↓ Status machine — add pickup transition path in OrderStatusService
+4 ↓ Vendor portal — accept 'pending' pickup orders; add to vendorRelevantStatuses
+5 ↓ Rider notification guard — skip OrderPlaced blast for pickup
+6 ↓ Rider available pool — exclude pickup from query
+7 ↓ Pickup confirmation endpoint — vendor "Mark Collected" button (simplest)
+8 ↓ Checkout UI — order type toggle, conditional delivery section, fee logic
+9 ↓ Customer order show — pickup progress steps + hide rider panel
+10 ↓ Vendor/admin views — conditional copy, hide rider card for pickup
+```
+
+Steps 1–6 = system skeleton (orders flow end to end). Steps 7–10 = UX layer.
+
+---
+
+### Sunmi Companion App — ON HOLD
+- Plan: Android `.apk` — polls print queue API, auto-accepts, prints via Sunmi AIDL SDK
+- Components: BootReceiver, PrinterService, SunmiPrinterHelper, MainActivity
+- **Status**: ON HOLD until Aiman's Sunmi device arrives. Will revisit once in hand.
+
+---
+
+## Outstanding Tasks (as of Jul 6, 2026)
+
+### Pre-Launch Must-Do
+1. ⬜ FIUU refund ONDW-158 — stuck at `refund_pending`; FIUU sandbox won't send callback. Manual DB reset → `captured`, retry on prod
+2. ⬜ `verifyRefundNotifySignature()` — confirm formula when real prod callback arrives
+3. ⬜ Attachment image bug — remove `Content-Length` in `ConversationAttachmentController::show()`
+4. ⬜ Proof modal drawer — pull preprod + test on mobile
+5. ⬜ End-to-end preprod test (full order flow: checkout → payment → rider pickup GPS → deliver proof → PERKESO)
+6. ⬜ Email BillPlz for e-wallet activation (SSM + KYC docs)
+7. ⬜ Run `billplz:sync-fpx-banks` on preprod/prod
+8. ⬜ Test payout flow end-to-end on preprod
+9. ⬜ Legacy data migration on prod at launch
+10. ⬜ CEO confirmation: "Terima Order" call button — rider or customer?
+11. ⬜ Ask Aiman: KK distances (KM) + ETA (minutes) for rider available orders page
+12. ⬜ Chat order UI improvement (Hakim not satisfied with current design)
+13. ⬜ Merge `feature/push-notification` → `main`
+
+### New Features (Planned)
+14. ⬜ Pickup feature — analysis done, 10-step build plan above
+15. ⬜ Sunmi companion app — ON HOLD until device arrives
+
+### Prod .env Checklist (before going live)
+```
+SESSION_SAME_SITE=none
+SESSION_SECURE_COOKIE=true
+PERKESO_ENV=production
+PERKESO_SECTOR_CODE=G
+PERKESO_EMPLOYER_NAME=ONDW
+PERKESO_EMPLOYER_CODE=
+PERKESO_TOKEN=
+PERKESO_CLIENT_ID=
+PERKESO_CLIENT_SECRET=
+FIUU_ENV=production
+FIUU_MERCHANT_ID=
+FIUU_VERIFY_KEY=
+FIUU_SECRET_KEY=
+FIUU_CHANNEL=RPP_DuitNowQR
+php artisan migrate
+php artisan db:seed --class=DeliveryLocationsSeeder
+php artisan db:seed --class=BillplzPaymentChannelSeeder
+php artisan config:cache
+php artisan route:cache
+```
+
+---
+
+## Jul 12, 2026 — Pickup Feature COMPLETE + Reports/Fees Fixed
+
+### Branch: `feature/push-notification` — 9 commits pushed, latest: `ad755f3`
+
+### What Was Built & Fixed (9 commits)
+
+**Root cause of "same bug three rounds in a row":**
+1. `resources/js/delivery-conversation-realtime.js` is Vite-compiled → `public/build/assets/app-*.js`. The committed bundle was 10 days stale (built Jul 2) — pickup JS was never in the deployed bundle. All JS fixes for chat were committing to source but never reaching the browser.
+2. `public/build` is git-tracked. Preprod has no Node.js. ANY edit to `resources/js/*` MUST be followed by `npm run build` locally + commit the new bundle + push. MANDATORY RULE from this session forward.
+3. JS assets in vendor blade had no cache-busting — PWA kept serving old pre-pickup JS forever. Fixed with `?v={filemtime()}`.
+
+**Commit `0cad105`** — Vendor polling: `VendorOrderController::getOrdersStatusUpdates()` was including ALL terminal orders from last 24h in `other` payload. Now: terminal orders only sent if `updated_at >= now()->subMinutes(10)` (JS needs one terminal event to remove the card, then they drop off). Added `sweepStaleCards()` to remove rendered cards absent from both lists.
+
+**Commit `7d32c5c`** — Rebuilt Vite bundle (10-day stale). `DeliveryChatService::statusPillFor/statusLabelFor` made pickup-aware — polling was overwriting the blade-rendered pill with "Waiting for rider" on every tick.
+
+**Commit `c5722b6`** — Vendor history/stats/earnings: `whereIn(['delivered','collected'])` for all revenue/completed queries; "Dipungut" green label; blank location → "Ambil sendiri"; Pickup badge on server-rendered cards; stat cards renamed "Delivered" → "Completed".
+
+**Commit `7c9404b`** — `DisbursementService::pendingBalances()`: `where('status','delivered')` → `whereIn('status', ['delivered','collected'])`. Vendors were silently never getting paid for pickup orders via BillPlz disbursement.
+
+**Commit `c13f64d`** — Customer/Rider/Admin reports: collected in all completed counts; rider feeds sealed from pickup (`order_type=delivery`); customer history card "Waiting for rider" → "Pickup" badge; admin cancel guard fixed (collected is terminal now); `OrderController@repeatLast` now includes collected.
+
+**Commit `3f090d8`** — Platform fee display fixed. `MoneyHelper::platformFeeSen()` is TIERED (RM 0.50 → RM 1.80+, not flat RM 1.00). Old blades had hardcoded `+ 1` or omitted fee. Fixed: order detail, list card, payment pending, checkout initial paint. Fee is NEVER stored in DB — always computed at display time.
+
+**Commit `c505ca5`** — Chat: confirmation message pickup-aware ("Self pickup at the stall."); "Collect my order" button moved above chat composer (matches rider pattern, `data-pickup-collect-section` + `data-pickup-trigger` attributes unchanged so polling JS works without Vite rebuild); pickup drawer converted to AJAX with photo compression (mirrors rider drawer: fetch + FormData + AbortController 45s timeout + `ondwCompressImage`). `collect()` returns JSON when `expectsJson()`.
+
+**Commit `285ea3e`** — Chat receipt: "Platform support" fee row added (tiered); `DeliveryChatService::conversationPayload()` `total_amount_formatted` now includes tiered fee so JS polling can't regress the header. Label unified to **"Platform support"** (exact checkout.blade.php label) across all customer-facing breakdowns.
+
+**Commit `ad755f3`** — About page: "RM1 system fee" → "RM0.50+ platform support, from"; count-up JS made decimal-safe (was `parseInt`, now `parseFloat` with `toFixed(decimals)`).
+
+### Architecture Decisions — Locked
+- `MessageAttachment.attachment_type` = computed accessor (NOT DB column). `uploaded_by_user_id` IS DB NOT NULL — must always be set on `attachments()->create()`.
+- Platform fee: NEVER stored in DB. `MoneyHelper::platformFeeRm($total)` at display time, `MoneyHelper::platformFeeSen($total)` at charge time. Never hardcode RM 1.00.
+- `DeliveryChatService::ensureForOrder()` (not `forOrder()`) must be used in `collect()` — creates conversation + guarantees customer is a participant so `sendMessage()` doesn't 403.
+- Vendor disbursement: `whereIn('status', ['delivered', 'collected'])` — both terminal types paid out.
+
+### Updated Outstanding Tasks (as of Jul 12, 2026)
+1. ⬜ FIUU refund ONDW-158 — stuck at refund_pending; manually reset DB + retry on prod
+2. ⬜ Chat order UI improvement — Hakim wants polish (future session)
+3. ⬜ Attachment image bug — remove `Content-Length` from `ConversationAttachmentController::show()`
+4. ⬜ End-to-end preprod test: checkout → payment → pickup flow end-to-end
+5. ⬜ Clear test order data from PROD
+6. ⬜ Email BillPlz for e-wallet activation (SSM + KYC docs)
+7. ⬜ Run `billplz:sync-fpx-banks` on preprod/prod
+8. ⬜ Test payout flow end-to-end on preprod
+9. ⬜ Legacy data migration on prod at launch
+10. ⬜ CEO confirmation: "Terima Order" call button — rider or customer?
+11. ⬜ Ask Aiman: KK distances + ETA for rider available orders page
+12. ⬜ Merge `feature/push-notification` → `main`
+13. ⬜ Sunmi companion app — ON HOLD until Aiman's device arrives
