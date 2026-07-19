@@ -1,163 +1,173 @@
 # ☁️ ONDW — Cloudflare R2 Storage Migration Plan
 *PT mode · Created: Thu Jul 16, 2026 · Last updated: Sun Jul 19, 2026*
-*Status: **PHASE 1–4 CODE COMPLETE** — branch `feature/s3-r2-storage` pushed, 7 commits*
-*Waiting on: Hakim to add R2/AWS S3 credentials to `.env` for testing (Phase 5)*
+*Status: **ALL CODE COMPLETE — 12 commits on `feature/s3-r2-storage`***
+*Waiting on: Hakim to create AWS S3 test buckets + fill `.env` credentials*
+
+---
+
+## Project Domains
+- **Production**: `ondewei.my`
+- **Preprod**: `preprod.ondewei.my`
+- **CDN (public files)**: `assets.ondewei.my` → CNAME to `ondewei-public` R2 bucket (prod only)
 
 ---
 
 ## Decision Summary
-Migrate ONDW from Hostinger local disk → **Cloudflare R2** (not AWS S3).
-- Same `flysystem-aws-s3-v3` Laravel driver — zero code difference
+Migrate ONDW from Hostinger local disk → **Cloudflare R2** (S3-compatible, cheapest at scale).
+- Same `flysystem-aws-s3-v3` Laravel driver — zero code difference between AWS S3 and R2
 - R2 free tier: 10GB + unlimited egress = **RM 0/month permanently**
-- Custom domain `assets.ondw.my` masks R2 URLs for public files
-- PHP proxy pattern for private files (rider docs, chat attachments) — no signed URL expiry risk
+- **Two separate buckets** — `ondewei-public` (CDN) and `ondewei-private` (PHP proxy only)
+- Public files (menu photos, avatars): served via `301 → assets.ondewei.my` CDN — ONDW server CPU = 0
+- Private files (rider docs, proofs, attachments): served via Laravel PHP proxy — client never sees R2 URL
+- PHP proxy chosen over signed URLs (Reddit rule #5): no expiry = no broken links, auth re-checked every request
 - Full architectural rationale: `decisions/decision-log.md`
 
 ---
 
-## File Inventory (9 touch points)
+## Two-Bucket Architecture (CRITICAL)
 
-| Controller | Folder | Disk | Sensitivity | Action |
+| Bucket | Disk | Contents | Access | Custom Domain |
 |---|---|---|---|---|
-| MenuItemController | `menu-items/` | public → r2-public | None | Switch disk + fix image_url (see Phase 1) |
-| ProfileController | `avatars/` | public → r2-public | Low | Switch disk |
-| GoogleAuthController (avatar) | `avatars/` | public → r2-public | Low | Switch disk |
-| GoogleAuthController (rider docs) | `rider_documents/{id}/` | private → r2-private | High PII | Switch disk + PHP proxy |
-| Rider/ProfileDocumentController | `rider_documents/{id}/` | private → r2-private | High PII | Switch disk + PHP proxy |
-| RegisteredUserController | `rider_documents/{id}/` | private → r2-private | High PII | Switch disk + PHP proxy |
-| Rider/OrderController | delivery proofs | unknown → confirm first | Medium | Confirm disk, then switch |
-| Customer/OrderController | `pickup-proofs/` | public → r2-private | Medium | Switch to private + serve via controller |
-| DeliveryConversationController | `conversation_attachments/{id}/` | local → r2-private | Medium-high | Switch disk, keep PHP proxy |
+| `ondewei-public` | `r2` | menu-items/, avatars/ | Public CDN | `assets.ondewei.my` ✅ |
+| `ondewei-private` | `r2-private` | rider_documents/, delivery_proofs/, pickup-proofs/, conversation_attachments/ | PHP proxy only | ❌ NEVER |
+
+⚠️ **Why two buckets**: Cloudflare R2 custom domain exposes the ENTIRE bucket. One bucket = rider ICs and delivery proofs accessible at guessable `assets.ondewei.my/rider_documents/1/ic.pdf`.
 
 ---
 
-## Phase 1 — Prerequisites ✅ ALL DONE (commit f666f38, 1008e84, ff36a06)
+## Bucket Folder Structure (in each bucket, under `{APP_ENV}/` root prefix)
 
-- [x] **Fix pickup-proofs auth gap** — NEW `storage.pickup-proof` route added to `routes/web.php` (auth-gated: customer+admin only). Disk changed to `r2-private`.
-- [x] **Fix `MenuItem.image_url` stores full URL** — `MenuItemController` now saves `$imagePath` (relative). Backfill migration `2026_07_19_000001_backfill_menu_items_image_url_to_relative_path.php` converts old `/storage/...` rows.
-- [x] **Fix rider doc route — hardcoded `storage_path()`** — updated to buffered `r2-private->get()` with local fallback. Hostinger LiteSpeed QUIC compat: buffered not streamed.
-- [x] **Add rate limits** — `PATCH /profile` (10/min), `POST /auth/google/complete` (3/min), `POST /rider/orders/{id}/deliver` (10/min) all added.
-- [x] **Install flysystem package** — `league/flysystem-aws-s3-v3 ^3.0` installed (commit 1c9e68d).
-- [x] **Confirm delivery proof disk** — was `'public'`, now `'r2-private'`. DB `disk` column in `message_attachments` also updated to `'r2-private'` for both delivery and pickup proofs.
-
----
-
-## Phase 2 — Cloudflare R2 Setup (code done ✅ — waiting on Hakim to create accounts)
-
-Code: `config/filesystems.php` has `r2` + `r2-private` disks configured. `.env.example` has all R2_ vars.
-
-**Testing path (AWS S3 — Hakim has personal account):**
-1. AWS Console → S3 → Create bucket (e.g. `ondw-test`, region `ap-southeast-1`)
-2. IAM → Create user → `AmazonS3FullAccess` → get access key + secret
-3. Add to `.env`: `R2_ACCESS_KEY=`, `R2_SECRET_KEY=`, `R2_BUCKET=ondw-test`, `R2_ENDPOINT=` (blank), `R2_REGION=ap-southeast-1`, `R2_URL=https://ondw-test.s3.ap-southeast-1.amazonaws.com`
-
-**Production path (Cloudflare R2 — account not created yet):**
-- [ ] Create Cloudflare account
-- [ ] R2 → Create bucket: `ondw-assets`
-- [ ] Manage R2 API Tokens → Create token (Object Read & Write)
-- [ ] Get Account ID → `R2_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com`
-- [ ] R2 bucket → Custom Domains → add `assets.ondw.my`
-- [ ] Update `.env`: `R2_ACCESS_KEY=`, `R2_SECRET_KEY=`, `R2_BUCKET=ondw-assets`, `R2_ENDPOINT=https://...`, `R2_URL=https://assets.ondw.my`, `R2_REGION=auto`
-
-**`.env` keys to add:**
 ```
-R2_ACCESS_KEY=
-R2_SECRET_KEY=
-R2_BUCKET=ondw-assets
+ondewei-public/
+└── production/
+    ├── menu-items/{uuid}.webp       ← one per menu item
+    └── avatars/{uuid}.jpg           ← one per user
+
+ondewei-private/
+└── production/
+    ├── rider_documents/{rider_id}/  ← IC, matric, licence, roadtax, vehicle photo
+    ├── delivery_proofs/{order_id}/  ← rider captured at delivery
+    ├── pickup-proofs/{order_id}/    ← customer captured at pickup collection
+    └── conversation_attachments/{conversation_id}/
+```
+
+`APP_ENV` root prefix: local dev → `local/...`, production → `production/...`. Prevents test file pollution in same bucket. Applied transparently by Flysystem — app code never writes the prefix manually.
+
+---
+
+## Phase 1 — Prerequisites ✅ ALL DONE
+
+- [x] Install `league/flysystem-aws-s3-v3 ^3.0` (commit 1c9e68d)
+- [x] Fix `MenuItem.image_url` stored full URL → now stores relative path. Backfill migration added.
+- [x] Fix pickup-proofs auth gap → `storage.pickup-proof` route added (customer+admin only)
+- [x] Fix rider doc route hardcoded `storage_path()` → buffered R2 proxy with local fallback
+- [x] Add rate limits — PATCH /profile (10/min), POST /auth/google/complete (3/min), POST /rider/orders/{id}/deliver (10/min)
+- [x] Confirm delivery proof disk — was public, now r2-private
+
+---
+
+## Phase 2 — Storage Config ✅ DONE (commits 50b537a, e11467c)
+
+`config/filesystems.php` has both disks. `.env.example` has all vars.
+
+**`.env` values to fill (testing on personal AWS S3):**
+```
+R2_ACCESS_KEY=<IAM key>
+R2_SECRET_KEY=<IAM secret>
+R2_ENDPOINT=                                   ← blank for AWS S3
+R2_REGION=ap-southeast-1                       ← AWS Singapore region
+R2_PUBLIC_BUCKET=ondewei-test-public           ← create this S3 bucket
+R2_PUBLIC_URL=https://ondewei-test-public.s3.ap-southeast-1.amazonaws.com
+R2_PRIVATE_BUCKET=ondewei-test-private         ← create this S3 bucket
+```
+
+**`.env` values for production (Cloudflare R2):**
+```
+R2_ACCESS_KEY=<R2 API token key>
+R2_SECRET_KEY=<R2 API token secret>
 R2_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com
-R2_URL=https://assets.ondw.my
 R2_REGION=auto
-```
-
-**`config/filesystems.php` — add R2 disk:**
-```php
-'r2' => [
-    'driver'                  => 's3',
-    'key'                     => env('R2_ACCESS_KEY'),
-    'secret'                  => env('R2_SECRET_KEY'),
-    'region'                  => 'auto',
-    'bucket'                  => env('R2_BUCKET'),
-    'url'                     => env('R2_URL'),
-    'endpoint'                => env('R2_ENDPOINT'),
-    'use_path_style_endpoint' => false,
-    'visibility'              => 'public',
-],
-'r2-private' => [
-    // same as r2 but visibility => 'private', no url, no custom domain
-    'driver'   => 's3',
-    'key'      => env('R2_ACCESS_KEY'),
-    'secret'   => env('R2_SECRET_KEY'),
-    'region'   => 'auto',
-    'bucket'   => env('R2_BUCKET'),
-    'endpoint' => env('R2_ENDPOINT'),
-    'use_path_style_endpoint' => false,
-    'visibility' => 'private',
-],
+R2_PUBLIC_BUCKET=ondewei-public
+R2_PUBLIC_URL=https://assets.ondewei.my
+R2_PRIVATE_BUCKET=ondewei-private
 ```
 
 ---
 
-## Phase 3 — Code Changes (disk swaps) ✅ ALL DONE (commits ff36a06, 12bf1aa)
+## Phase 3 — Controller Disk Swaps ✅ ALL DONE (commits ff36a06, 12bf1aa)
 
-7 controllers updated. All have dual-disk pattern: try R2 first, fall back to local during migration window.
+All 7 controllers updated. Dual-disk pattern: try R2 first, fall back to local disk during migration window.
 
-- [x] `MenuItemController` → `store('menu-items', 'r2')` + stores relative path (not full URL)
-- [x] `ProfileController` → `store('avatars', 'r2')` + `Storage::disk('r2')->delete()`
-- [x] `GoogleAuthController` avatar → `Storage::disk('r2')->put()`
-- [x] `GoogleAuthController` rider docs → `storeAs('rider_documents/...', 'r2-private')`
-- [x] `Rider/ProfileDocumentController` → `storeAs('rider_documents/...', 'r2-private')` + delete swapped to `r2-private`
-- [x] `RegisteredUserController` → `storeAs('rider_documents/...', 'r2-private')`
-- [x] `Customer/OrderController` pickup proofs → `r2-private` + `'disk' => 'r2-private'` on message_attachments
-- [x] `Rider/OrderController` delivery proofs → `r2-private` + `'disk' => 'r2-private'` on message_attachments
-- [x] `DeliveryConversationController` → `store('conversation_attachments/...', 'r2-private')` + `'disk' => 'r2-private'`
+- [x] MenuItemController → `store('menu-items', 'r2')`, relative path saved to DB
+- [x] ProfileController → `store('avatars', 'r2')` + `Storage::disk('r2')->delete()`
+- [x] GoogleAuthController avatar → `Storage::disk('r2')->put()` with `Str::uuid()` naming
+- [x] GoogleAuthController rider docs → `storeAs('rider_documents/...', 'r2-private')`
+- [x] GoogleAuthController outer catch → `Storage::disk('r2')->delete($avatarPath)` on DB rollback
+- [x] Rider/ProfileDocumentController → `storeAs('rider_documents/...', 'r2-private')`
+- [x] RegisteredUserController → `storeAs('rider_documents/...', 'r2-private')`
+- [x] Customer/OrderController pickup proofs → `store('pickup-proofs/{order_id}', 'r2-private')`
+- [x] Customer/OrderController track() JSON → uses `storage.pickup-proof` route for pickup orders (security fix)
+- [x] Rider/OrderController delivery proofs → `store('delivery_proofs/{order_id}', 'r2-private')`
+- [x] DeliveryConversationController → `store('conversation_attachments/{conv_id}', 'r2-private')`
 
-**Serving routes** (all in `routes/web.php` — buffered responses, NOT streaming):
-- `storage.menu-item` — CDN redirect (301 to R2 URL) for public files; local fallback
-- `storage.avatar` — CDN redirect (301 to R2 URL); local fallback
-- `storage.rider-document` — buffered PHP proxy via `r2-private->get()`; local fallback
-- `storage.delivery-proof` — buffered PHP proxy via `r2-private->get()`; local fallback
-- `storage.pickup-proof` — NEW auth-gated route (customer+admin only); buffered PHP proxy; local fallback
+**Serving routes (routes/web.php — ALL buffered, not streamed — Hostinger LiteSpeed QUIC compat):**
+- `storage.menu-item` — CDN redirect 301 to `assets.ondewei.my/production/menu-items/...`; local fallback
+- `storage.avatar` — CDN redirect 301 to `assets.ondewei.my/production/avatars/...`; local fallback
+- `storage.rider-document` — buffered PHP proxy (admin only); local fallback
+- `storage.delivery-proof` — buffered PHP proxy (customer+vendor+rider+admin); local fallback
+- `storage.pickup-proof` — buffered PHP proxy (customer+admin ONLY); local fallback
 
-**Hostinger note**: All private-file proxy routes use buffered `Storage::disk()->get()` + `response($content, 200, [...])`. Do NOT use `response()->stream()` + `fpassthru()` — LiteSpeed QUIC/HTTP3 drops PHP streaming responses mid-flight.
+**Security bugs fixed during Phase 3 review (Jul 19):**
+- `customer/orders/show.blade.php` line 251: was using `storage.delivery-proof` for pickup orders → vendor could view pickup proof
+- `Customer/OrderController::track()` line 773: same issue in JSON polling API
+- Both fixed: now route to `storage.pickup-proof` when `order_type === 'pickup'`
 
 ---
 
-## Phase 4 — File Migration (existing files on Hostinger) ✅ Command written (commit 12bf1aa) — run pending
+## Phase 4 — File Migration Command ✅ Written (commit 12bf1aa) — run pending
 
-**Artisan command**: `php artisan storage:migrate-to-r2`
-- `--dry-run` flag: lists files without copying
-- `--chunk=50` (default): files per batch
-- `set_time_limit(0)` + `ini_set('memory_limit', '256M')` for Hostinger shared hosting SSH
-- Restart-safe: progress saved in `storage/app/r2-migration-progress.json`
-- Uses `readStream()` + `writeStream()` (memory-efficient, suitable for shared hosting)
+```bash
+php artisan storage:migrate-to-r2 [--dry-run] [--chunk=50]
+```
 
-**6 scopes covered:**
-1. `public/menu-items` → `r2`
-2. `public/avatars` → `r2`
-3. `public/delivery_proofs` → `r2-private`
-4. `public/pickup-proofs` → `r2-private`
-5. `private/rider_documents` → `r2-private`
-6. `local/conversation_attachments` → `r2-private`
+- Restart-safe: progress in `storage/app/r2-migration-progress.json`
+- `set_time_limit(0)` + `ini_set('memory_limit', '256M')` for Hostinger SSH
+- 6 scopes: menu-items, avatars, delivery_proofs, pickup-proofs, rider_documents, conversation_attachments
 
-**Steps to run (after Phase 2 credentials are in .env):**
-- [ ] `php artisan migrate` (runs backfill migration for menu_items.image_url)
-- [ ] `php artisan storage:migrate-to-r2 --dry-run` (verify counts)
-- [ ] `php artisan storage:migrate-to-r2` (actual copy)
-- [ ] Spot-check each file type loads correctly
-- [ ] Full regression test (see checklist below)
+```bash
+php artisan storage:normalise-avatars [--dry-run]
+```
+- Renames old Google-avatar paths (`{username}_{timestamp}.jpg`) to UUID scheme in R2 and updates DB
+- Run AFTER `storage:migrate-to-r2` completes
+- Restart-safe: UUID pattern check skips already-renamed rows
+
+**⚠️ IMPORTANT**: Migration command must be run AFTER credentials are added. Do NOT run migration on a bucket that was previously used without the `root=APP_ENV` config — files would land without the `production/` prefix and `exists()` checks would miss them. If that happens, clear `r2-migration-progress.json` and re-run.
 
 ---
 
 ## Phase 5 — Production Cutover ⬜ Pending (after preprod test passes)
 
-- [ ] Enable maintenance mode: `php artisan down`
-- [ ] Run Artisan migration command on PROD: `php artisan storage:migrate-to-r2`
-- [ ] Run `php artisan migrate` on PROD (backfill)
-- [ ] Verify file counts + spot-check all 6 scopes
-- [ ] Run full regression test (see checklist below)
-- [ ] Lift maintenance mode: `php artisan up`
+**Preprod test steps (on preprod.ondewei.my):**
+1. Fill `.env` on preprod with AWS S3 test credentials (two buckets)
+2. `php artisan config:clear && php artisan cache:clear`
+3. `php artisan migrate` (runs backfill + any pending)
+4. `php artisan storage:migrate-to-r2 --dry-run` → verify counts
+5. `php artisan storage:migrate-to-r2` → actual copy
+6. `php artisan storage:normalise-avatars --dry-run` → check old-scheme avatars
+7. `php artisan storage:normalise-avatars` → rename in R2 + update DB
+8. Full regression test (checklist below)
+
+**Production cutover:**
+- [ ] `php artisan down` (maintenance mode)
+- [ ] Fill `.env` with Cloudflare R2 credentials
+- [ ] `php artisan config:clear`
+- [ ] `php artisan migrate`
+- [ ] `php artisan storage:migrate-to-r2`
+- [ ] `php artisan storage:normalise-avatars`
+- [ ] Spot-check all 6 file types
+- [ ] `php artisan up`
 - [ ] Monitor error logs for 1 hour
-- [ ] Keep Hostinger local files for 30 days then delete (rollback safety)
+- [ ] Keep Hostinger local files 30 days then delete
 - [ ] Merge `feature/s3-r2-storage` → `main`
 
 ---
@@ -165,27 +175,30 @@ R2_REGION=auto
 ## Regression Test Checklist
 
 - [ ] Menu item photo uploads and displays correctly (vendor panel)
-- [ ] Menu item photo updates and old file cleaned from R2
-- [ ] User avatar upload works (profile page)
-- [ ] Google OAuth avatar saves correctly
+- [ ] Menu item photo updates — old R2 file deleted, new file serves via CDN
+- [ ] User avatar upload (profile page) — CDN URL returned
+- [ ] Google OAuth avatar saves correctly + old avatar deleted on profile update
 - [ ] Rider uploads IC + licence docs during registration
-- [ ] Admin can view rider documents (PHP proxy serves correctly)
-- [ ] Delivery proof photo captured and viewable (customer + admin)
-- [ ] Pickup proof photo captured, NOT publicly guessable (auth check works)
+- [ ] Admin can view rider documents (PHP proxy, not raw R2 URL)
+- [ ] Delivery proof captured and viewable by customer + admin
+- [ ] Pickup proof captured, NOT viewable by vendor/rider (auth check: 403)
 - [ ] Chat attachment sends and loads in conversation
-- [ ] Chat attachment served via controller (no direct URL exposed)
-- [ ] ConversationAttachmentController only serves to conversation members
-- [ ] Old Hostinger URLs return 404 (confirm nothing still pointing to /storage/)
+- [ ] Chat attachment: ConversationAttachmentController only serves to conversation members
+- [ ] `assets.ondewei.my` CDN serves files (200 with cache headers)
+- [ ] Old Hostinger `/storage/` URLs return 404 (nothing still pointing there)
+- [ ] `storage.delivery-proof` for a pickup order → must 403 (or be unreachable from UI)
 
 ---
 
 ## Notes
-- Do this AFTER E2E test passes (BillPlz → webhook → order flow)
-- PHP proxy pattern: streams R2 file through Laravel controller — no expiry, same auth model
-- Vendor.profile_picture column exists in DB — check `SELECT COUNT(*) FROM vendors WHERE profile_picture IS NOT NULL` before migrating
-- Post-launch (not blocking): magic byte validation for PDFs, virus scan queue for rider docs
+- PHP proxy beats signed URLs (Hostinger): no expiry, no broken links, auth always enforced
+- `APP_ENV` root prefix is transparent to app code — Flysystem applies it automatically
+- `assets.ondewei.my` CDN must point at bucket ROOT — `production/` is a key prefix inside the bucket
+- Post-launch: magic byte validation for PDFs, virus scan queue for rider docs
+- Vendor.profile_picture: check `SELECT COUNT(*) FROM vendors WHERE profile_picture IS NOT NULL` before prod migration
 
 ---
 
-*Plan authored: Jul 16, 2026 — team review by Reza 🔐, Hana 🌸, Sora ⚡, Davai 🧪*
-*Decision log: `decisions/decision-log.md`*
+*Plan authored: Jul 16, 2026 — full review + security audit Jul 19, 2026*
+*Team: Reza 🔐, Hana 🌸, Sora ⚡, Davai 🧪, Kai 🏗️*
+*12 commits total on branch `feature/s3-r2-storage`*
