@@ -1,5 +1,7 @@
 # ☁️ ONDW — Cloudflare R2 Storage Migration Plan
-*PT mode · Created: Thu Jul 16, 2026 · Status: PENDING — start after FT mode*
+*PT mode · Created: Thu Jul 16, 2026 · Last updated: Sun Jul 19, 2026*
+*Status: **PHASE 1–4 CODE COMPLETE** — branch `feature/s3-r2-storage` pushed, 7 commits*
+*Waiting on: Hakim to add R2/AWS S3 credentials to `.env` for testing (Phase 5)*
 
 ---
 
@@ -29,50 +31,33 @@ Migrate ONDW from Hostinger local disk → **Cloudflare R2** (not AWS S3).
 
 ---
 
-## Phase 1 — Prerequisites (fix these FIRST — bugs regardless of R2)
+## Phase 1 — Prerequisites ✅ ALL DONE (commit f666f38, 1008e84, ff36a06)
 
-These are standalone bugs that need fixing before touching any storage driver.
-
-- [ ] **Fix pickup-proofs auth gap** — currently `public` disk, raw URL guessable by anyone
-  - Move to `local`/`private` + serve via a new controller with `order->customer_id === auth()->id()` check
-  - `Customer/OrderController.php` → change `store('pickup-proofs', 'public')` → `store('pickup-proofs/{orderId}', 'local')`
-  - Add serving route + controller similar to `ConversationAttachmentController`
-
-- [ ] **Fix `MenuItem.image_url` stores full URL, not relative path**
-  - Currently: `Storage::url($imagePath)` → saves `/storage/menu-items/abc.jpg` in DB
-  - All other models store relative path — this is the odd one out
-  - Fix `MenuItemController`: save `$imagePath` directly (relative), resolve URL in blade with `Storage::url()`
-  - Run DB backfill: `UPDATE menu_items SET image_url = REPLACE(image_url, '/storage/', '') WHERE image_url LIKE '/storage/%';`
-
-- [ ] **Fix rider doc route — hardcoded `storage_path()`**
-  - Current serving uses `storage_path('app/private/rider_documents/...')` — direct filesystem string
-  - After migration: no local path exists → 404/error
-  - Fix: replace with `Storage::disk('private')->get($document->file_path)` + buffered response
-
-- [ ] **Add rate limits to 3 upload endpoints**
-  - `PATCH /profile` → `throttle:10,1`
-  - `POST /auth/google/complete` → `throttle:3,1`
-  - `POST /rider/orders/{id}/deliver` → `throttle:10,1`
-  - Add in `routes/web.php` or `app/Http/Middleware`
-
-- [ ] **Install flysystem package**
-  - `composer require league/flysystem-aws-s3-v3 "^3.0"`
-  - Verify it installs on Hostinger without dependency conflicts
-
-- [ ] **Confirm delivery proof disk in `Rider/OrderController`**
-  - Grep for `$proofCompressed->store(` and find the disk argument
-  - Document it before changing anything
+- [x] **Fix pickup-proofs auth gap** — NEW `storage.pickup-proof` route added to `routes/web.php` (auth-gated: customer+admin only). Disk changed to `r2-private`.
+- [x] **Fix `MenuItem.image_url` stores full URL** — `MenuItemController` now saves `$imagePath` (relative). Backfill migration `2026_07_19_000001_backfill_menu_items_image_url_to_relative_path.php` converts old `/storage/...` rows.
+- [x] **Fix rider doc route — hardcoded `storage_path()`** — updated to buffered `r2-private->get()` with local fallback. Hostinger LiteSpeed QUIC compat: buffered not streamed.
+- [x] **Add rate limits** — `PATCH /profile` (10/min), `POST /auth/google/complete` (3/min), `POST /rider/orders/{id}/deliver` (10/min) all added.
+- [x] **Install flysystem package** — `league/flysystem-aws-s3-v3 ^3.0` installed (commit 1c9e68d).
+- [x] **Confirm delivery proof disk** — was `'public'`, now `'r2-private'`. DB `disk` column in `message_attachments` also updated to `'r2-private'` for both delivery and pickup proofs.
 
 ---
 
-## Phase 2 — Cloudflare R2 Setup
+## Phase 2 — Cloudflare R2 Setup (code done ✅ — waiting on Hakim to create accounts)
 
-- [ ] Create Cloudflare account (if not already)
-- [ ] Create R2 bucket: `ondw-assets` (or two buckets: `ondw-public` + `ondw-private`)
-- [ ] Create R2 API token with R2 edit permissions → get `R2_ACCESS_KEY` + `R2_SECRET_KEY`
-- [ ] Get account ID → `R2_ENDPOINT = https://{account_id}.r2.cloudflarestorage.com`
-- [ ] Add custom domain `assets.ondw.my` for public files (in R2 settings → Custom Domains)
-- [ ] Verify Hostinger can connect: run phpinfo(), check `memory_limit`, `max_execution_time`, `open_basedir`
+Code: `config/filesystems.php` has `r2` + `r2-private` disks configured. `.env.example` has all R2_ vars.
+
+**Testing path (AWS S3 — Hakim has personal account):**
+1. AWS Console → S3 → Create bucket (e.g. `ondw-test`, region `ap-southeast-1`)
+2. IAM → Create user → `AmazonS3FullAccess` → get access key + secret
+3. Add to `.env`: `R2_ACCESS_KEY=`, `R2_SECRET_KEY=`, `R2_BUCKET=ondw-test`, `R2_ENDPOINT=` (blank), `R2_REGION=ap-southeast-1`, `R2_URL=https://ondw-test.s3.ap-southeast-1.amazonaws.com`
+
+**Production path (Cloudflare R2 — account not created yet):**
+- [ ] Create Cloudflare account
+- [ ] R2 → Create bucket: `ondw-assets`
+- [ ] Manage R2 API Tokens → Create token (Object Read & Write)
+- [ ] Get Account ID → `R2_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com`
+- [ ] R2 bucket → Custom Domains → add `assets.ondw.my`
+- [ ] Update `.env`: `R2_ACCESS_KEY=`, `R2_SECRET_KEY=`, `R2_BUCKET=ondw-assets`, `R2_ENDPOINT=https://...`, `R2_URL=https://assets.ondw.my`, `R2_REGION=auto`
 
 **`.env` keys to add:**
 ```
@@ -112,44 +97,68 @@ R2_REGION=auto
 
 ---
 
-## Phase 3 — Code Changes (disk swaps)
+## Phase 3 — Code Changes (disk swaps) ✅ ALL DONE (commits ff36a06, 12bf1aa)
 
-After Phase 1 + 2 are confirmed working on preprod:
+7 controllers updated. All have dual-disk pattern: try R2 first, fall back to local during migration window.
 
-- [ ] `MenuItemController` → `store('menu-items', 'r2')`
-- [ ] `ProfileController` → `store('avatars', 'r2')` + `Storage::disk('r2')->delete()`
-- [ ] `GoogleAuthController` avatar → `Storage::disk('r2')->put()`
-- [ ] `GoogleAuthController` rider docs → `storeAs('rider_documents/...', 'r2-private')`
-- [ ] `Rider/ProfileDocumentController` → `storeAs('rider_documents/...', 'r2-private')`
-- [ ] `RegisteredUserController` → `storeAs('rider_documents/...', 'r2-private')`
-- [ ] `Customer/OrderController` pickup proofs → local/r2-private (from Phase 1 fix)
-- [ ] `Rider/OrderController` delivery proofs → `r2` or `r2-private` (confirm in Phase 1)
-- [ ] `DeliveryConversationController` → `store('conversation_attachments/...', 'r2-private')`
+- [x] `MenuItemController` → `store('menu-items', 'r2')` + stores relative path (not full URL)
+- [x] `ProfileController` → `store('avatars', 'r2')` + `Storage::disk('r2')->delete()`
+- [x] `GoogleAuthController` avatar → `Storage::disk('r2')->put()`
+- [x] `GoogleAuthController` rider docs → `storeAs('rider_documents/...', 'r2-private')`
+- [x] `Rider/ProfileDocumentController` → `storeAs('rider_documents/...', 'r2-private')` + delete swapped to `r2-private`
+- [x] `RegisteredUserController` → `storeAs('rider_documents/...', 'r2-private')`
+- [x] `Customer/OrderController` pickup proofs → `r2-private` + `'disk' => 'r2-private'` on message_attachments
+- [x] `Rider/OrderController` delivery proofs → `r2-private` + `'disk' => 'r2-private'` on message_attachments
+- [x] `DeliveryConversationController` → `store('conversation_attachments/...', 'r2-private')` + `'disk' => 'r2-private'`
+
+**Serving routes** (all in `routes/web.php` — buffered responses, NOT streaming):
+- `storage.menu-item` — CDN redirect (301 to R2 URL) for public files; local fallback
+- `storage.avatar` — CDN redirect (301 to R2 URL); local fallback
+- `storage.rider-document` — buffered PHP proxy via `r2-private->get()`; local fallback
+- `storage.delivery-proof` — buffered PHP proxy via `r2-private->get()`; local fallback
+- `storage.pickup-proof` — NEW auth-gated route (customer+admin only); buffered PHP proxy; local fallback
+
+**Hostinger note**: All private-file proxy routes use buffered `Storage::disk()->get()` + `response($content, 200, [...])`. Do NOT use `response()->stream()` + `fpassthru()` — LiteSpeed QUIC/HTTP3 drops PHP streaming responses mid-flight.
 
 ---
 
-## Phase 4 — File Migration (existing files on Hostinger)
+## Phase 4 — File Migration (existing files on Hostinger) ✅ Command written (commit 12bf1aa) — run pending
 
-- [ ] Write Artisan command: `php artisan storage:migrate-to-r2`
-  - Chunked: process 50 files per chunk, write progress to a log file
-  - Restart-safe: track last processed file so re-running skips already-migrated files
-  - Scope: `menu-items/`, `avatars/`, `rider_documents/`, `pickup-proofs/`, `delivery_proofs/`, `conversation_attachments/`
-  - Check: `SELECT COUNT(*), SUM(LENGTH(image_url)) FROM menu_items` first to estimate volume
-- [ ] Run on preprod, verify counts match
+**Artisan command**: `php artisan storage:migrate-to-r2`
+- `--dry-run` flag: lists files without copying
+- `--chunk=50` (default): files per batch
+- `set_time_limit(0)` + `ini_set('memory_limit', '256M')` for Hostinger shared hosting SSH
+- Restart-safe: progress saved in `storage/app/r2-migration-progress.json`
+- Uses `readStream()` + `writeStream()` (memory-efficient, suitable for shared hosting)
+
+**6 scopes covered:**
+1. `public/menu-items` → `r2`
+2. `public/avatars` → `r2`
+3. `public/delivery_proofs` → `r2-private`
+4. `public/pickup-proofs` → `r2-private`
+5. `private/rider_documents` → `r2-private`
+6. `local/conversation_attachments` → `r2-private`
+
+**Steps to run (after Phase 2 credentials are in .env):**
+- [ ] `php artisan migrate` (runs backfill migration for menu_items.image_url)
+- [ ] `php artisan storage:migrate-to-r2 --dry-run` (verify counts)
+- [ ] `php artisan storage:migrate-to-r2` (actual copy)
 - [ ] Spot-check each file type loads correctly
 - [ ] Full regression test (see checklist below)
 
 ---
 
-## Phase 5 — Production Cutover
+## Phase 5 — Production Cutover ⬜ Pending (after preprod test passes)
 
 - [ ] Enable maintenance mode: `php artisan down`
-- [ ] Run Artisan migration command on PROD
-- [ ] Verify file counts + spot-check
-- [ ] Run full regression
+- [ ] Run Artisan migration command on PROD: `php artisan storage:migrate-to-r2`
+- [ ] Run `php artisan migrate` on PROD (backfill)
+- [ ] Verify file counts + spot-check all 6 scopes
+- [ ] Run full regression test (see checklist below)
 - [ ] Lift maintenance mode: `php artisan up`
-- [ ] Monitor for 1 hour — check error logs
-- [ ] Keep Hostinger local files for 30 days before deleting (rollback safety)
+- [ ] Monitor error logs for 1 hour
+- [ ] Keep Hostinger local files for 30 days then delete (rollback safety)
+- [ ] Merge `feature/s3-r2-storage` → `main`
 
 ---
 
