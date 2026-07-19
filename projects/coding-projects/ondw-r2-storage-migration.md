@@ -1,7 +1,7 @@
 # ☁️ ONDW — Cloudflare R2 Storage Migration Plan
-*PT mode · Created: Thu Jul 16, 2026 · Last updated: Sun Jul 19, 2026*
-*Status: **ALL CODE COMPLETE — 12 commits on `feature/s3-r2-storage`***
-*Waiting on: Hakim to create AWS S3 test buckets + fill `.env` credentials*
+*PT mode · Created: Thu Jul 16, 2026 · Last updated: Mon Jul 20, 2026*
+*Status: **PRESIGNED UPLOAD BACKEND COMPLETE — 17 commits on `feature/s3-r2-storage`***
+*Next: Configure R2/S3 bucket CORS, then wire up AJAX proof forms*
 
 ---
 
@@ -91,6 +91,60 @@ R2_PUBLIC_BUCKET=ondewei-public
 R2_PUBLIC_URL=https://assets.ondewei.my
 R2_PRIVATE_BUCKET=ondewei-private
 ```
+
+---
+
+## Phase 3.5 — Presigned Upload Architecture ✅ BACKEND COMPLETE (commits 1632611–26dc336, Jul 20)
+
+### Why presigned uploads
+Files uploaded via Hostinger shared hosting caused "Takes a long time on loading" — every byte goes through Hostinger before reaching R2. Presigned architecture eliminates that:
+```
+Browser → POST /upload/presigned (gets URL+key, <1ms) → PUT file directly to R2 (bypasses Hostinger) → POST form with key string → save key to DB
+```
+
+### What was built (5 commits today)
+| # | File | Change |
+|---|---|---|
+| 1 | `PresignedUploadController` | NEW — POST /upload/presigned, 3 scopes, all Reza P0+P1 security |
+| 2 | `routes/web.php` | Route + throttle:20,1 |
+| 3 | `RiderDocumentUpdateRequest` | rules → accept `*_key` strings |
+| 4 | `Rider/ProfileDocumentController` | loop → read key strings, removed ImageCompression |
+| 5 | `Rider/OrderController` | accept proof_photo OR proof_photo_key |
+| 6 | `Customer/OrderController` | accept pickup_proof_photo OR pickup_proof_photo_key |
+| 7 | `resources/js/presigned-upload.js` | NEW Alpine component (Zara) |
+| 8 | `resources/js/app.js` | import presigned-upload |
+| 9 | `resources/views/profile/edit.blade.php` | x-data + data-presigned-scope on rider doc form |
+| 10 | `resources/css/app.css` | [x-cloak] { display: none } |
+
+### Security controls implemented (Reza P0–P1)
+- P0: Server constructs key from auth identity (never from client)
+- P0: mime_type allowlist per scope (image/jpeg, image/png, application/pdf)
+- P0: Extension from mime_type map, not filename
+- P0: Ownership check for delivery_proof (rider_id match) and pickup_proof (customer_id match)
+- P1: Rate limit 20 req/min, TTL 15 min
+
+### Field naming convention
+- File input `name="ic_document"` → JS uploads → injects `<input type="hidden" name="ic_document_key" value="r2-key">`
+- Controller receives `ic_document_key` string
+- Same pattern: `proof_photo_key`, `pickup_proof_photo_key`
+
+### What's live vs pending
+- ✅ Rider profile document update (profile/edit.blade.php) — fully wired
+- ⬜ Registration form — no auth yet, traditional upload still active
+- ⬜ Delivery proof (conversations/show.blade.php + _rider-proof-modal.blade.php) — AJAX forms, need separate JS integration
+- ⬜ Customer pickup proof (customer/orders/show.blade.php) — AJAX form, need separate JS integration
+
+### CORS required on bucket
+Before presigned PUT works from browser, add CORS rule to R2/S3 private bucket:
+```json
+[{
+  "AllowedHeaders": ["Content-Type"],
+  "AllowedMethods": ["PUT"],
+  "AllowedOrigins": ["https://ondewei.my", "https://preprod.ondewei.my", "http://localhost"],
+  "MaxAgeSeconds": 3000
+}]
+```
+In AWS console: S3 → bucket → Permissions → Cross-origin resource sharing → Edit
 
 ---
 
