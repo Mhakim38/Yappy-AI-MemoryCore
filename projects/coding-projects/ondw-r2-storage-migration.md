@@ -134,17 +134,26 @@ Browser → POST /upload/presigned (gets URL+key, <1ms) → PUT file directly to
 - ⬜ Delivery proof (conversations/show.blade.php + _rider-proof-modal.blade.php) — AJAX forms, need separate JS integration
 - ⬜ Customer pickup proof (customer/orders/show.blade.php) — AJAX form, need separate JS integration
 
-### CORS required on bucket
-Before presigned PUT works from browser, add CORS rule to R2/S3 private bucket:
+### CORS on bucket — STATUS
+- [x] AWS S3 `ondewei-test-private` — CORS added for `http://localhost` ✅ (confirmed working Jul 20)
+- [ ] Cloudflare R2 `ondewei-private` — **MUST add CORS when R2 is set up** (see reminder below)
+
+### ⚠️ REMINDER — When setting up Cloudflare R2 `ondewei-private`:
+Add this CORS rule BEFORE deploying presigned uploads to preprod/prod.
+R2 dashboard → `ondewei-private` bucket → Settings → CORS policy:
 ```json
 [{
   "AllowedHeaders": ["Content-Type"],
   "AllowedMethods": ["PUT"],
-  "AllowedOrigins": ["https://ondewei.my", "https://preprod.ondewei.my", "http://localhost"],
+  "AllowedOrigins": [
+    "https://ondewei.my",
+    "https://preprod.ondewei.my"
+  ],
   "MaxAgeSeconds": 3000
 }]
 ```
-In AWS console: S3 → bucket → Permissions → Cross-origin resource sharing → Edit
+**Do NOT add localhost here** — prod/preprod only. localhost uses AWS S3 test bucket (separate CORS).
+If you forget this, presigned PUT uploads will be blocked by CORS in browser and riders/customers get silent errors.
 
 ---
 
@@ -199,10 +208,50 @@ php artisan storage:normalise-avatars [--dry-run]
 
 ---
 
+## Phase 4.5 — Cloudflare R2 Setup ⬜ NOT STARTED (do before production cutover)
+
+**Status (Jul 20):** AWS S3 test buckets working locally. R2 not set up yet.
+
+**R2 setup checklist (one-time, do when ready for preprod):**
+1. [ ] Create Cloudflare account (or use existing)
+2. [ ] Go to R2 → Create bucket → `ondewei-public` (leave Block Public Access OFF for CDN)
+3. [ ] Go to R2 → Create bucket → `ondewei-private` (Block Public Access: ON — no custom domain EVER)
+4. [ ] R2 → Manage API tokens → Create token (Object Read & Write) — copy key + secret
+5. [ ] `ondewei-public` → Settings → Custom domain → Add `assets.ondewei.my`
+   - This creates a Cloudflare DNS CNAME automatically
+   - ⚠️ Only add custom domain to PUBLIC bucket — never to private
+6. [ ] **⚠️ `ondewei-private` → Settings → CORS policy** → add:
+   ```json
+   [{
+     "AllowedHeaders": ["Content-Type"],
+     "AllowedMethods": ["PUT"],
+     "AllowedOrigins": [
+       "https://ondewei.my",
+       "https://preprod.ondewei.my"
+     ],
+     "MaxAgeSeconds": 3000
+   }]
+   ```
+7. [ ] Fill preprod `.env` with R2 values:
+   ```
+   R2_ACCESS_KEY=<token key>
+   R2_SECRET_KEY=<token secret>
+   R2_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com
+   R2_REGION=auto
+   R2_PUBLIC_BUCKET=ondewei-public
+   R2_PUBLIC_URL=https://assets.ondewei.my
+   R2_PRIVATE_BUCKET=ondewei-private
+   ```
+8. [ ] `php artisan config:clear` on preprod
+
+**Note:** R2 account_id is in the R2 dashboard URL. Format: `https://<32-char-hex>.r2.cloudflarestorage.com`
+
+---
+
 ## Phase 5 — Production Cutover ⬜ Pending (after preprod test passes)
 
 **Preprod test steps (on preprod.ondewei.my):**
-1. Fill `.env` on preprod with AWS S3 test credentials (two buckets)
+1. Complete Phase 4.5 R2 setup first
 2. `php artisan config:clear && php artisan cache:clear`
 3. `php artisan migrate` (runs backfill + any pending)
 4. `php artisan storage:migrate-to-r2 --dry-run` → verify counts
@@ -213,7 +262,7 @@ php artisan storage:normalise-avatars [--dry-run]
 
 **Production cutover:**
 - [ ] `php artisan down` (maintenance mode)
-- [ ] Fill `.env` with Cloudflare R2 credentials
+- [ ] Fill `.env` with Cloudflare R2 credentials (same as preprod but prod bucket names)
 - [ ] `php artisan config:clear`
 - [ ] `php artisan migrate`
 - [ ] `php artisan storage:migrate-to-r2`
