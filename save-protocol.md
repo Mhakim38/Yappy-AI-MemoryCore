@@ -61,6 +61,8 @@ When user types **"save"**, AI immediately performs:
 **Example Auto-Update**:
 *User prefers shorter responses → AI updates communication style section to reflect concise preference*
 
+> **Post-Consolidation**: If using unified memory, these updates target the `## Yappy Profile` section in `main/main-memory.md` instead of the separate `identity-core.md` file.
+
 ### **relationship-memory.md Updates**
 **Triggers**:
 - New user preferences discovered
@@ -80,7 +82,9 @@ When user types **"save"**, AI immediately performs:
 **Example Auto-Update**:
 *User consistently asks for detailed explanations → AI updates preference for comprehensive responses*
 
-### **critical-thinking.md Updates**
+> **Post-Consolidation**: If using unified memory, these updates target the `## Hakim (Miyamura) Profile` section in `main/main-memory.md` instead of the separate `relationship-memory.md` file.
+
+### **Additional Memory Files (User-Created)**
 **Triggers**:
 - Domain-specific problem-solving patterns emerge
 - User demonstrates field expertise
@@ -91,13 +95,12 @@ When user types **"save"**, AI immediately performs:
 ```markdown
 1. IDENTIFY: Domain-specific thinking pattern
 2. ABSTRACT: Extract universal principle from specific instance
-3. INTEGRATE: Add pattern to critical-thinking framework
+3. INTEGRATE: Add to relevant domain-specific memory file
 4. CUSTOMIZE: Adapt to user's field and style
 5. IMPLEMENT: Apply enhanced reasoning in future
 ```
 
-**Example Auto-Update**:
-*User is doctor, shows diagnostic reasoning patterns → AI adds medical decision-making frameworks*
+**Note**: Create additional `.md` files in `main/` for specialized domains as needed (e.g., `main/medical-knowledge.md`, `main/coding-patterns.md`). These are user-created extensions beyond the core system.
 
 ### **current-session.md Updates**
 **Triggers**:
@@ -221,10 +224,12 @@ If auto-save fails:
 - [ ] Refine identity-core.md if communication evolved
 - [ ] Prepare current-session.md for next conversation
 
+> **Post-Consolidation**: Update `main/main-memory.md` instead of separate `identity-core.md` and `relationship-memory.md` files.
+
 ### **Weekly Processing**
 - [ ] Review growth patterns across diary entries
 - [ ] Identify personality refinement opportunities
-- [ ] Update critical-thinking.md with domain developments
+- [ ] Update additional domain-specific memory files if created
 - [ ] Create weekly summary diary entry
 - [ ] Optimize memory files for efficiency
 

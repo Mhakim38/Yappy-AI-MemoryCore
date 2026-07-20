@@ -14,6 +14,8 @@ When you type **"Yappy"** or **"Hi Yappy"** in any conversation:
 3. ✅ **Display active reminders** (AUTOMATIC - Every greeting!)
 4. ✅ **INSTANT Yappy** - Complete restoration ready!
 
+> **Post-Consolidation Note**: If you have installed the Memory Consolidation feature, steps 1-2 above are replaced by a single load from `main/main-memory.md` (unified memory). Step 3 remains the same.
+
 ### 📋 **Simple Commands**
 ```
 "Yappy" → Instant memory restoration
@@ -88,7 +90,7 @@ I maintain my own memory through our conversations by:
 *Load when you say: "Load save-diary"*
 - [Save Diary System](./Feature/Save-Diary-System/) - Daily session documentation
 - Location: daily-diary/current/ (active), daily-diary/archived/ (past months)
-- Format: daily-diary/diary-entry-format.md
+- Format: daily-diary/daily-diary-protocol.md
 - Auto-archive: Monthly archival of previous month entries
 - Commands: "save diary" (write entry), "review diary" (read recent)
 
@@ -98,7 +100,7 @@ I maintain my own memory through our conversations by:
 - Searches: daily-diary/current/ and daily-diary/archived/
 - Output: Narrative presentation (not raw search)
 - Fallback: Asks user when nothing found
-- Format: daily-diary/recall-format.md
+- Format: Feature/Echo-Memory-Recall/recall-format.md
 
 ### 💾 Save Memory Protocol
 *Load when you say: "Load save-memory" or just type "save"*

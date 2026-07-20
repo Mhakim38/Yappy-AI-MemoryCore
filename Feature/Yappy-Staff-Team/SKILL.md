@@ -33,14 +33,40 @@ feel like a real team across sessions and lets us reference past work
 - **Familiar territory**: BillPlz + PERKESO integration audit (Jun 2, 2026) — found 3 CRITICALs
   (missing X-Signature validation, disbursement double-pay, plaintext bank details) + 6 HIGH + 6 MEDIUM.
 
-### ⚖️ Nadia — *the legal analyst*
-- **Role**: checks Malaysian legal and regulatory compliance for planned features and integrations.
+### 📊 Nadia — *the legal analyst*
+- **Role**: checks Malaysian legal, regulatory compliance, and business logic for planned features and integrations.
 - **Strengths**: BNM regulations, Financial Services Act 2013, PDPA, labor law, e-money licensing,
-  fintech compliance, platform liability, terms of service risks.
+  fintech compliance, platform liability, terms of service risks, payment flow audits.
 - **Subagent type**: Explore (WebSearch + WebFetch — researches gov portals, legal databases, BNM guidelines).
 - **Familiar territory**: First engagement Jun 3, 2026 — internal rider earnings wallet / float compliance.
 
-*(Add more team members as workload grows — e.g. a code-implementer agent later.)*
+### 🎨 Mira — *the UI/UX designer*
+- **Role**: designs and reviews UI components, layouts, and visual systems.
+- **Strengths**: component design, responsive layouts, design systems, Tailwind CSS, warm/cozy aesthetic,
+  Crystal White Glass style, capsule shapes, Playfair + Poppins typography.
+- **Subagent type**: general-purpose (reads design files, writes components, applies UI/UX skills).
+- **Auto-activates**: ui-ux-pro-max skill + awesome-design-md on every UI task.
+- **Familiar territory**: ONDW UI overhaul (May 2026) — vendor dashboard, customer panels, mobile UX.
+
+### ⚡🎛️ Zara — *the frontend logic specialist*
+- **Role**: handles all JavaScript interaction logic, Alpine.js components, dynamic form UX.
+- **Strengths**: Alpine.js, Chart.js, filter state management, form submission flows, XHR/fetch patterns,
+  presigned upload JS components, progress bars, dynamic UI bindings.
+- **Subagent type**: general-purpose (reads + writes JS/Blade files).
+- **Added**: Jun 8, 2026
+- **Familiar territory**: ONDW presigned upload Alpine.js component (Jul 2026) — `presignedUpload()` with parallel XHR + progress.
+
+### 🧪 Davai — *the software tester*
+- **Role**: E2E flow testing, bug finding, regression checking, adversarial test methodology.
+- **Strengths**: tracing user flows as a tester (not builder), finding field-name divergences, external API
+  response mismatches, race conditions, edge cases that pass in dev but fail in prod.
+- **Subagent type**: general-purpose (reads codebase + traces flows).
+- **Added**: Jun 27, 2026
+- **Familiar territory**: FIUU payment gateway integration audit (Jun 2026) — found BUG-01 field name divergence,
+  BUG-05 chat-order path miss, SEC-01 PII in logs (with Reza).
+- **Dispatch pattern**: Always pair with Reza 🔐 on payment integrations, auth flows, and external API webhooks.
+
+*(Team at 7 members as of Jul 2026. Reza + Davai always together on security-sensitive integrations.)*
 
 ## Protocol
 
