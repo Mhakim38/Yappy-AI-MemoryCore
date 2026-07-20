@@ -211,16 +211,33 @@ php artisan storage:normalise-avatars [--dry-run]
 ## Phase 4.5 — Cloudflare R2 Setup ⬜ NOT STARTED (do before production cutover)
 
 **Status (Jul 20):** AWS S3 test buckets working locally. R2 not set up yet.
+**Docs verified:** Jul 20, 2026 against live Cloudflare docs via cloudflare-docs MCP. All findings below confirmed.
 
-**R2 setup checklist (one-time, do when ready for preprod):**
+### ⚠️ Prerequisites (MUST do first)
+
+**`ondewei.my` must be a Cloudflare zone before you can attach a custom domain to R2.**
+Cloudflare requires the domain to exist as a zone in the **same account** as the R2 bucket.
+- If `ondewei.my` is currently on Hostinger/Namecheap DNS → either transfer DNS fully to Cloudflare (recommended), OR use [partial CNAME setup](https://developers.cloudflare.com/dns/zone-setups/partial-setup/)
+- This is a hard blocker for step 5 (custom domain). Do this first.
+
+### API Token — use the correct permission type
+
+For S3-compatible presigned uploads, use **"Object Read & Write"** — NOT "Admin Read & Write" (that's for Data Catalog/Iceberg, wrong scope).
+- Scope the token to `ondewei-private` + `ondewei-public` buckets only (principle of least privilege)
+- Token gives you `Access Key ID` + `Secret Access Key` — copy both immediately after creation (Secret Key shown once only)
+
+### R2 setup checklist (one-time, do when ready for preprod)
+
 1. [ ] Create Cloudflare account (or use existing)
-2. [ ] Go to R2 → Create bucket → `ondewei-public` (leave Block Public Access OFF for CDN)
-3. [ ] Go to R2 → Create bucket → `ondewei-private` (Block Public Access: ON — no custom domain EVER)
-4. [ ] R2 → Manage API tokens → Create token (Object Read & Write) — copy key + secret
-5. [ ] `ondewei-public` → Settings → Custom domain → Add `assets.ondewei.my`
-   - This creates a Cloudflare DNS CNAME automatically
+2. [ ] **⚠️ Add `ondewei.my` as a zone in the same Cloudflare account** (transfer DNS or partial CNAME setup — required for custom domain step)
+3. [ ] Go to R2 → Create bucket → `ondewei-public` (leave Block Public Access OFF for CDN)
+4. [ ] Go to R2 → Create bucket → `ondewei-private` (Block Public Access: ON — no custom domain EVER)
+5. [ ] R2 → Manage API tokens → Create token → **"Object Read & Write"** scoped to both buckets — copy key + secret
+6. [ ] `ondewei-public` → Settings → Custom domain → Add `assets.ondewei.my`
+   - Domain must already be a Cloudflare zone (step 2) for this to work
+   - Cloudflare creates the CNAME record automatically
    - ⚠️ Only add custom domain to PUBLIC bucket — never to private
-6. [ ] **⚠️ `ondewei-private` → Settings → CORS policy** → add:
+7. [ ] **⚠️ `ondewei-private` → Settings → CORS policy** → add:
    ```json
    [{
      "AllowedHeaders": ["Content-Type"],
@@ -229,10 +246,12 @@ php artisan storage:normalise-avatars [--dry-run]
        "https://ondewei.my",
        "https://preprod.ondewei.my"
      ],
+     "ExposeHeaders": ["ETag"],
      "MaxAgeSeconds": 3000
    }]
    ```
-7. [ ] Fill preprod `.env` with R2 values:
+   *Note: `ExposeHeaders: ETag` added per Cloudflare S3-compatibility recommendation (Jul 20, 2026 docs check)*
+8. [ ] Fill preprod `.env` with R2 values:
    ```
    R2_ACCESS_KEY=<token key>
    R2_SECRET_KEY=<token secret>
@@ -242,9 +261,12 @@ php artisan storage:normalise-avatars [--dry-run]
    R2_PUBLIC_URL=https://assets.ondewei.my
    R2_PRIVATE_BUCKET=ondewei-private
    ```
-8. [ ] `php artisan config:clear` on preprod
+9. [ ] `php artisan config:clear` on preprod
 
-**Note:** R2 account_id is in the R2 dashboard URL. Format: `https://<32-char-hex>.r2.cloudflarestorage.com`
+**Notes:**
+- R2 `account_id` is in the R2 dashboard URL. Format: `https://<32-char-hex>.r2.cloudflarestorage.com`
+- R2 region is always `auto` — never use `ap-southeast-1` (that's AWS S3 only)
+- If CORS errors appear on custom domain: check for `cf-mitigated` header in browser DevTools — may be WAF blocking, not actual CORS
 
 ---
 
