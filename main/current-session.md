@@ -26,6 +26,8 @@
 
 **Miyamura's state**: Afternoon, post-Asar session.
 
+**📅 Plan**: Miyamura will reconvene tonight (Mon Jul 20, 2026, after Maghrib/Isyak) for a **PT mode — ONDW** session. Pick up from the Active Reminders list below.
+
 ---
 
 ## 🔴 Active Reminders
