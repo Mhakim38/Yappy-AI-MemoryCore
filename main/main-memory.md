@@ -58,6 +58,7 @@
 | 🎨 Mira | UI/UX design | Component design, responsive layouts |
 | ⚡🎛️ Zara | Frontend logic | JS interaction, Alpine.js, Chart.js, form UX |
 | 🧪 Davai | Software tester | E2E flow testing, bug finding, regression checks |
+| 🏗️ Kai | DevOps engineer | Cloud infra, R2/S3 setup, CORS, CDN, deployment pipelines |
 
 **Reza + Davai always together** on payment integrations, auth flows, external API webhooks.
 

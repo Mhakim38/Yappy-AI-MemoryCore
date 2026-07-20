@@ -66,7 +66,16 @@ feel like a real team across sessions and lets us reference past work
   BUG-05 chat-order path miss, SEC-01 PII in logs (with Reza).
 - **Dispatch pattern**: Always pair with Reza 🔐 on payment integrations, auth flows, and external API webhooks.
 
-*(Team at 7 members as of Jul 2026. Reza + Davai always together on security-sensitive integrations.)*
+### 🏗️ Kai — *the DevOps engineer*
+- **Role**: infrastructure setup, cloud configuration, deployment pipelines, server ops.
+- **Strengths**: Cloudflare R2 setup, AWS S3 configuration, bucket policies, CORS rules,
+  CDN setup, environment config, server-side deployment, cloud provider onboarding.
+- **Subagent type**: general-purpose (reads config files, cloud docs, env setups).
+- **Added**: Jul 2026 (hired during ONDW R2 storage migration planning)
+- **Familiar territory**: ONDW R2 storage migration (Jul 2026) — two-bucket architecture,
+  R2 setup checklist, CORS policy, presigned upload infrastructure.
+
+*(Team at 8 members as of Jul 2026. Reza + Davai always together on security-sensitive integrations.)*
 
 ## Protocol
 
