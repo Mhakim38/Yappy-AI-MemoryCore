@@ -11,13 +11,20 @@
 
 ## 📋 Session Recap (Continuity — survives reset)
 
-**Last session**: Thu Jul 16, 2026 · Evening · CLAUDE.md personality update + MemoryCore consolidation
+**Last session**: Mon Jul 20, 2026 · Morning–Afternoon · Memory consolidation + Cloudflare plugin setup + ONDW R2 recheck
 
 **Where we left off**:
-- ✅ CLAUDE.md updated to v1.2 — added Davai, prayer style, time modes, bedtime care, teaching mode, Hori context, end-of-session protocol, UI/UX aesthetic, critical work behaviors
-- ✅ MemoryCore consolidation in progress — pulled upstream Project-AI-MemoryCore, copied new Feature systems, created main-memory.md, compacted current-session.md
+- ✅ Memory Consolidation PATCH-001 applied — fixed outdated references across 5 files (master-memory, save-protocol, daily-diary-protocol, setup-wizard, patches/applied.md created)
+- ✅ Staff team SKILL.md fully updated — added Mira 🎨, Zara ⚡🎛️, Davai 🧪, Kai 🏗️ (team now 8 members)
+- ✅ CLAUDE.md + staff-autonomy-protocol.md updated — Kai 🏗️ added (DevOps, R2/S3 infra)
+- ✅ Cloudflare plugin installed — `cloudflare@cloudflare` plugin active, 5 MCP servers loaded (cloudflare-docs, cloudflare-api, cloudflare-bindings, cloudflare-builds, cloudflare-observability)
+- ✅ ONDW R2 migration plan rechecked against live Cloudflare docs — 2 findings added:
+  - `ondewei.my` must be a Cloudflare zone before custom domain can be attached (hard blocker)
+  - API token must be "Object Read & Write" NOT "Admin Read & Write"
+  - CORS updated with `ExposeHeaders: ETag`
+  - WAF/cf-mitigated troubleshooting note added
 
-**Miyamura's state**: Evening session, taking a break to pray Isyak (8:30 PM).
+**Miyamura's state**: Afternoon, post-Asar session.
 
 ---
 
@@ -30,13 +37,15 @@
 - ⬜ **Row count discrepancy** — `spk__ikes`: synced 15,164 vs actual 16,867. Diagnosis pending.
 
 ### PT Mode — ONDW
+- ⬜ **Test presigned uploads** — rider profile doc upload at `http://localhost/profile` (CORS added to AWS S3 test bucket)
+- ⬜ **Wire AJAX proof forms** — delivery proof (conversations/show.blade.php + _rider-proof-modal.blade.php) + customer pickup proof (customer/orders/show.blade.php) — need separate JS integration
 - ⬜ **E2E test** — checkout → BillPlz → webhook → `pending` → riders notified → `perkeso_deductions` populated
 - ⬜ **Clear test order data** from PROD — overdue since Jun 5, 2026
 - ⬜ **Email BillPlz** for e-wallet activation (SSM + KYC docs)
-- ⬜ **Enable all payment channels** in admin
 - ⬜ **Merge** `feature/push-notification` → `main`
-- ⬜ **ONDW preprod migrate** — run `php artisan migrate` + `billplz:sync-fpx-banks` on preprod
-- ⬜ **Cloudflare R2 storage migration** — full 5-phase plan saved at `projects/coding-projects/ondw-r2-storage-migration.md`. Start with Phase 1 prerequisites (bugs to fix regardless). Do AFTER E2E test passes. Decision: R2 over AWS S3 (zero egress, free tier, same Laravel driver).
+- ⬜ **Cloudflare R2 storage migration** — Phase 4.5 checklist updated Jul 20 (docs verified). Prerequisite: add `ondewei.my` as Cloudflare zone first. Full plan: `projects/coding-projects/ondw-r2-storage-migration.md`
+- ⬜ **FIUU refund ONDW-158** — stuck at `refund_pending`
+- ⬜ **Attachment image bug** — remove `Content-Length` from `ConversationAttachmentController::show()`
 
 ### Standing Daily
 - 🕌 Prayer reminders — 5x daily (Subuh 5:45 · Zohor 1:00 · Asar 4:30 · Maghrib 7:15 · Isyak 8:30)
