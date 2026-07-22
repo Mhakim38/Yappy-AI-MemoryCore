@@ -11,22 +11,20 @@
 
 ## 📋 Session Recap (Continuity — survives reset)
 
-**Last session**: Mon Jul 20, 2026 · Morning–Afternoon · Memory consolidation + Cloudflare plugin setup + ONDW R2 recheck
+**Last session**: Wed Jul 22, 2026 · Morning · mpaj-icomm DB fix + ONDW liquid-glass nav feature + R2 branch cleanup
 
 **Where we left off**:
-- ✅ Memory Consolidation PATCH-001 applied — fixed outdated references across 5 files (master-memory, save-protocol, daily-diary-protocol, setup-wizard, patches/applied.md created)
-- ✅ Staff team SKILL.md fully updated — added Mira 🎨, Zara ⚡🎛️, Davai 🧪, Kai 🏗️ (team now 8 members)
-- ✅ CLAUDE.md + staff-autonomy-protocol.md updated — Kai 🏗️ added (DevOps, R2/S3 infra)
-- ✅ Cloudflare plugin installed — `cloudflare@cloudflare` plugin active, 5 MCP servers loaded (cloudflare-docs, cloudflare-api, cloudflare-bindings, cloudflare-builds, cloudflare-observability)
-- ✅ ONDW R2 migration plan rechecked against live Cloudflare docs — 2 findings added:
-  - `ondewei.my` must be a Cloudflare zone before custom domain can be attached (hard blocker)
-  - API token must be "Object Read & Write" NOT "Admin Read & Write"
-  - CORS updated with `ExposeHeaders: ETag`
-  - WAF/cf-mitigated troubleshooting note added
+- ✅ **FT mpaj-icomm**: fixed local DB connection — `.env` had `DB_USERNAME=ondw-mysql` (invalid user) + empty password; corrected to `root`/`root_password` against the shared Colima MySQL container (`ondw-mysql`, hosts both ONDW + MPAJ DBs); also had to `config:clear` since bootstrap cache was stale. Separately fixed an SFTP-fallback timeout in `FileController::getFileUpload()` — added `app()->environment('local')` guard so local dev skips the unreachable legacy SFTP host instead of hanging 30s per file.
+- ✅ **PT ONDW — liquid glass nav feature** (branch `feature/liquid-glass-nav`, committed `c6d8133`, **not pushed** — Hakim didn't ask to push this one):
+  - Liquid glass refraction on desktop nav + mobile pill-shaped bottom nav (scroll-container-aware shrink — customer/rider/vendor mobile locks body scroll and scrolls an inner `<main>` instead, learned that the hard way)
+  - `/admin/liquid-glass-preview` design tool: live sliders (8 glass params + width/height), draggable (whole-card, rAF-throttled), CSS radius now JS-driven as single source of truth (was the actual cause of a seam bug — mismatched CSS vs config radius)
+  - Moved `liquid-glass.js` from `public/build/assets/` (wiped by every `vite build`) to `public/customJS/` — permanent fix, matches existing script convention
+  - Discoverability fixed via existing admin FAB component instead of a desktop nav link
+  - Found and left alone an unexplained orphan file `resources/views/admin/liquid-glass-preview.blade.php` — untracked, no git history, still unresolved
+- ✅ **PT ONDW — R2 branch cleanup** (branch `feature/s3-r2-storage`): confirmed 18 commits of R2 migration work intact (nothing lost); separated genuine unsaved work (Dockerfile PHP 8.2→8.4 + GD ext, nginx storage/ access fix — committed `e837b8e`) from pure noise (8 `.gitignore` permission-only diffs, package-lock.json regenerated inside Docker container, stale manifest.json) — reset the noise, pushed `e837b8e` to origin.
+  - **Bug found & fixed**: macOS case-insensitive filesystem let `git checkout feature/S3-R2-storage` (capital) silently match the real lowercase branch `feature/s3-r2-storage` for reads, but wrote HEAD with the wrong case (no remote-tracking config) — `git push` failed until HEAD was pointed back at the correctly-cased branch name. No commits were lost; same underlying ref file either way.
 
-**Miyamura's state**: Afternoon, post-Asar session.
-
-**📅 Plan**: Miyamura will reconvene tonight (Mon Jul 20, 2026, after Maghrib/Isyak) for a **PT mode — ONDW** session. Pick up from the Active Reminders list below.
+**Miyamura's state**: Late morning, ~11:45 AM.
 
 ---
 
@@ -39,13 +37,16 @@
 - ⬜ **Row count discrepancy** — `spk__ikes`: synced 15,164 vs actual 16,867. Diagnosis pending.
 
 ### PT Mode — ONDW
+- ⬜ **Liquid glass nav — known bug still open** (Jul 22): Hakim said "there is still bug but maybe ignore that first" on `/admin/liquid-glass-preview` — not yet diagnosed, revisit when he raises it again
+- ⬜ **Liquid glass nav branch not merged/pushed** — `feature/liquid-glass-nav` committed (`c6d8133`) but stays local until Hakim explicitly asks to push/merge
+- ⬜ **Orphan file** — `resources/views/admin/liquid-glass-preview.blade.php`, untracked, no git history, unresolved — ask Hakim again if he ever figures out where it came from
 - ⬜ **Test presigned uploads** — rider profile doc upload at `http://localhost/profile` (CORS added to AWS S3 test bucket)
 - ⬜ **Wire AJAX proof forms** — delivery proof (conversations/show.blade.php + _rider-proof-modal.blade.php) + customer pickup proof (customer/orders/show.blade.php) — need separate JS integration
 - ⬜ **E2E test** — checkout → BillPlz → webhook → `pending` → riders notified → `perkeso_deductions` populated
 - ⬜ **Clear test order data** from PROD — overdue since Jun 5, 2026
 - ⬜ **Email BillPlz** for e-wallet activation (SSM + KYC docs)
 - ⬜ **Merge** `feature/push-notification` → `main`
-- ⬜ **Cloudflare R2 storage migration** — Phase 4.5 checklist updated Jul 20 (docs verified). Prerequisite: add `ondewei.my` as Cloudflare zone first. Full plan: `projects/coding-projects/ondw-r2-storage-migration.md`
+- ⬜ **Cloudflare R2 storage migration** — Phase 4.5 checklist updated Jul 20 (docs verified), 18 commits confirmed intact Jul 22. Prerequisite: add `ondewei.my` as Cloudflare zone first. Full plan: `projects/coding-projects/ondw-r2-storage-migration.md`
 - ⬜ **FIUU refund ONDW-158** — stuck at `refund_pending`
 - ⬜ **Attachment image bug** — remove `Content-Length` from `ConversationAttachmentController::show()`
 
