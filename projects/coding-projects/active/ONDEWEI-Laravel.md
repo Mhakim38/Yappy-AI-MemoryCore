@@ -948,4 +948,44 @@ php artisan route:cache
 - QA pass (Davai) found + fixed: F's broken waist seam, R2's chip overflow + lost corner radii. D verified untouched/clean 3×.
 - **Implementation scope (Hakim confirmed)**: winning design applies ONLY to the two pages with a message input — delivery chat (`conversations/show.blade.php`) + AI chat-order (`chat-order/index.blade.php`). Bonus: unifies their currently-inconsistent composers. Nav elsewhere unchanged.
 - **Already shipped to code (commit `a807237`, pushed to `feature/push-notification`)**: Option 3 auto-hide behavior — composer focus adds `body.ow-composer-focused`, fades out `#mobile-nav-wrap` (opacity/pointer-events only, Safari-safe), composer shell locally zeroes `--ow-bottom-nav-h`. Pickup Collect button stays visible, shifts with composer. NOT yet browser-tested — Davai E2E test still pending.
-- **Next session**: Hakim picks final winner from 18 frames → Zara implements on the two chat pages (on top of the auto-hide already in place). Open question for Hakim: island concepts that drop the Cart tab (G/L) — acceptable tradeoff or dealbreaker?
+- **Design gallery grew to 24 frames** (Cart-solution round added, y=2782): 6 variants answering "where does Cart go in island layouts" — CART-1 Compressed Five, CART-2 Orders Merge, CART-3 Cart Satellite, CART-4 Context Swap (contextual FAB, blue Cart / green Collect), CART-5 Cart in Composer, CART-6 Expandable More. All build on D/G's island language.
+- **DECIDED (Jul 24 night): Hakim picked OVERHAUL D — Split Dock (12:1127)** as the final design direction. Cart-tab question still technically open (which CART-1..6 treatment pairs with it) but NOT YET IMPLEMENTED IN CODE — a same-night feature request (Unofficial Vendor) took priority and consumed the rest of the session. **Next session: resume here** — either finalize the Cart pairing then dispatch Zara to implement D on the two chat pages (delivery chat + AI chat-order, on top of the already-shipped Option 3 auto-hide), or ask Hakim if priorities shifted.
+- Option 3 auto-hide (commit `a807237`) **still not browser-tested** — carried over, still pending.
+
+---
+
+## Jul 24 night → Jul 25 early morning — Unofficial Vendor + Rider Credit (FULL FEATURE SHIPPED)
+
+### Branch: `feature/s3-r2-storage` (Hakim's explicit choice — a side branch, NOT the preprod deploy branch `feature/push-notification`; synced with latest preprod + pushed before work started, HEAD `8585ed1`)
+
+### The problem
+Some real vendors refuse to onboard onto ONDW. **Unofficial Vendor** = admin-created vendor account, indistinguishable to customers. Customer still pays in full online (FIUU/BillPlz: food + delivery fee + platform fee). Since the vendor has no real platform relationship, the **rider pays the vendor cash at the counter** like a walk-up customer — funded by a **Credit** float that admins manually bank-transfer to riders and track in a new ledger.
+
+### Locked business rules (owner-confirmed via AskUserQuestion, do not revisit without him)
+1. Credit deducts **food subtotal only** (`total_amount − delivery_fee`) — platform fee NOT deducted, ONDW already keeps that from the customer charge.
+2. Negative credit **auto-heals from future earnings** — each delivery's earnings (delivery fee − PERKESO) divert into the ledger (partial diversion when the gap is smaller) until balance ≥ 0.
+3. **Rider accept = vendor accept** — no admin/vendor override needed; rider accepting auto-advances the phantom vendor's accept step.
+4. Unofficial vendors are **delivery-only** — self-pickup hidden + server-rejected (nobody could hand off a pickup, vendor never sees the order).
+5. Unofficial vendors **fully excluded** from vendor weekly payouts (rider already paid cash, no bank details stored).
+
+### What shipped (10 commits, `ad1192e`..`fae3b2e`, all pushed)
+1. **Schema**: `vendor_type` on `vendor_profiles`; new `credit_transactions` ledger (types: topup/food_payment/earnings_refill/reversal/adjustment, signed `amount_sen`, `unique(order_id, type)` for hard idempotency, **no cached balance column** — always `SUM()`, avoids drift).
+2. **`CreditService`**: balance/topup/adjust/recordFoodPayment (idempotent)/divertEarningsIfNegative (partial math)/reverseFoodPaymentIfAny. Plus `Vendor::isUnofficial()`, `Order::isUnofficialVendorOrder()/foodSubtotalSen()`.
+3. **Checkout guard**: pickup blocked for unofficial vendors, both UI (`customer/checkout.blade.php`) and server (`OrderService::createOrder`).
+4. **Rider accept chain**: new `OrderStatusService::systemTransition()` (proper lock/validate/history, not a raw bypass) — `Rider/OrderController::accept` auto-advances unofficial orders straight to `accepted`→auto-`preparing`.
+5. **Pickup cash step**: server `recordFoodPayment()` in `pickup()` (try/catch, never blocks — negative allowed); rider-facing cash-confirm modal in `ondw-pickup-gps.js` (all pickup surfaces funnel through it) showing "Pay counter RM X cash · credit RM Y → RM Z", red when going negative. **Chat page needed its own mirrored modal** (`delivery-conversation-realtime.js` has a separate `wireRiderActions()` path, doesn't use `ondw-pickup-gps.js` — forced an `npm run build`, only JS rebuild needed all night).
+6. **Diversion + payout exclusion**: diversion runs in `deliver()`'s terminating callback after PERKESO submission; `DisbursementService::pendingBalances` subtracts diverted amounts from rider payout and fully excludes unofficial vendors (`vendor_type='official'` whereExists) from vendor payouts.
+7. **Rider UI**: 3rd "Credit" header card on `available.blade.php` (exact sibling of PERKESO/Earnings cards, red when negative, **hidden entirely for riders with an empty ledger**); new `rider.credits` history page; amber "Cash at counter · RM X" chips everywhere a rider sees an order card. **Security note**: `conversationPayload()` is shared with customers — unofficial-vendor fields gated to `Auth::id() === rider.user_id` so customers never see the flag even in dev tools.
+8. **Admin UI**: `Admin/UnofficialVendorController` (create vendor, one-time credential flash — "save these now, shown once"; MVP menu management = admin logs into the vendor account directly, no separate admin menu CRUD built); `Admin/RiderCreditController` (balances list negatives-first, per-rider ledger, topup + adjustment forms, adjustment note mandatory for audit trail).
+9. **Cancel-after-pickup reversal**: new `ReverseUnofficialFoodPaymentOnCancel` listener on `OrderStatusChanged` (manually registered — `EventServiceProvider` has event discovery OFF) — rider's cash auto-credited back if order cancelled post-pickup. Cancel-before-pickup: no-op. **ONDW absorbs the counter cash on cancel-after-pickup — accepted risk, flagged to Hakim, not a bug.**
+10. **Tests + verification**: 19 new tests (`CreditServiceTest` unit, `UnofficialVendorOrderFlowTest` feature — deliberately service-level, sidestepping this env's pre-existing CSRF/302 HTTP-test trap) + full E2E tinker walkthrough of the money flow (vendor→order→accept→pickup→deliver→diversion→cancel-reversal), all inside a rolled-back DB transaction. **Verified independently twice** — once by Davai (agent), once by Yappy directly re-running the suite herself as a manager check. Both got identical **78 failed / 58 passed** (78 = pre-existing unrelated env failures, unchanged; +19 genuinely new passing tests, zero regressions).
+
+### Environment facts discovered this session (save — will bite again otherwise)
+- Host only has the **standalone `docker-compose` binary**, not the `docker compose` plugin — every artisan command must be `docker-compose exec app php artisan ...`.
+- The local Docker MySQL has **no persistent volume** — it's a fresh schema-only scaffold, never seeded with real data. Confirmed 0 rows before AND after tonight's work; nothing was wiped, there was just never anything there. Real ONDW data lives on the Hostinger preprod/production server, untouched by local Docker work.
+- `phpunit.xml` points tests at a **separate** `ondw_testing` database specifically so `RefreshDatabase` can never touch the dev DB — comment in the file confirms this was deliberate.
+
+### Genuinely still pending (not done, not glossed over)
+- **Real browser/device testing** — everything is verified at code + DB-transaction level, nobody has clicked through the actual UI yet (admin creating a vendor, rider seeing the cash modal live in a browser).
+- **Merge decision** — all 10 commits live on `feature/s3-r2-storage` only; not yet merged into `feature/push-notification` (preprod) or `main`. Hakim's call, after browser testing.
+- Pre-existing (unrelated) bug flagged, NOT fixed (out of scope): `available.blade.php`'s earnings card never subtracted PERKESO from displayed pending earnings even before tonight — separate from the diverted-refills fix this feature added correctly.
