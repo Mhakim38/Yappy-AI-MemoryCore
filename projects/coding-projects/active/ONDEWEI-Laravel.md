@@ -918,3 +918,28 @@ php artisan route:cache
 11. ⬜ Ask Aiman: KK distances + ETA for rider available orders page
 12. ⬜ Merge `feature/push-notification` → `main`
 13. ⬜ Sunmi companion app — ON HOLD until Aiman's device arrives
+
+---
+
+## Jul 22–24, 2026 — Liquid Glass Nav + Chat Composer Redesign + Figma-CLI Exploration
+
+### Branch: `feature/push-notification`, commits `41b6d52`..`9b268a0`
+
+### Liquid glass nav (Jul 22)
+- `feature/liquid-glass-nav` merged in. Full SVG-displacement refraction effect is **Chromium-only** — Safari, Firefox, and every iOS browser (Chrome-for-iOS, Arc-for-iOS included, since Apple mandates the WebKit engine for all iOS browsers outside the EU) fall back to a plain frosted `backdrop-filter: blur()`. Confirmed with Hakim as expected/permanent, not a bug — closed.
+- Fixed a real WebKit bug: `position:fixed` + `backdrop-filter` + `transform` stacked on one element kills backdrop-filter rendering in Safari. Fix: moved the scroll-shrink `transform` to a separate `.mobile-glass-nav-wrap` outer element, kept `backdrop-filter` on the untransformed inner `.mobile-glass-nav`.
+- Fixed: mobile bottom pill nav had zero `dark:` classes at all — added, matching `#main-nav`'s existing dark-glass convention.
+- Fixed: scroll-shrink was completely dead for customer/rider/vendor (worked only for admin). Root cause: the nav's scroll script is `@include`d in `app.blade.php` *above* `<main>`, and ran synchronously before `<main>` existed in the DOM — `document.querySelector('body.ow-app-shell > main')` always returned null on the locked-shell roles. Admin isn't in the locked-shell list so its plain `window` scroller never hit this. Fixed by wrapping in `DOMContentLoaded`.
+
+### Chat composer redesign (Jul 24)
+- First pass: composer became its own floating glass card (rounded-28px, translucent, same recipe as nav) sitting above the pill nav.
+- Hakim asked to simplify further: removed the outer card entirely. The input pill itself now carries the glass styling directly and sits right against the top of the nav — no more "card containing a pill" double-box look. Desktop keeps the original flat full-width bar (no pill nav there to match).
+- Nav shrink/full-size state now persists across full page navigations via `sessionStorage` (`ow-nav-compact` key), restored synchronously before paint. Previously every fresh page load always started full-size regardless of scroll position on the prior page — visible "pop" when navigating while scrolled down. Fixed.
+
+### Figma-CLI exploration (Jul 24, in progress)
+- Dispatched a design-focused subagent to research `github.com/silships/figma-cli` (a third-party CLI, NOT Figma's official Dev Mode MCP) and propose design options for the nav+composer pairing.
+- **Key fact about figma-cli**: connects to Figma **Desktop** directly via Chrome DevTools Protocol (port 9222), not Figma's cloud REST API — this is why it needs Figma Desktop open, unlike token-based MCP servers. No API key, no rate limits, runs fully local.
+- Two connection modes: **Yolo** (default) patches a single string inside Figma Desktop's `app.asar` (`removeSwitch("remote-debugging-port")` → harmless variant) to unblock Electron's own standard remote-debugging flag — genuinely small/reversible at the byte level, but requires macOS **"App Management"** permission for the terminal, which is a broader ongoing grant than the "one file patch" framing suggests. **Safe Mode** avoids this entirely via a real Figma plugin (Plugins → Development → FigCli) instead, no binary touched.
+- Hakim chose Yolo. First attempt failed: `EPERM` — terminal lacked App Management permission. Hakim has since granted the permission via System Settings and needs to fully quit + reopen the terminal for it to take effect — **that's where this left off**, resume with `node src/index.js` (or `figma-cli connect`) from `/private/tmp/claude-501/-Users-hakim/dafc432b-6956-493a-b25c-7d8a01bdc993/scratchpad/figma-cli-check/figma-cli` (session scratchpad — may not exist in a future session; re-clone `https://github.com/silships/figma-cli.git` if so) once the terminal's been restarted.
+- Three design options already proposed for the nav+composer pairing (grounded in existing tokens — `#d8e8f4` border, `rgba(255,255,255,.72)`/`.85` bg, `--ow-bottom-nav-h` var, `inset-x-3`): (1) refined stacked cluster — tighten gap, sync with scroll-shrink var — lowest risk, ~90% already built; (2) merged single capsule with internal seam — more novel, needs real iOS-vs-Chromium testing; (3) nav auto-hides on composer focus, composer drops to nav's resting position — best if keyboard-covering-composer is a real complaint. Recommended starting with (1). Also flagged: send button is 40×40px, just under the 44px touch-target minimum — worth bumping regardless of which option ships.
+- Next step once reconnected: actually build the picked option(s) live in Figma via plain-language commands, per the CLI's design.
