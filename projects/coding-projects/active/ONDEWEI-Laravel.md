@@ -961,14 +961,14 @@ php artisan route:cache
 ### The problem
 Some real vendors refuse to onboard onto ONDW. **Unofficial Vendor** = admin-created vendor account, indistinguishable to customers. Customer still pays in full online (FIUU/BillPlz: food + delivery fee + platform fee). Since the vendor has no real platform relationship, the **rider pays the vendor cash at the counter** like a walk-up customer — funded by a **Credit** float that admins manually bank-transfer to riders and track in a new ledger.
 
-### Locked business rules (owner-confirmed via AskUserQuestion, do not revisit without him)
-1. Credit deducts **food subtotal only** (`total_amount − delivery_fee`) — platform fee NOT deducted, ONDW already keeps that from the customer charge.
-2. Negative credit **auto-heals from future earnings** — each delivery's earnings (delivery fee − PERKESO) divert into the ledger (partial diversion when the gap is smaller) until balance ≥ 0.
-3. **Rider accept = vendor accept** — no admin/vendor override needed; rider accepting auto-advances the phantom vendor's accept step.
-4. Unofficial vendors are **delivery-only** — self-pickup hidden + server-rejected (nobody could hand off a pickup, vendor never sees the order).
-5. Unofficial vendors **fully excluded** from vendor weekly payouts (rider already paid cash, no bank details stored).
+### Locked business rules (owner-confirmed via AskUserQuestion, do not revisit without him) — SUPERSEDED, see corrections below
+1. Credit deducts **food subtotal only** (`total_amount − delivery_fee`) — platform fee NOT deducted, ONDW already keeps that from the customer charge. **Still true.**
+2. ~~Negative credit auto-heals from future earnings~~ — **REMOVED Jul 25, see "Debt-direction correction" below.**
+3. **Rider accept = vendor accept** — no admin/vendor override needed; rider accepting auto-advances the phantom vendor's accept step. **Still true.**
+4. Unofficial vendors are **delivery-only** — self-pickup hidden + server-rejected (nobody could hand off a pickup, vendor never sees the order). **Still true.**
+5. Unofficial vendors **fully excluded** from vendor weekly payouts (rider already paid cash, no bank details stored). **Still true.**
 
-### What shipped (10 commits, `ad1192e`..`fae3b2e`, all pushed)
+### What shipped (initial pass — 10 commits, `ad1192e`..`fae3b2e`, all pushed)
 1. **Schema**: `vendor_type` on `vendor_profiles`; new `credit_transactions` ledger (types: topup/food_payment/earnings_refill/reversal/adjustment, signed `amount_sen`, `unique(order_id, type)` for hard idempotency, **no cached balance column** — always `SUM()`, avoids drift).
 2. **`CreditService`**: balance/topup/adjust/recordFoodPayment (idempotent)/divertEarningsIfNegative (partial math)/reverseFoodPaymentIfAny. Plus `Vendor::isUnofficial()`, `Order::isUnofficialVendorOrder()/foodSubtotalSen()`.
 3. **Checkout guard**: pickup blocked for unofficial vendors, both UI (`customer/checkout.blade.php`) and server (`OrderService::createOrder`).
@@ -985,7 +985,31 @@ Some real vendors refuse to onboard onto ONDW. **Unofficial Vendor** = admin-cre
 - The local Docker MySQL has **no persistent volume** — it's a fresh schema-only scaffold, never seeded with real data. Confirmed 0 rows before AND after tonight's work; nothing was wiped, there was just never anything there. Real ONDW data lives on the Hostinger preprod/production server, untouched by local Docker work.
 - `phpunit.xml` points tests at a **separate** `ondw_testing` database specifically so `RefreshDatabase` can never touch the dev DB — comment in the file confirms this was deliberate.
 
+### Jul 25 — five follow-up hardening passes (all on the same branch, same session continued into the night)
+
+Hakim kept using the feature conceptually after the initial ship and found real gaps by reasoning through concrete numbers with Yappy — this is the value of walking through scenarios out loud, not just shipping and moving on.
+
+1. **Rider eligibility gate** (`7549a6a`) — the initial ship had ZERO restriction on which riders could see/take unofficial-vendor orders (real gap, not hypothetical — confirmed via codebase research before building). New `rider_profiles.can_fulfill_unofficial_orders` boolean + `enabled_by`/`enabled_at` audit trail, admin toggle on the existing rider approval page. Gates 6 touchpoints: `available()`, AJAX polling, `accept()` (defense-in-depth), `show()`, `track()`, badge count — plus the push-notification listener (`SendOrderNotifications`) so ineligible riders don't even get pinged about orders they can't take.
+
+2. **−RM5.00 credit floor** (`1f92c91`) — composes with #1 via `Rider::isEligibleForUnofficialVendors()` (trust flag AND above floor). Blocks accepting **new** unofficial orders once balance ≤ −500 sen; in-flight orders completely unaffected (a real bug was caught and fixed while building this — the eligibility scope would have 404'd a rider's own already-assigned order the moment they crossed the floor mid-delivery).
+
+3. **Photo proof at pickup** (`fafb87e`) — replaced the honor-system "I've paid" tap with a required photo, reusing the app's existing delivery-proof-drawer pattern exactly (same compression, same AJAX upload). New `credit_transactions.proof_photo_path` column. Closes the "rider could just lie about paying" gap.
+
+4. **Debt-direction correction — the important one** (`52312a8`) — Hakim identified via first-principles reasoning (not a bug report, a live Socratic back-and-forth) that the original "negative credit auto-heals from future delivery earnings" design had the debt direction backwards. The rider always fronts real cash first for a customer who already paid ONDW in full — so a negative balance means **ONDW owes the rider**, not the reverse. The old mechanic "repaid" this by withholding the rider's *unrelated, already-earned* delivery pay (traced concretely: a small −RM5 gap self-healed almost invisibly within the same order's own delivery fee, but a −RM45 gap meant ~9-10 completely separate deliveries paid at RM0 before clearing). **Removed entirely** — `divertEarningsIfNegative()` deleted, riders now get paid their full delivery fee unconditionally, every delivery, no exceptions. Negative credit became a plain debt resolvable only by admin topup (as of this commit).
+
+5. **Auto-settlement via payout** (`d7e7ee0`) — Hakim's own follow-up improvement on #4: instead of relying on an admin to remember to top up, fold any owed debt into the rider's next scheduled/manual payout automatically, funded by ONDW as an addition on top of earnings (never subtracted). Works even for riders with zero orders that cycle (settlement-only payout, `order_count=0` — the existing skip-if-zero batch logic needed the calculation itself extended, not the eligibility list). New `disbursements.credit_settlement_sen` column for audit breakdown (earnings vs. debt, per Hakim's explicit ask so Aiman/admins can see why a payout was bigger than that week's deliveries suggest); new `credit_transactions` `auto_settlement` type. Row-locked (mirrors the existing `PerkesoAnnualCap` pattern) to prevent the Friday cron and a manual disburse double-settling the same rider.
+
+### CEO-facing documentation delivered
+Built a full scenario-reference document (14 distinct situations, business language not code) as both a published Artifact and a matching PDF for Hakim to send his CEO Aiman — covers every negative-credit scenario, the debt-direction principle, and a live-vs-in-development status table. Republished once already (auto-settlement flipped from "in development" to "Live" the moment `d7e7ee0` landed and was independently verified). Artifact URL: `https://claude.ai/code/artifact/a26e2591-b53e-4ed5-b356-e9ccd3085d63`.
+
+### Full test count as of Jul 25 late night
+**55 new tests** across 6 files (`CreditServiceTest`, `UnofficialVendorOrderFlowTest`, `RiderEligibilityGateTest`, `RiderCreditFloorGateTest`, `UnofficialVendorPickupProofTest`, `CreditSettlementDisbursementTest`) — all independently confirmed passing via a filtered run, not just trusted from agent reports. Full suite: **78 failed / 94 passed**. The 78 are 100% pre-existing, unrelated to any of tonight's work (traced one sample failure back to a Dec 2025 Laravel boilerplate scaffold test — `VendorOrderTest::test_example()` hitting `/` expecting 200, gets 302 — never cleaned up, not a regression).
+
+### Leftover/cleanup audit (Jul 25, post-session)
+Ran a full sweep after Hakim asked "any leftover from last session?" — genuinely useful habit, do this after any long multi-agent session: git working tree clean + fully pushed, all 62 migrations run with none pending, **zero leftover rows** in any table touched by tonight's tinker/verification work (rollback discipline held, verified by direct query not assumption), Docker containers healthy with no orphans, no stray scratch files inside the actual repo, `php -l` clean across all 44 files touched since the branch's merge-base. Only genuine gap found: **MemoryCore itself was stale** — this file hadn't been updated since the initial 10-commit pass, missing all 5 follow-up hardening commits. Fixed by this edit.
+
 ### Genuinely still pending (not done, not glossed over)
-- **Real browser/device testing** — everything is verified at code + DB-transaction level, nobody has clicked through the actual UI yet (admin creating a vendor, rider seeing the cash modal live in a browser).
-- **Merge decision** — all 10 commits live on `feature/s3-r2-storage` only; not yet merged into `feature/push-notification` (preprod) or `main`. Hakim's call, after browser testing.
-- Pre-existing (unrelated) bug flagged, NOT fixed (out of scope): `available.blade.php`'s earnings card never subtracted PERKESO from displayed pending earnings even before tonight — separate from the diverted-refills fix this feature added correctly.
+- **Real browser/device testing** — everything is verified at code + DB-transaction level, nobody has clicked through the actual UI yet (admin creating a vendor, rider seeing the cash modal or photo-proof drawer live in a browser).
+- **Merge decision** — all 15 commits live on `feature/s3-r2-storage` only; not yet merged into `feature/push-notification` (preprod) or `main`. Hakim's call, after browser testing.
+- Pre-existing (unrelated) bug flagged, NOT fixed (out of scope): `available.blade.php`'s earnings card never subtracted PERKESO from displayed pending earnings even before tonight.
+- **Figma design decision (OVERHAUL D — Split Dock)** from earlier the same evening — picked, 24-frame gallery complete, but NOT YET implemented in code on the two chat pages. This got deprioritized when the Unofficial Vendor feature request came in; resume next session if Hakim wants it.
