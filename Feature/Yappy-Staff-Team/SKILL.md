@@ -65,6 +65,7 @@ feel like a real team across sessions and lets us reference past work
 - **Familiar territory**: FIUU payment gateway integration audit (Jun 2026) — found BUG-01 field name divergence,
   BUG-05 chat-order path miss, SEC-01 PII in logs (with Reza).
 - **Dispatch pattern**: Always pair with Reza 🔐 on payment integrations, auth flows, and external API webhooks.
+- **QA deliverable format**: see "QA Checklist Artifact Protocol" below — applies to any staff producing a testing/verification checklist, not Davai-exclusive.
 
 ### 🏗️ Kai — *the DevOps engineer*
 - **Role**: infrastructure setup, cloud configuration, deployment pipelines, server ops.
@@ -92,6 +93,21 @@ feel like a real team across sessions and lets us reference past work
    protocol; cross-link from the relevant project memory.
 6. **Naming consistency**: use the same names across sessions so Hakim can say
    "ask Hana to check…" / "did Sora confirm…" — and Yappy knows who to dispatch.
+
+## QA Checklist Artifact Protocol (added Jul 27, 2026)
+
+Whenever a task calls for a testing/QA checklist — verifying a feature, a migration, an infra change, anything with multiple scenarios to click through — the deliverable is an **interactive HTML artifact** (published via Claude Artifacts), not a plain-text list in chat. Confirmed by Hakim after the R2 + Unofficial Vendor QA checklist built Jul 26-27, 2026 (`https://claude.ai/code/artifact/a23f70b5-5c80-4206-a003-d93f1d1f3bf3`).
+
+**Why:** A chat wall of "1. do X, 2. do Y" gets lost, can't be reopened cleanly days later, and gives no sense of progress across a long testing session. An artifact with real checkboxes — tap to expand steps, tap to mark done, a progress bar, state saved via `localStorage` so it survives across sessions in the same browser — turns testing into something Hakim can actually work through at his own pace and pick back up later.
+
+**The concrete pattern to reuse:**
+- Group tests into logical sections (by feature area, not just a flat numbered list).
+- Each test item: a short name, a relevant tag/label (e.g. "Public bucket", "Private bucket"), expandable step-by-step instructions, and a clearly separated "Expect" line stating the correct outcome.
+- Checkbox + progress bar at the top, `localStorage`-backed so progress isn't lost on reload.
+- Reuse ONDW's established palette (blue `#2167AD` / green `#2F7D5C`, warm-neutral background) for visual consistency across artifacts delivered to Hakim, both light and dark theme.
+- If new gotchas/findings surface *during* testing, fold them back into the same artifact (a callout box, updated "Expect" text) rather than leaving them to rot in chat — republish in place, same file path, so the URL stays stable.
+
+**Who this governs**: Davai 🧪 by default, but any staff member producing a testing/verification checklist (Reza during a security review, Kai after an infra change) should point to this same protocol rather than improvising a different format — one consistent QA artifact style across the team.
 
 ## Future expansion
 Roles likely to be needed:
