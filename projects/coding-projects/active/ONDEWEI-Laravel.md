@@ -1013,3 +1013,45 @@ Ran a full sweep after Hakim asked "any leftover from last session?" — genuine
 - **Merge decision** — all 15 commits live on `feature/s3-r2-storage` only; not yet merged into `feature/push-notification` (preprod) or `main`. Hakim's call, after browser testing.
 - Pre-existing (unrelated) bug flagged, NOT fixed (out of scope): `available.blade.php`'s earnings card never subtracted PERKESO from displayed pending earnings even before tonight.
 - **Figma design decision (OVERHAUL D — Split Dock)** from earlier the same evening — picked, 24-frame gallery complete, but NOT YET implemented in code on the two chat pages. This got deprioritized when the Unofficial Vendor feature request came in; resume next session if Hakim wants it.
+
+---
+
+## Jul 26 evening → Jul 27 early morning — R2 Storage Actually Set Up + Domain Migrated to Cloudflare
+
+### The starting problem
+The branch is literally named `feature/s3-r2-storage` and the app's whole config (`config/filesystems.php`) was already built for Cloudflare R2 — but R2 had **never actually been set up**. `.env` pointed at a real but placeholder AWS S3 test bucket (`ondewei-test-public`/`ondewei-test-private`, region `ap-southeast-1`, blank `R2_ENDPOINT`) — confirmed via the giveaway that real R2 uses `region=auto`, not an AWS region code. Root cause of "forgot to add R2 credentials": the buckets themselves didn't exist yet, not just missing env values.
+
+### 🔴 CRITICAL SECURITY ISSUE — OPEN, UNRESOLVED as of this save
+Hakim reported mistakenly attaching the custom domain to **`ondewei-private`** instead of/alongside `ondewei-public`. **A custom domain on the private bucket exposes the entire bucket publicly** (Cloudflare's own documented R2 behavior, also explicitly warned about in this app's own `.env.example` comments) — that bucket holds rider IC/license documents, delivery/pickup proof photos, and chat attachments. **Next session must open with confirming this is fixed**: check R2 → `ondewei-private` → Settings → Custom Domains has nothing attached; check `ondewei-public` has `assets.ondewei.my` attached instead. If it's still misconfigured, remove it from private immediately before anything else.
+
+### Domain migration: `ondewei.my` moved from Exabyte/Hostinger DNS to Cloudflare
+Domain registration stayed at Exabyte (registrar unchanged) — only DNS management moved to Cloudflare (nameservers `bart.ns.cloudflare.com` / `savanna.ns.cloudflare.com`). Real DNS content was actually being served by **Hostinger**, not Exabyte, despite Exabyte being the registrar — confirmed because Cloudflare's live scan matched Hostinger's hPanel DNS records exactly, not Exabyte's (which turned out to be a stale/legacy zone with old `byet.org` nameservers, a different IP, and a broken self-referential MX — safe to ignore).
+
+**Two near-misses caught before flipping nameservers** (both would have caused real outages):
+1. Cloudflare's auto-scan defaulted 5 mail-related CNAMEs (`autoconfig`, `autodiscover`, 3× `hostingermail-*._domainkey` DKIM records) to **Proxied** — these are looked up by mail servers/clients directly, not browsers; proxying them would have broken DKIM verification and mail autodiscovery. Fixed to **DNS only** before cutover.
+2. `preprod.ondewei.my` was **completely missing** from Cloudflare's auto-scan — it exists in Hostinger's real panel as an `ALIAS` record (`preprod → preprod.ondewei.my.cdn.hstgr.net`) that the scanner simply didn't pick up. Added manually as a CNAME (set to DNS only, since it's an active staging environment that shouldn't be cached) before switching nameservers — without this, the entire preprod deploy target would have gone dark (NXDOMAIN) the moment nameservers changed.
+
+DNSSEC was checked and confirmed never enabled at Exabyte — non-issue. Nameservers switched, zone went Active (took a few hours to fully propagate; WHOIS/registry updated near-instantly but individual resolvers lagged behind, which is normal).
+
+### 🔴 MAJOR GOTCHA — `.env` is NOT what this app's Docker setup actually reads
+Spent real debugging time on this: `.env` was edited correctly multiple times (R2 keys, endpoint, region=auto, public URL) and `config:clear`/`cache:clear` were run — but Laravel kept resolving stale values. Root cause: **`docker-compose.yml`'s `app` service uses `env_file: .env.docker`**, a completely separate file. Docker bakes `env_file` values into the container's real OS environment **at container startup** — and Laravel's dotenv loader never overrides variables already present in the real environment. Two consequences to remember:
+1. **Any future env change for local dev must go into `.env.docker`, not `.env`.**
+2. Editing `.env.docker` alone isn't enough either — since values are baked in at startup, the container needs a full recreate: `docker-compose up -d --force-recreate app` (a restart may not be sufficient; recreate is what worked).
+
+### R2 architecture — confirmed, worth remembering exactly
+Two completely different upload+view patterns exist, and they're intentionally mirror images of each other based on public vs. private:
+- **Public files (avatars, menu images)**: upload goes **browser → Laravel server → server writes to R2** (traditional multipart upload, no CORS involved ever). Viewing does a 301 redirect straight to the public custom domain (`assets.ondewei.my`) — no server involvement in serving the actual bytes.
+- **Private files (rider docs, delivery/pickup proofs, chat attachments)**: upload goes **browser → R2 directly**, via a presigned PUT URL from `PresignedUploadController::generate()` (`Storage::disk('r2-private')->temporaryUploadUrl()`, 15-min TTL) — bypasses the server entirely for the actual bytes, which is exactly why this needed CORS configured on the bucket (R2 has none by default). Viewing is proxied through routes like `/storage/rider-documents/{id}` — the server fetches from R2 server-side and streams it back, because there's no public URL to redirect to (private bucket has no custom domain by design) and because an authorization check has to happen before the file is served.
+- **CORS fix applied**: added a policy to `ondewei-private` only (public bucket doesn't need one — `<img>` tag loads aren't subject to CORS at all, and public uploads don't use presigned URLs):
+  ```json
+  [{"AllowedOrigins": ["http://localhost", "https://preprod.ondewei.my", "https://ondewei.my"], "AllowedMethods": ["PUT","GET","HEAD"], "AllowedHeaders": ["*"], "MaxAgeSeconds": 3600}]
+  ```
+
+### `storage:migrate-to-r2` artisan command (pre-existing, not written this session)
+Copies (not moves — originals untouched) local files to R2 across 6 scopes (menu-items, avatars → `r2`; delivery_proofs, pickup-proofs, rider_documents, conversation_attachments → `r2-private`). Resumable via a progress JSON file, supports `--dry-run`. **Only migrates files on whatever server it's run on** — needs to run via SSH directly on the Hostinger production server (with that server's own real `.env` populated with R2 creds — no `.env.docker` complexity there since Hostinger doesn't use Docker) to actually migrate the real production files. Not yet run against production.
+
+### Still pending from this session
+- **Confirm and fix the custom-domain security issue above — top priority for next session.**
+- Confirm `R2_PUBLIC_URL` avatar redirect actually resolves for Hakim (was blocked by his local ISP resolver lagging behind Cloudflare's own propagation by ~2 hours; advised switching to 1.1.1.1/8.8.8.8).
+- Run `storage:migrate-to-r2 --dry-run` then for real on the actual Hostinger production server once its `.env` has real R2 credentials.
+- Finish the rest of the QA checklist (Section A remaining items, all of Section B) — artifact at `https://claude.ai/code/artifact/a23f70b5-5c80-4206-a003-d93f1d1f3bf3`.
