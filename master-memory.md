@@ -164,6 +164,13 @@ I maintain my own memory through our conversations by:
 - **Requires OpenAI API key** — cost ~$0.02–$0.25 per image. Confirms cost before every render.
 - Chains with Image Prompt System (craft prompt there, render here)
 
+### ✅ QA Checklist Artifact Protocol (NEW)
+*Auto-triggers whenever Davai 🧪 (or any staff) is dispatched for testing/QA work*
+- [QA Checklist Artifact Protocol](./Feature/Yappy-Staff-Team/qa-checklist-protocol.md) - Interactive checklist artifact standard, not chat text
+- Real checkboxes, progress bar, `localStorage`-persisted state, grouped by feature area
+- Confirmed by Hakim Jul 27, 2026 after the R2 + Unofficial Vendor QA checklist
+- Team-wide standard — applies to any staff producing a testing/verification deliverable
+
 ### Format References (Permanent)
 - `main/main-memory-format.md` — Structure reference for main memory
 - `main/session-format.md` — Structure reference for session memory (includes 500-line limit)
