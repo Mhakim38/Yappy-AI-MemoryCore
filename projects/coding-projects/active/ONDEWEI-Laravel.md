@@ -1070,6 +1070,8 @@ Hakim's list had two "6"s and two "7"s — renumbered into 11 distinct items, re
 
 Every fix verified live (Playwright screenshots/measurements for UI, real HTTP repro + targeted test runs for the two bugs) before committing — not just code review.
 
+QA checklist artifact for this batch: `https://claude.ai/code/artifact/bf46225b-1b13-414e-a8e3-4ad76a2801f2` (interactive, localStorage-persisted, per the QA Checklist Artifact Protocol).
+
 ### 🔴 GOTCHA — `php artisan test` wipes the local dev database, recurs even without running tests
 Happened 3 times in one session (documented above), including once with no `php artisan test` in between at all — just `php -l`/`route:clear`/`route:list`/tinker commands. Root cause not fully pinned down beyond the known env_file-baked-at-startup mismatch (`if0_38066807_ondewei` vs `.env.docker`'s `ondewei_local`) — something is periodically triggering a fresh migration/reseed-worthy wipe on this exact local setup, more often than just "when tests run." Reseed via `php artisan db:seed` restores it (19 users/5 riders/10 orders/3 vendors) — confirmed safe to do freely, Hakim confirmed this DB is just local dev data, not anything sensitive.
 
