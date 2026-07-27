@@ -1058,6 +1058,12 @@ Avatar (public) and rider-document (private) upload + view both verified working
 - Finish the rest of the QA checklist (Section A remaining items, all of Section B — the actual Unofficial Vendor + Credit flow has still never been clicked through live).
 - Confirm on preprod/prod later: same `.env` vs `.env.docker`-style gotcha shouldn't exist there (no Docker), but worth a sanity check that R2 env vars are actually present before assuming they work.
 
+### `ERR_NAME_NOT_RESOLVED` on `assets.ondewei.my` — expected propagation lag, not a real bug (27 Jul 2026)
+Hakim reported avatar upload/upload confirmed present in `ondewei-public` bucket, but browser threw `ERR_NAME_NOT_RESOLVED` loading it from `assets.ondewei.my`. Rider-doc (private, server-proxied) path confirmed working fine at the same time — that alone narrows it to the public redirect path specifically, since that's the only R2 path where the *client's own DNS* resolves the hostname directly (private files never touch `assets.ondewei.my` at all).
+
+Diagnosed directly: `dig assets.ondewei.my` against the sandbox's default resolver returned nothing (SOA still showed `ns1.dns-parking.com`), but the exact same query against `1.1.1.1` and `8.8.8.8` directly resolved correctly to Cloudflare's anycast IPs. Zone/custom-domain config on Cloudflare's side is confirmed correct — this is a resolver that hasn't picked up the nameserver delegation change yet, consistent with what's already documented above ("WHOIS/registry updated near-instantly but individual resolvers lagged behind, which is normal"). Not a bucket, upload, or R2-config problem.
+**Fix**: nothing to fix — resolves itself as caches expire (typically within a few hours, up to ~24-48h worst case for stubborn ISP resolvers). If Hakim wants to confirm it's *only* propagation and not something else: point his device's DNS at `1.1.1.1` temporarily, or just retry the same image URL again later today.
+
 ---
 
 ## Jul 27 morning — Split Dock live-built, BillPlz local creds fixed, preprod deployed twice, critical `.gitignore` bug found
