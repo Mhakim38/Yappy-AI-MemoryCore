@@ -1054,6 +1054,7 @@ Copies (not moves — originals untouched) local files to R2 across 6 scopes (me
 Avatar (public) and rider-document (private) upload + view both verified working live in browser after the DNS-resolver switch and the custom-domain fix. Session closed with two artifacts: an updated QA checklist (`https://claude.ai/code/artifact/a23f70b5-5c80-4206-a003-d93f1d1f3bf3`, now includes a gotchas callout at the top) and a new architecture diagram (`https://claude.ai/code/artifact/ff1e0c29-f686-49be-8671-2043a390c8d2`) showing exactly why public vs private files take mirror-image upload/view paths.
 
 ### Still pending from this session
+- Hakim confirmed preprod pulled + running fine (27 Jul 2026, after the Profile-nav + earlier composer/PHP-8.3 + gitignore fixes all shipped to `feature/push-notification`, latest `bb98ec1`).
 - Run `storage:migrate-to-r2 --dry-run` then for real on the actual Hostinger production server once its `.env` has real R2 credentials (no `.env.docker` complexity there — Hostinger doesn't use Docker).
 - Finish the rest of the QA checklist (Section A remaining items, all of Section B — the actual Unofficial Vendor + Credit flow has still never been clicked through live).
 - Confirm on preprod/prod later: same `.env` vs `.env.docker`-style gotcha shouldn't exist there (no Docker), but worth a sanity check that R2 env vars are actually present before assuming they work.
