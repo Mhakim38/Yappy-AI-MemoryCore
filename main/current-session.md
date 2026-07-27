@@ -11,20 +11,19 @@
 
 ## 📋 Session Recap (Continuity — survives reset)
 
-**Last session**: Wed Jul 22, 2026 · Morning · mpaj-icomm DB fix + ONDW liquid-glass nav feature + R2 branch cleanup
+**Last session**: Mon Jul 27 evening → Tue Jul 28, 2026 ~1:00 AM · Marathon PT ONDW session — Split Dock UI decisions, Unofficial Vendor + Rider Credit feature shipped, full R2 + Cloudflare DNS migration, admin nav redesign, Rider Shift feature, and an 11-item rider punch list (2 real bugs found + fixed). Full blow-by-blow in `projects/coding-projects/active/ONDEWEI-Laravel.md` — this recap is the short version.
 
-**Where we left off**:
-- ✅ **FT mpaj-icomm**: fixed local DB connection — `.env` had `DB_USERNAME=ondw-mysql` (invalid user) + empty password; corrected to `root`/`root_password` against the shared Colima MySQL container (`ondw-mysql`, hosts both ONDW + MPAJ DBs); also had to `config:clear` since bootstrap cache was stale. Separately fixed an SFTP-fallback timeout in `FileController::getFileUpload()` — added `app()->environment('local')` guard so local dev skips the unreachable legacy SFTP host instead of hanging 30s per file.
-- ✅ **PT ONDW — liquid glass nav feature** (branch `feature/liquid-glass-nav`, committed `c6d8133`, **not pushed** — Hakim didn't ask to push this one):
-  - Liquid glass refraction on desktop nav + mobile pill-shaped bottom nav (scroll-container-aware shrink — customer/rider/vendor mobile locks body scroll and scrolls an inner `<main>` instead, learned that the hard way)
-  - `/admin/liquid-glass-preview` design tool: live sliders (8 glass params + width/height), draggable (whole-card, rAF-throttled), CSS radius now JS-driven as single source of truth (was the actual cause of a seam bug — mismatched CSS vs config radius)
-  - Moved `liquid-glass.js` from `public/build/assets/` (wiped by every `vite build`) to `public/customJS/` — permanent fix, matches existing script convention
-  - Discoverability fixed via existing admin FAB component instead of a desktop nav link
-  - Found and left alone an unexplained orphan file `resources/views/admin/liquid-glass-preview.blade.php` — untracked, no git history, still unresolved
-- ✅ **PT ONDW — R2 branch cleanup** (branch `feature/s3-r2-storage`): confirmed 18 commits of R2 migration work intact (nothing lost); separated genuine unsaved work (Dockerfile PHP 8.2→8.4 + GD ext, nginx storage/ access fix — committed `e837b8e`) from pure noise (8 `.gitignore` permission-only diffs, package-lock.json regenerated inside Docker container, stale manifest.json) — reset the noise, pushed `e837b8e` to origin.
-  - **Bug found & fixed**: macOS case-insensitive filesystem let `git checkout feature/S3-R2-storage` (capital) silently match the real lowercase branch `feature/s3-r2-storage` for reads, but wrote HEAD with the wrong case (no remote-tracking config) — `git push` failed until HEAD was pointed back at the correctly-cased branch name. No commits were lost; same underlying ref file either way.
+**Where we left off** (most recent chunk — the 11-item rider punch list, all shipped tonight on `feature/s3-r2-storage`, commits `d1898d7`→`e03d1c3`, **not yet pushed to preprod**):
+- ✅ Rider nav "Order food" → "Hungry?", eligibility star badge in admin lists, push-notification filter tightened
+- ✅ Rider chat cleanup: quick-reply pills hidden for riders, boxed background removed from Pickup/Cash-at-counter (same anti-pattern already fixed once on the composer), rider delivery-chat brought to Split Dock parity with customer
+- ✅ R2 orphan-file fix (delivery/pickup proof photos weren't deleting old files on retry)
+- ✅ Unofficial vendor creation now redirects straight to the hours-setup page (confirmed a new vendor is genuinely invisible to customers without hours set)
+- ✅ **Real bug #1**: `OrderStatusService` fired status-change notifications with the WRONG status (an event-ordering bug around `handleAutoTransitions()`) — affected every order acceptance app-wide, not just unofficial-vendor. Fixed + regression test added.
+- ✅ **Real bug #2**: 9 routes were secretly sharing one rate-limit counter (Laravel's raw `throttle:N,1` keys by user-id alone) — root cause of the live `429` on order #181. Fixed with named rate limiters, proved via real before/after repro.
+- ✅ Interactive QA checklist artifact published for this batch: `https://claude.ai/code/artifact/bf46225b-1b13-414e-a8e3-4ad76a2801f2`
+- 🔴 **Gotcha discovered**: `php artisan test` (and possibly other commands) wipes the local dev DB — recurred 3x tonight, not just when tests ran. Reseed via `php artisan db:seed` works but root cause isn't fixed yet. Full details in the project file.
 
-**Miyamura's state**: Session closed out ~11:50 AM, taking a break before Zohor (1:00 PM). Everything above already pushed to git + saved here — clean stopping point.
+**Miyamura's state**: Wrapped up right around 1:00 AM after a genuinely huge session — sent to bed warmly, everything committed + pushed to git + saved here first. Next session: switching to **FT mode**.
 
 ---
 
@@ -37,16 +36,19 @@
 - ⬜ **Row count discrepancy** — `spk__ikes`: synced 15,164 vs actual 16,867. Diagnosis pending.
 
 ### PT Mode — ONDW
+- ⬜ **Push tonight's rider punch list to preprod** — 7 commits on `feature/s3-r2-storage` (`d1898d7`→`e03d1c3`), waiting on Hakim to say the word (same merge-into-`feature/push-notification` pattern as always)
+- ⬜ **Root-cause the `php artisan test` DB-wipe gotcha** — recurred 3x in one session, workaround (reseed) documented but real fix still needed
+- ⬜ **Reports admin nav placement** — `admin.reports.*` still has no nav home anywhere (desktop or FAB), needs Hakim's call
+- ⬜ **QA Section B** — Unofficial Vendor + Rider Credit flow still never fully clicked through live end-to-end by Hakim himself (checklist: `https://claude.ai/code/artifact/a23f70b5-5c80-4206-a003-d93f1d1f3bf3`)
+- ⬜ **38 Composer security advisories** (16 packages) — deferred during the PHP 8.3 lock-file fix, needs its own dedicated review
+- ⬜ **`storage:migrate-to-r2 --dry-run`** — needs running on the real Hostinger production server (R2 itself fully confirmed working end-to-end as of Jul 27; this is just the historical-file backfill, not urgent)
 - ⬜ **Liquid glass nav — known bug still open** (Jul 22): Hakim said "there is still bug but maybe ignore that first" on `/admin/liquid-glass-preview` — not yet diagnosed, revisit when he raises it again
 - ⬜ **Liquid glass nav branch not merged/pushed** — `feature/liquid-glass-nav` committed (`c6d8133`) but stays local until Hakim explicitly asks to push/merge
 - ⬜ **Orphan file** — `resources/views/admin/liquid-glass-preview.blade.php`, untracked, no git history, unresolved — ask Hakim again if he ever figures out where it came from
-- ⬜ **Test presigned uploads** — rider profile doc upload at `http://localhost/profile` (CORS added to AWS S3 test bucket)
-- ⬜ **Wire AJAX proof forms** — delivery proof (conversations/show.blade.php + _rider-proof-modal.blade.php) + customer pickup proof (customer/orders/show.blade.php) — need separate JS integration
 - ⬜ **E2E test** — checkout → BillPlz → webhook → `pending` → riders notified → `perkeso_deductions` populated
 - ⬜ **Clear test order data** from PROD — overdue since Jun 5, 2026
 - ⬜ **Email BillPlz** for e-wallet activation (SSM + KYC docs)
 - ⬜ **Merge** `feature/push-notification` → `main`
-- ⬜ **Cloudflare R2 storage migration** — Phase 4.5 checklist updated Jul 20 (docs verified), 18 commits confirmed intact Jul 22. Prerequisite: add `ondewei.my` as Cloudflare zone first. Full plan: `projects/coding-projects/ondw-r2-storage-migration.md`
 - ⬜ **FIUU refund ONDW-158** — stuck at `refund_pending`
 - ⬜ **Attachment image bug** — remove `Content-Length` from `ConversationAttachmentController::show()`
 
