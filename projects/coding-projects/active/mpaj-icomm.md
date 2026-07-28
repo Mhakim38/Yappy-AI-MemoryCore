@@ -154,6 +154,19 @@ Backup file in config/. Should be removed from repo.
 ### DUPLICATE ROUTE BLOCK: `/klinik-panel/*` in web.php
 Defined twice (lines 628–658 and 641–658). Second block is superset. Functional but messy.
 
+### 🟡 ON HOLD — SFTP file-routing gap (found + Phase 1 implemented 28 Jul 2026)
+Diagnosed why local disk storage keeps filling up despite a working, tested `sftp` disk (`config/filesystems.php`): every file-upload call in the app hardcodes `'public'`/`'upload'` (local disks) as the explicit disk argument — sftp was configured but never actually wired into upload code. Real scope, confirmed by reading the code (not estimated): 34 files, 167 write call sites across 6 shapes, dozens of read call sites with no sftp-awareness at all, no DB column anywhere tracks which disk a file lives on.
+
+Hakim chose to phase it: **reads first → writes → migrate existing files last**, verifying each phase before the next. **Phase 1 (reads) fully implemented** across 26 files:
+- New `app/Helpers/StorageHelper.php` (follows the existing `PdfHelper.php` precedent) — one `resolveDisk()`/`respond()`/`download()` helper used everywhere instead of each call site hand-rolling its own disk probe.
+- Fixed `file.view` route (`routes/web.php`) — the single highest-leverage change, since dozens of blade files hardcode `route('file.view', ['disk' => ...])`. Also found and fixed 3 more broken raw-`storage_path()` routes beyond the ones originally spotted (`view.file`, `view.proposal.file`, `view.relevant.file`) — same bug, a shape the first grep pass missed.
+- Refactored all ~20 files using the "check upload, then check public" read-probe pattern (~30 call sites) to use `StorageHelper` instead.
+- **2 extra bugs found and fixed along the way, unrelated to the original ask**: (1) `NotifyPegawaiForPetenderOffer.php` + `KontraktorAppointmentNotification.php` built mail attachments via a raw local file path derived from `Storage::disk($x)->path(...)` — would silently break for any sftp-stored file; switched to Laravel's `Attachment::fromStorageDisk()`, which is disk-agnostic. (2) `TawaranPegawai.php`'s download button was already broken independent of sftp — its stored `file_path` was never prefixed with `upload/`, so `storage_path('app/'.$file->file_path)` was looking in the wrong place regardless.
+- 9 of 13 files hardcoding public-disk URLs fixed (routed through `file.view`). 3 left alone on purpose (`GeneratesProcureEnvelopePdf.php`, `SenaraiDokumenPelawaanTender.php`, `SenaraiIklan.php`) — they generate+write a PDF from scratch bypassing `Storage::` entirely, which is real Phase 2 (write-side) work, not a read fix.
+- `tests/Feature/StorageHelperTest.php` added (7 tests, `Storage::fake()` only — deliberately no `RefreshDatabase`, since this repo's `phpunit.xml` has no isolated test database configured and the local dev DB isn't safe to let a test suite touch).
+
+**Status: ON HOLD, not committed.** Hakim: "someone else (she) said she did the changes [to SFTP], not sure what changes yet." Do not resume/push Phase 1, and do not start Phase 2/3, until that's reconciled — there may be conflicting work already in progress elsewhere. Plan file with full per-file detail (for whenever this resumes): was at `/Users/hakim/.claude/plans/stateful-wobbling-meerkat.md` this session — may get overwritten by a later unrelated plan, so treat this MemoryCore note as the durable record.
+
 ---
 
 ## 📁 Route Structure (web.php — 1,674 lines)
