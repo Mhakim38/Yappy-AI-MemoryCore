@@ -36,6 +36,8 @@
 - ⬜ **Row count discrepancy** — `spk__ikes`: synced 15,164 vs actual 16,867. Diagnosis pending.
 
 ### PT Mode — ONDW
+- ⬜ **[NEW Jul 28] View button unclickable on some rows** — `http://localhost/admin/users?user_type=rider` — some (not all) "View" links don't respond to clicks. Checked the star-badge markup added Jul 27 (`resources/views/admin/users/index.blade.php:88-94`) — it's in a separate `<td>` from the View button (`:102`), no overlap/z-index risk from that change, so likely a different cause. Needs live reproduction (which specific rows/riders) before diagnosing further — not yet investigated beyond ruling that out.
+- ⬜ **[NEW Jul 28] Star badge on rider's own profile page** — `http://localhost/profile` — currently the eligibility star only shows in admin-facing lists (approvals + users). Add it beside `$profileName` in `resources/views/profile/edit.blade.php:40`, same `can_fulfill_unofficial_orders` check pattern already used elsewhere.
 - ⬜ **Push tonight's rider punch list to preprod** — 7 commits on `feature/s3-r2-storage` (`d1898d7`→`e03d1c3`), waiting on Hakim to say the word (same merge-into-`feature/push-notification` pattern as always)
 - ⬜ **Root-cause the `php artisan test` DB-wipe gotcha** — recurred 3x in one session, workaround (reseed) documented but real fix still needed
 - ⬜ **Reports admin nav placement** — `admin.reports.*` still has no nav home anywhere (desktop or FAB), needs Hakim's call
