@@ -1119,3 +1119,15 @@ Separate from Split Dock — desktop admin bar regrouped from 9 flat items into 
 - **Confirm preprod server actually pulled + migrated** — GitHub is updated, unclear if Hostinger itself is caught up.
 - `storage:migrate-to-r2` still not run against real production data.
 - Full QA checklist Section B (Credit flow) still never fully clicked through live end-to-end.
+
+---
+
+## Jul 29 evening — Credit balance display fix (post-live-QA of Unofficial Vendor + Credit)
+
+Hakim clicked through the full Credit + Unofficial Vendor flow live end-to-end for the first time (closes the Section B QA gap above) and reported: "Earnings bug not tally with payout." Real bug was purely a DISPLAY problem, not a money problem — confirmed by reading `DisbursementService::pendingBalances()`/`settleCreditIfIncluded()` directly first: the actual bank payout already correctly folds negative credit balance into the real BillPlz PO amount (Hakim's own point #1 confirmed this). The gap: riders/admins saw a scary raw negative ledger number with no clear "already handled" framing, and the Earnings page's "Pending Payout" total was already correct but never broke down *why* it was bigger than plain delivery earnings.
+
+**Fix, commit `867686c`, `feature/push-notification`** (7 files):
+- `CreditService::displayBalanceSenFor()` / `pendingSettlementSenFor()` — two new PURE DISPLAY-ONLY derived methods (`max(0, balance)` / `abs(min(0, balance))`). Deliberately did NOT touch `balanceSenFor()` itself — that's what drives the real −RM5 floor gate and the real disbursement settlement math, both of which must never see a fake-zeroed balance or the floor gate stops gating and the real payout stops topping up.
+- Wired into `Rider\CreditController`, `Admin\RiderCreditController` (both `index()` and `show()`), and 4 blade views (`rider/credits/index`, `admin/rider-credits/index`, `admin/rider-credits/show`, `rider/earnings/index`) — balance never shows negative anymore, replaced with a non-alarming "pending payout, folded into next payout automatically" callout in both rider and admin views. Rider Earnings page now shows an explicit delivery-earnings + credit-settlement = total breakdown instead of one unexplained lump sum.
+- **Verified before committing**: 35/35 tests passing across `CreditServiceTest`, `RiderCreditFloorGateTest`, `CreditSettlementDisbursementTest`, `UnofficialVendorOrderFlowTest` — specifically re-ran the floor-gate and settlement suites as the two things most at risk of a silent regression, both fully green, confirming the real (non-display) balance logic is provably unchanged.
+- Tests must run via `docker exec ondw-app php artisan test ...` — running from the host hits the known `.env`-points-to-`mysql`-hostname gotcha (`getaddrinfo for mysql failed`), not a real failure. Reseeded (`db:seed`) after, per the known test-wipes-local-DB gotcha.
