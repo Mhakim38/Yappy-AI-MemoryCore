@@ -186,6 +186,22 @@ Diagnosis process worth remembering: this took several rounds of Hakim running r
 
 **Not yet done**: deploy + verify on staging/production — needs Hakim, no direct server access from here.
 
+### 🟢 RECOVERED + RE-APPLIED (29 Jul 2026, not yet committed) — Bill of Quantity (BOQ) 5-bug fix
+Hakim recalled a "debugging till 2:30am, server vs local code mismatch" session on `SampulKewangan.php`/`tab-bil-of-quantity.blade.php` but the story was never captured in MemoryCore. Recovered from a Desktop HTML report (`mpaj-boq-fix-report.html`, prepared 19 Jul 2026, original scope) plus `git stash@{0}` ("WIP on main-production", a further-evolved version of part of the fix) — the current `Hakim-dev2` working tree had reverted to the fully-broken original state, none of these fixes were present before this recovery.
+
+Files: `app/Http/Livewire/Perolehan/Tender/SampulKewangan.php` + `resources/views/livewire/perolehan/tender/tab/TabSampulKewangan/tab-bil-of-quantity.blade.php`.
+
+5 bugs, all now fixed locally:
+1. **Blade** — SST `wire:model`/`wire:change` on all 4 sub-levels (bq1_–bq4_) was hardcoded to the top-level `bq_{{ $group->id }}` key instead of each level's own key + correct parent id — SST was never calculated on any sub-row. Re-applied manually (dispatched to Zara, diff verified).
+2. **Blade** — bq4_ (deepest) level had no `total` input at all, just a bare `RM` span with nothing bound. Added the missing readonly input matching the bq3_ pattern. Re-applied manually.
+3. **Blade** — group subtotal rows read `$group['subtotal']`/`$group['subtotal_sst']` (array access on an Eloquent model — always null) instead of the real Livewire properties `$groupSubtotals[$group->id]`/`$groupSubtotalsSst[$group->id]`. Recovered from stash.
+4. **Major** (`SampulKewangan.php::calculateGroupSubtotals()`) — old version matched the BOQ hierarchy via `procure_additional_quotations`->`quotation_summary`, which fails on servers running a modified "Enhanced BOQ Matching" logic (every group subtotal silently shows RM 0.00 even with real rates entered). Replaced with a direct `boq_items` key-traversal — server-agnostic, immune to the mismatch. Recovered version (from stash) is actually **more evolved** than the original 19 Jul report: adds a legacy-format fallback match on `quotation_summary` (by ID or by label string) and a new recalculation block inside `loadFinancialData()` that rebuilds `total`/`total_sst` from the saved envelope on page load — neither documented in the original report, so real progress happened on this after the report was written, also never captured.
+5. **Cleanup** (`SampulKewangan.php::calculateAllTotals()`) — removed duplicate lines/dead comments left over from manual server-side nano edits. Recovered from stash.
+
+Recovery method: `git stash apply stash@{0}` (not `pop` — left the stash in place as a safety net) restored bugs 3/4/5, with 2 merge conflicts to resolve by hand: `SampulKewangan.php` (kept the stashed/fixed version over the old broken one — same underlying change I'd already diffed and confirmed clean) and an unrelated hunk in `config/app.php` (the stash had 4 submodule service providers — Epelesenan/Etempahan/Poslite/Stla — commented out; kept them active/uncommented since that looked like an unrelated local dev workaround baked into the same WIP stash, not part of the BOQ fix). Bugs 1/2 weren't in any stash or branch — checked the other 2 stashes and both `sampul-kewangan`-named remote branches (`origin/main-prod-sampul-kewangan-fix`, `origin/fix/sampul-kewangan-lampiran-4B`) first, found nothing newer there, then manually re-applied from the original report.
+
+**Status**: all 5 applied locally on `Hakim-dev2`, `php -l` clean on both PHP-touching files, not committed (FT mode — Hakim commits manually). Not yet tested in-browser.
+
 ---
 
 ## 📁 Route Structure (web.php — 1,674 lines)
