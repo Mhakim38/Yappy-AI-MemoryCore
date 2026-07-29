@@ -7,8 +7,7 @@
 - Treat Figma as the primary design surface for UI/UX tasks.
 
 ## Designer Assignment
-- **🌸 Hana** is the designated designer in the staff protocol for design work.
-- Hana owns logic alignment, layout sanity, and Figma-driven design analysis where applicable.
+- **🎨 Mira** (UI/UX design) handles design work here, same as every other project — Hakim confirmed 2026-07-29 that staff roles/responsibilities do NOT change per project. The earlier Hana-for-ONDW override (set 2026-07-27) is retired; always use the general staff roster.
 
 ---
 💜 *Simple by design. Updated without fuss.*
