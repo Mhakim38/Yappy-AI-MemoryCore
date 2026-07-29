@@ -154,7 +154,9 @@ Backup file in config/. Should be removed from repo.
 ### DUPLICATE ROUTE BLOCK: `/klinik-panel/*` in web.php
 Defined twice (lines 628–658 and 641–658). Second block is superset. Functional but messy.
 
-### 🟡 ON HOLD — SFTP file-routing gap (found + Phase 1 implemented 28 Jul 2026)
+### ⚪ DISCARDED — SFTP file-routing gap (found + Phase 1 implemented 28 Jul 2026, discarded 29 Jul 2026)
+Hakim asked to fully discard this work on 29 Jul — someone else ("she") already made her own separate SFTP-related changes. Confirmed via `git status` the tracked-file edits were already reverted before I checked; removed the 2 leftover untracked new files to complete the discard. **Nothing of this remains in the working tree as of 29 Jul.** Keeping the write-up below purely as historical reference of the diagnosis (the underlying "sftp disk configured but never wired into upload code" problem is still real and still there) — if this comes up again, treat it as a fresh investigation, don't assume any of the below is still applied.
+
 Diagnosed why local disk storage keeps filling up despite a working, tested `sftp` disk (`config/filesystems.php`): every file-upload call in the app hardcodes `'public'`/`'upload'` (local disks) as the explicit disk argument — sftp was configured but never actually wired into upload code. Real scope, confirmed by reading the code (not estimated): 34 files, 167 write call sites across 6 shapes, dozens of read call sites with no sftp-awareness at all, no DB column anywhere tracks which disk a file lives on.
 
 Hakim chose to phase it: **reads first → writes → migrate existing files last**, verifying each phase before the next. **Phase 1 (reads) fully implemented** across 26 files:
@@ -165,7 +167,24 @@ Hakim chose to phase it: **reads first → writes → migrate existing files las
 - 9 of 13 files hardcoding public-disk URLs fixed (routed through `file.view`). 3 left alone on purpose (`GeneratesProcureEnvelopePdf.php`, `SenaraiDokumenPelawaanTender.php`, `SenaraiIklan.php`) — they generate+write a PDF from scratch bypassing `Storage::` entirely, which is real Phase 2 (write-side) work, not a read fix.
 - `tests/Feature/StorageHelperTest.php` added (7 tests, `Storage::fake()` only — deliberately no `RefreshDatabase`, since this repo's `phpunit.xml` has no isolated test database configured and the local dev DB isn't safe to let a test suite touch).
 
-**Status: ON HOLD, not committed.** Hakim: "someone else (she) said she did the changes [to SFTP], not sure what changes yet." Do not resume/push Phase 1, and do not start Phase 2/3, until that's reconciled — there may be conflicting work already in progress elsewhere. Plan file with full per-file detail (for whenever this resumes): was at `/Users/hakim/.claude/plans/stateful-wobbling-meerkat.md` this session — may get overwritten by a later unrelated plan, so treat this MemoryCore note as the durable record.
+**Status: DISCARDED 29 Jul 2026, working tree clean.** If SFTP routing is picked up again later, it needs a fresh investigation — check what "she" actually changed first, don't assume this write-up still matches reality.
+
+---
+
+### 🟢 FIXED (29 Jul 2026, not yet committed) — CronCheckPaymentSenangPay lock timeout
+Real production incident, root-caused via live log correlation rather than guessed: `SQLSTATE[HY000]: General error: 1205 Lock wait timeout exceeded` on the hourly payment-reconciliation cron. The failing `UPDATE payment_collections ... WHERE rp_productID = X` sat blocked for **exactly 50 seconds** — matches MySQL's default `innodb_lock_wait_timeout` precisely (`updated_at` value being written showed `15:59:31`, error logged `16:00:21`).
+
+Two compounding causes:
+1. `payment_collections` (15,772+ rows) has **no index** on `rp_productID`, `paid`, or `timestamp` — confirmed by reading every migration; the table's only index (`description`+`myID`) is unused by this cron. Every query is a full table scan, and InnoDB's default isolation can lock rows merely examined during a scan, not just the one matched.
+2. `CronCheckPaymentSenangPay.php` wrapped its entire daily batch loop in one outer transaction (`DB::beginTransaction()` before the loop, `commit()` only after every order that day finished) — so any lock taken processing order #1 stayed held until the last order in the batch was done.
+
+**Fix** (both in the local working tree, not committed — FT mode, Hakim commits):
+- New migration `database/migrations/2026_07_29_000001_add_indexes_to_payment_collections_table.php` — adds the two missing indexes. Verified locally (ran, checked via `SHOW INDEX`, rolled back cleanly, re-applied).
+- `app/Console/Commands/CronCheckPaymentSenangPay.php` — removed the outer `DB::beginTransaction()`/`commit()`/`rollback()` (each order's real writes already have their own transaction handling inside `Helper::semakPembayaranSenangpay()`). Verified via a real local run — hit an unrelated pre-existing local-only gap (the `Epelesenan` submodule isn't even registered in this checkout's `.gitmodules`), but confirmed the fix itself behaves correctly: exception caught cleanly, no dangling transaction.
+
+Diagnosis process worth remembering: this took several rounds of Hakim running real commands on staging/production and pasting back actual logs (not me guessing) — including catching that my first hypothesis (a mixed-format `timestamp` column silently breaking date-range queries) was **wrong**, disproven by a real test returning 22 rows instead of the predicted 0. Left that as a known code smell, not a bug, once disproven.
+
+**Not yet done**: deploy + verify on staging/production — needs Hakim, no direct server access from here.
 
 ---
 
