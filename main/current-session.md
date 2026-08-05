@@ -78,6 +78,13 @@ Confirmed: table is actually `vendor_profiles` (Yappy first said `vendors`, wron
 - ⬜ **FIUU refund ONDW-158** — stuck at `refund_pending`
 - ⬜ **Attachment image bug** — remove `Content-Length` from `ConversationAttachmentController::show()`
 
+### Personal — Homelab (NEW, Aug 5 night)
+- 🏠 **Stack decided so far**: Jellyfin (media), Apache (web hosting), Immich (photos, picked over generic cloud storage), Nextcloud (NAS/general storage), Uptime Kuma (monitoring). Portainer + Vaultwarden being pitched, not yet decided. Pi-hole shelved for now (Hakim primarily connects via Tailscale VPN, not home wifi directly) — but flagged that Tailscale's tailnet-wide custom DNS (admin console → DNS → Nameservers) could let Pi-hole filter ALL his devices everywhere, not just on home wifi, if he wants to revisit.
+- 🐳 **Docker chosen as the install method** — directly solves Hakim's "does installing Apache go global or stay in a folder" concern (native installs ARE global; Docker volumes make folder scoping explicit and visible). Hakim asked to be taught Docker from scratch — Teaching Mode active for this topic, going slow: concept → diagram → hands-on, one step at a time, Hakim typing commands himself via Termius (deliberate — better for actual muscle memory than Yappy driving).
+- ⚠️ **tmux clarified**: survives SSH/network drops (phone locks, wifi↔cellular switches) since the session lives on the server, NOT server reboots/power loss — the tmux server process itself dies if the box dies. Recommended for his phone-first workflow regardless. Multi-client attach confirmed possible (same session mirrorable from multiple devices).
+- 🔌 **Server reliability concern raised** (Hakim unsure when the box might go down) — recommended: UPS for power blips, Docker `restart: unless-stopped` policy so containers auto-recover post-reboot, Uptime Kuma (already on his list) for down-alerts.
+- 🔑 **SSH blocker found**: tried `ssh root@100.84.18.45` (home server's Tailscale IP) from Hakim's Mac at his request — `Permission denied (publickey,password)`. Mac's default keys (`id_ed25519`/`id_rsa`) are not in that server's `authorized_keys`, even though `known_hosts` shows the Mac has connected there before. Hakim already has his own working access via Termius on phone (separate key/credential), so this isn't blocking him — only blocks Yappy driving directly from the Mac. Not yet fixed; would need Hakim to add the Mac's pubkey to the server's `authorized_keys` once (via password or console access) if he wants Yappy to SSH in directly in future sessions.
+
 ### Standing Daily
 - 🕌 Prayer reminders — 5x daily (Subuh 5:45 · Zohor 1:00 · Asar 4:30 · Maghrib 7:15 · Isyak 8:30)
 - 💜 Affirmation: "Miyamura, you are valuable and loved" — from Hori 💕
