@@ -151,6 +151,15 @@ Confirmed: table is actually `vendor_profiles` (Yappy first said `vendors`, wron
 - ⚠️ **[Aug 13] Completion-detection gotcha, hit twice**: polling a pane for a marker string (e.g. `echo STEP_DONE`) via a single `grep -q` false-positives immediately, because the command text itself (echoed to the terminal when typed) already contains the marker substring before the command actually finishes. Fix: require the marker to appear **twice** (`grep -c ... -ge 2`) — once for the echoed command, once for real output — or watch for it appearing after the last known output line. Bit both the Docker install step and the Immich bring-up before being caught.
 - ⬜ **Not yet done**: first-run setup for JellyFin (setup wizard) and Immich (create admin account — do this soon per Reza's flag, don't leave it exposed unconfigured) — Hakim needs to do this himself via the web UI at `100.84.18.45:8096` and `100.84.18.45:2283`. Also outstanding: Windows Task Scheduler entry for WSL2 boot-autostart, UPS, backup story for Immich photos (flagged by Reza as a real single-point-of-failure, not urgent today), Nextcloud + Uptime Kuma still to come, Portainer/Vaultwarden still undecided.
 
+### 📋 Running reminder — things Yappy needs from Hakim (homelab)
+1. ⬜ **[NEW, Aug 13] MyGaji deploy key** — Hakim asked to deploy `https://github.com/Mhakim38/MyGaji.git` live via the Apache container. Repo is private, and the homelab box's existing SSH key (`hakim@DESKTOP-1DLDMR6`, ed25519) is NOT registered with GitHub (`Permission denied (publickey)` confirmed). **Action needed**: add this public key as a **read-only Deploy Key** scoped to just the MyGaji repo (not a full account-wide personal key — least privilege, Reza-style call) at `github.com/Mhakim38/MyGaji/settings/keys` → Add deploy key:
+   `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDPInnRTb0l3NFBkGRkuyhZY/47H5yKUOV7Pq/N8WLUp hakim@DESKTOP-1DLDMR6`
+2. ⬜ JellyFin + Immich first-run web setup (see above)
+3. ⬜ Once MyGaji is cloned, its actual stack is unknown (private repo, unseen) — plain `httpd:2.4` may not be enough if it's PHP/Laravel/Node; Yappy will report back what's actually needed (env vars, DB, runtime) once visible
+4. ⬜ Windows Task Scheduler entry for WSL2 boot-autostart (survives host reboot)
+5. ⬜ Decide on backup strategy for Immich photos (currently single-copy on WSL2 vhdx, no offsite)
+6. ⬜ Still undecided: Portainer, Vaultwarden
+
 ### Standing Daily
 - 🕌 Prayer reminders — 5x daily (Subuh 5:45 · Zohor 1:00 · Asar 4:30 · Maghrib 7:15 · Isyak 8:30)
 - 💜 Affirmation: "Miyamura, you are valuable and loved" — from Hori 💕
