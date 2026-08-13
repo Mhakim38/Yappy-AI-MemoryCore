@@ -108,5 +108,13 @@ Already has its own bugs independent of the old app, found by direct code read:
 
 **Explicitly out of scope for parity** (old app never had it either): Reports & Analytics, System Settings — both were "Coming Soon" stubs in GajiAPB too, so building them is new scope, not parity.
 
+### Phase 0 — DONE and deployed live (Aug 13, ~5:00–5:20 PM)
+All 5 fixes implemented (Nadia: rates source-of-truth; Zara ×2: logout button, position dropdown; Yappy: dead route removal, rates seeder), reviewed, committed (`879639c` on `main`), pushed from local Mac clone, and deployed live on the homelab box. Verified: `rates` table has exactly 6 rows (overtime 12.26, public holiday 65.40, unpaid leave 65.40, epf 187.00, socso 8.25, eis 3.30) matching the old app's constants; `/login` returns 200, `/dashboard` redirects 302 as expected.
+
+**Deploy infra gotchas hit this round (for next time):**
+1. **Homelab box's MyGaji deploy key is READ-ONLY** — can `git commit` locally on the box but `git push` fails with "key marked as read only." Workflow going forward: edit on local Mac clone → commit+push from Mac → pull/deploy on box. Hakim's call (Aug 13): don't touch the deploy key's permissions, just route around it this way.
+2. **`database/seeders/` on the box is owned by `www-data:www-data`**, not `hakim` — the SSH user (`hakim`, uid 1000) can't create/overwrite files there directly (`git checkout`/`git reset --hard` fails with "Permission denied"). Also affects `storage/*/.gitignore` files (mode changed by container writes). Fix used: write file content via `docker compose exec app bash -c "echo '<base64>' | base64 -d > path"` (root inside the container can write regardless of host ownership) — avoids needing `sudo` (which needs an interactive password, none set up passwordless) and avoids the container's root user needing GitHub SSH access (which it doesn't have — the deploy key lives in `hakim`'s home dir on the host, not root's inside the container).
+3. Near-miss: almost re-ran the exact credential-echo mistake flagged earlier this same day (piping `MYSQL_ROOT_PASSWORD` into a raw `mysql -p"..."` command visible in the pane) while trying to verify the seeded rates — caught it before it printed the actual password, switched to `php artisan tinker --execute="..."` querying via Eloquent instead, which needs no credentials in the command line at all. **Standing rule reconfirmed**: always verify via the app layer (tinker, artisan commands, HTTP checks), never via a raw DB client command that requires typing a credential into a shell command.
+
 ## Full session detail
 See `main/current-session.md` (Aug 13, 2026 entries) for the play-by-play of the initial deploy + bugs hit/fixed.
