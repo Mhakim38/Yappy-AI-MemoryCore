@@ -19,8 +19,18 @@ Three real bugs hit back to back, all found through direct verification (PDO tes
 - **Standing rule going forward (Kai's recommendation)**: any secret in either `.env` file should be double-quoted by default if it contains `#`, spaces, backslash, or a quote char — single-quoted instead if it contains `$` (phpdotenv supports `${VAR}` interpolation inside double quotes, so `$` in a double-quoted secret is a real risk). Better yet: **generate future secrets on this project without `#`/`$`/backtick/quote characters entirely** to sidestep the whole bug class rather than relying on remembering to quote correctly each time.
 - **Security note**: Kai's proposed verification step (printing the resolved password via `tinker --execute="echo config(...)"`) was flagged by the harness as a credential-exposure risk before execution — skipped it, verified success via the migration itself succeeding instead (no need to ever echo the real secret to a transcript/pane).
 
-## Blocking on Hakim
-- **GajiAPB deploy key**: same SSH key as MyGaji (`ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDPInnRTb0l3NFBkGRkuyhZY/47H5yKUOV7Pq/N8WLUp hakim@DESKTOP-1DLDMR6`), needs adding as a **read-only deploy key** at `github.com/Mhakim38/GajiAPB/settings/keys`. Blocks the entire gap-analysis phase — can't compare against a repo Yappy can't read.
+## Access (resolved Aug 13, ~4:20 PM)
+- GajiAPB is now cloned at `/home/hakim/docker/gajiapb-src/` on the homelab box. **GitHub deploy keys cannot be reused across repos** — the original MyGaji key got "already in use" when tried on GajiAPB. Fixed by generating a SECOND dedicated keypair (`~/.ssh/id_ed25519_gajiapb`) + an SSH config alias (`Host github-gajiapb` in `~/.ssh/config`, pointing at `github.com` with `IdentityFile ~/.ssh/id_ed25519_gajiapb`) so both repos have isolated, least-privilege access. Clone via `git clone github-gajiapb:Mhakim38/GajiAPB.git`, not the plain `git@github.com:` form.
+
+## GajiAPB — real structure (confirmed Aug 13, not what was assumed)
+Much more complex than a simple "Firebase backend" — it's a **Capacitor hybrid mobile app** (Android-wrapped web app), not a plain web app:
+- `www/` — vanilla JS frontend (no framework)
+- `www/ajax/` — separate PHP backend, own `composer.json`, uses `kreait/firebase-php` (server-side Firebase SDK)
+- `www/secret/config.js` — Firebase client config
+- `www/calculation.js` — core payroll calculation logic (highest priority file for the business-logic gap analysis)
+- `www/js/sessionCapacitor.js` — session/auth handling
+- `www/ajax/processPDF.php` — PDF generation (likely payslips)
+- Talks to Firebase from BOTH the frontend JS (`firebase` npm package) AND the PHP backend (`kreait/firebase-php`) — two separate integration points to account for when mapping to MySQL
 
 ## Plan (phases)
 1. **Infra** (in progress): MySQL migration for Laravel MyGaji — Kai
@@ -32,6 +42,71 @@ Three real bugs hit back to back, all found through direct verification (PDO tes
 ## Notes / gotchas discovered
 - Running `docker compose` commands from inside `~/docker/mygaji/src/` (the Laravel root, not the compose-file directory `~/docker/mygaji/`) produced warnings referencing `WWWUSER`/`DB_DATABASE`/`DB_USERNAME`/`DB_PASSWORD`/`MYSQL_EXTRA_OPTIONS` (Laravel Sail's stock variable names) and "service app is not running" — cause under investigation by Kai as part of the MySQL setup, since two `.env` files will exist in this project (compose-level at `~/docker/mygaji/.env` and Laravel's own at `~/docker/mygaji/src/.env`) and that distinction needs to be crystal clear to avoid future confusion.
 - Earlier bug (fixed): Apache's `AllowOverride None` default silently broke all non-root Laravel routes — see `main/current-session.md` Aug 13 entry for full detail, same box/pattern likely relevant to remember for any future PHP container here.
+
+## Gap analysis (Aug 13, ~4:30–4:45 PM) — full redo, verified against real code
+
+**Note**: an earlier gap-analysis pass (task #17) was done in a prior session but its findings were never saved anywhere durable — not here, not in `current-session.md`, not in the task record. This section replaces that with a fresh, fully-verified pass: Sora read the old GajiAPB codebase over SSH, Hana read the new MyGaji Laravel codebase locally, Nadia extracted and diffed the payroll math from both, Kai mapped Firestore → MySQL schema. All findings below are quoted from actual code, not inferred.
+
+### Old app (GajiAPB) — what it actually does
+15 screens/pages (vanilla JS + Firebase v9 modular SDK, Firestore project `mygaji-7212c`). Working: login (Firebase Auth), staff list/create/detail/update (photo upload, delete w/ cascade), salary management (OT/PH/UPL adjustment + calc), payslip + monthly report printing (via `window.postMessage('reportReady')` pattern), HR letter generation (warning/reason, `.docx` via docxtemplater — **PDF conversion step is dead code**, missing Firebase service-account credentials on disk, and its only caller is commented out). Stubbed as "Coming Soon": Reports & Analytics, System Settings, Profile nav tab. Two orphan pages (`welcomev2.html`, `PageKosong.html`), not reachable from nav.
+
+Firestore collections: `employees` (doc ID = staff-entered ID), `salaries` (**one doc per employee, current cycle only — destructively wiped every month** by a manual reset gated to the 18th+; no salary history ever existed in this data model), `system_reset` (single config doc). No Firestore security rules exist in source control anywhere.
+
+Payroll math (`calculation.js`, applied in `Msalary.html`): base salary flat **RM1700 for every staff member regardless of position** (Position is just a free-text label, never affects pay) → minus fixed KWSP 187/SOCSO 8.25/EIS 3.30 → plus/minus PH (RM65.40/day), OT (RM12.26/hr), UPL (RM65.40/day deduction). **Part-time staff are a fully separate category**: RM8.17/hr flat, zero deductions, no base salary. Old app has one internal dead-code bug (`paycheck.html`'s unused `calculateTotal()` treats UPL as addition, contradicts the live formula) — don't accidentally port it.
+
+### New app (MyGaji Laravel) — current real state
+Already has its own bugs independent of the old app, found by direct code read:
+- `GET /staff/updateStaff` is a **broken route** — points to a nonexistent Blade view
+- **Finance Settings screen is a pure mockup** — hardcoded fake stats, "save" buttons just `alert()`, no backend wiring at all, routes referenced are commented out
+- **KWSP/SOCSO/EIS dual-sourced**: hardcoded as PHP constants inside `calculateSalary()`, but read from the `rates` table for *display only* in `displayPaycheck()` — editing those rate rows silently does nothing to actual payroll
+- `rates` table has **zero seeded rows** — nothing populates OT/PH/UPL values into it yet
+- Position dropdown hardcoded (3 fixed options) on staff-create, but dynamically DB-driven on staff-detail's update modal — inconsistent
+- No profile-photo upload wired (`uploadProfileImage()` JS function doesn't exist, no DB column)
+- **No logout button anywhere in the rendered UI** (route/controller work fine, just unlinked)
+- Dead link: floating-button option points to nonexistent `letterForm.html`
+- Payroll calc **structure** is already correct and matches the old app's formula shape (additions − deductions = net), stored per staff/year/month with a proper unique constraint — a real improvement over the old app's history-destroying model
+- Part-time payroll: **does not exist at all** — no staff-type field, no rate, no code path, `staff` table has no way to even represent a part-time worker
+
+### Schema mapping (Firestore → MySQL) — key gaps
+- `employees.Position` (free-text, 3 fixed values) → needs a seeded `position` table; `base_salary` per position has **no source data** — old app never varied base pay by role, so this is a new business decision, not a migration
+- `marital_status` was **never stored** in Firestore — old app inferred it from whether `Nama_Suami_Istri` was non-empty; must be derived at import, not copied
+- `disease_status` inconsistently written (update flow sets it, create flow doesn't) — real data-quality gap in the source
+- `profileImage` (Storage URL) has no MySQL column yet
+- **Biggest structural gap**: `salaries` → `paychecks`. Old data is "current cycle only," destructively reset monthly — **there is no history to migrate**, only whatever's live at cutover time. `total_earned`/`total_deducted` don't exist as stored fields in the old data (only a single `totalSalary` net figure) — must be recomputed from the same formula against the stored OT/PH/UPL inputs, not copied.
+- `rates` table seed data is a clean, direct win: old app's hardcoded constants (OT 12.26, PH/UPL 65.40, KWSP 187, SOCSO 8.25, EIS 3.30) map straight across.
+- No `system_reset` equivalent exists yet — needs either a small settings table, or (recommended) redesign the reset flow to keep history instead of wiping it, since the new schema already supports that and the old destructive pattern was arguably a bug, not a feature worth preserving as-is.
+
+## Phased plan to reach parity (Task #18)
+
+**Phase 0 — Fix what's already broken in the new app** (independent of any old-app parity work, do this regardless):
+1. Fix/remove the broken `GET /staff/updateStaff` route
+2. Pick ONE source of truth for KWSP/SOCSO/EIS (read from `rates` table everywhere, drop the hardcoded PHP constants) — this is a real correctness bug, not cosmetic
+3. Seed the `rates` table with the old app's constants (OT 12.26, PH 65.40, UPL 65.40, KWSP 187, SOCSO 8.25, EIS 3.30)
+4. Add a logout entry point to the UI
+5. Reconcile the position-dropdown inconsistency (hardcoded on create vs DB-driven on detail) — make both DB-driven
+
+**Phase 1 — Schema completion** (before any data migration):
+6. Add `marital_status`, `disease_status`, profile-photo column to `staff` (decide storage target — R2/S3, not Firebase)
+7. Add a small settings/config table, or redesign monthly reset to preserve history (recommended over porting the old destructive-wipe behavior)
+8. **Needs Hakim's call**: `position.base_salary` — keep old behavior (flat RM1700 for everyone) or genuinely go per-position now that the schema supports it? Old app data gives no guidance either way.
+
+**Phase 2 — One-time data migration**:
+9. Migrate `employees` → `staff` per the field mapping above, seeding `position` first, deriving `marital_status`, reconciling `disease_status`
+10. Migrate whatever's live in `salaries` → `paychecks` (current cycle only — explicitly no history exists to bring over), recomputing `total_earned`/`total_deducted` from the formula rather than copying
+
+**Phase 3 — Missing features** (real gaps vs. old app, not bugs):
+11. Part-time staff support — new staff-type field, hourly-rate-only pay path, no deductions (currently 0% present in new app)
+12. Wire up staff profile-photo upload
+13. Real Finance Settings backend (rate + position CRUD) — currently pure mockup
+14. **Decision needed**: port HR letter generation (warning/reason letters)? The old app's PDF step was already dead/dormant before this project even started — worth asking if it's wanted at all or was already abandoned in practice
+
+**Phase 4 — Business rules & UX parity**:
+15. Session timeout (30 min inactivity)
+16. Staff ID uniqueness validation
+17. Cascade delete (staff → paycheck records)
+18. Print/payslip flow parity
+
+**Explicitly out of scope for parity** (old app never had it either): Reports & Analytics, System Settings — both were "Coming Soon" stubs in GajiAPB too, so building them is new scope, not parity.
 
 ## Full session detail
 See `main/current-session.md` (Aug 13, 2026 entries) for the play-by-play of the initial deploy + bugs hit/fixed.
