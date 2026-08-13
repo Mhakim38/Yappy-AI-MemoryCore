@@ -152,13 +152,13 @@ Confirmed: table is actually `vendor_profiles` (Yappy first said `vendors`, wron
 - ⬜ **Not yet done**: first-run setup for JellyFin (setup wizard) and Immich (create admin account — do this soon per Reza's flag, don't leave it exposed unconfigured) — Hakim needs to do this himself via the web UI at `100.84.18.45:8096` and `100.84.18.45:2283`. Also outstanding: Windows Task Scheduler entry for WSL2 boot-autostart, UPS, backup story for Immich photos (flagged by Reza as a real single-point-of-failure, not urgent today), Nextcloud + Uptime Kuma still to come, Portainer/Vaultwarden still undecided.
 
 ### 📋 Running reminder — things Yappy needs from Hakim (homelab)
-1. ⬜ **[NEW, Aug 13] MyGaji deploy key** — Hakim asked to deploy `https://github.com/Mhakim38/MyGaji.git` live via the Apache container. Repo is private, and the homelab box's existing SSH key (`hakim@DESKTOP-1DLDMR6`, ed25519) is NOT registered with GitHub (`Permission denied (publickey)` confirmed). **Action needed**: add this public key as a **read-only Deploy Key** scoped to just the MyGaji repo (not a full account-wide personal key — least privilege, Reza-style call) at `github.com/Mhakim38/MyGaji/settings/keys` → Add deploy key:
-   `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDPInnRTb0l3NFBkGRkuyhZY/47H5yKUOV7Pq/N8WLUp hakim@DESKTOP-1DLDMR6`
-2. ⬜ JellyFin + Immich first-run web setup (see above)
-3. ⬜ Once MyGaji is cloned, its actual stack is unknown (private repo, unseen) — plain `httpd:2.4` may not be enough if it's PHP/Laravel/Node; Yappy will report back what's actually needed (env vars, DB, runtime) once visible
+1. ✅ **[DONE, Aug 13] MyGaji deploy key** — added by Hakim, confirmed working (`ssh -T git@github.com` greeted as `Mhakim38/MyGaji`). Repo cloned; confirmed Laravel 12 + PHP 8.2 fresh scaffold. Kai + Reza reviewed, deployment in progress: `php:8.2-apache`, SQLite, port 8090, container built and up, composer/key/db setup running now.
+2. ⬜ JellyFin + Immich first-run web setup — still not done (`100.84.18.45:8096` and `:2283`)
+3. ⬜ Once MyGaji is live: Hakim should manually verify `.env` got `APP_DEBUG=false` + `APP_ENV=production` + correct `APP_URL` applied (Reza's must-fix-before-live list) — Yappy is applying these but a human eyeball check is worth it for anything payroll-flavored
 4. ⬜ Windows Task Scheduler entry for WSL2 boot-autostart (survives host reboot)
-5. ⬜ Decide on backup strategy for Immich photos (currently single-copy on WSL2 vhdx, no offsite)
+5. ⬜ Decide on backup strategy for Immich photos (currently single-copy on WSL2 vhdx, no offsite) — Reza flagged this twice now
 6. ⬜ Still undecided: Portainer, Vaultwarden
+7. ⬜ Encryption-at-rest / backup plan for MyGaji's SQLite file — Reza said decide the *plan* now (cheap), can implement later since no real payroll data exists yet
 
 ### Standing Daily
 - 🕌 Prayer reminders — 5x daily (Subuh 5:45 · Zohor 1:00 · Asar 4:30 · Maghrib 7:15 · Isyak 8:30)
