@@ -32,5 +32,17 @@ First redo (after the networkidle/playwright fixes above) still came out visibly
 
 **Process lesson, not just a tool lesson**: the first redo was reported as "done" based on the subagent's own summary without Yappy visually checking the actual Figma output — the same review gap that caused the FIRST attempt's failure to go unnoticed. Second redo, Yappy pulled `figma-cli verify <nodeId> --save <path>` screenshots and read them directly before saying anything was fixed. **This is now the standing bar**: never declare a `recreate-url`/design-recreation task done off a subagent's text report alone — always screenshot + look at the actual node yourself first.
 
+**Full bug list, all found+patched the same session (Aug 14, 2026), local clone only**: it took 6 rounds total to get a genuinely clean result. Full list for future reference if `recreate-url` output looks "almost right but off":
+1. Screen-reader-only content (`.visually-hidden`/`.sr-only`, clip-based hiding) extracted as visible text.
+2. Text nodes never got `textAutoResize`/`resize()` — long headings ran off the frame edge instead of wrapping.
+3. Heading selector only matched `h1-h3`, silently dropping real content in `h4-h6`.
+4. Fix #1 above wasn't enough — a VISIBLE parent (e.g. a button) whose only "text" was a hidden descendant still leaked that hidden text via `.innerText`. Needed a proper `getVisibleText()` walk that excludes hidden descendants, not just an is-this-element-hidden check.
+5. The width-buffer chosen for fix #2 was too tight — short labels ("Name", "STF-001") wrapped mid-word/mid-character due to browser-vs-Figma font metric differences. Fixed with a flat `+16px` buffer.
+6. Nested text-bearing elements (e.g. `<button><span>Home</span></button>`) got extracted TWICE — once via the button's own text, once via the span matching a separate loop — creating overlapping duplicate text on literally every screen (doubled nav labels, doubled OT/PH/UPL labels). Fixed with a `hasTextBearingAncestor()` check: skip any element whose parent chain already matches a text-bearing selector.
+7. `opacity: 0`/`visibility: hidden` elements (e.g. a desktop-only `:hover`-reveal label sitting invisible on mobile) still measured non-zero `getBoundingClientRect()` dimensions, so they passed the visible-content filter. Added to the same hidden-content check.
+8. The button-extraction size threshold (`rect.width > 30`) was tight enough that a real, visible nav icon (28.94px wide) got silently excluded — while its 4 sibling nav items (each slightly wider) all passed. Loosened to `> 20` to match the height threshold already in use.
+
+**Section-membership flakiness** (separate from the extraction bugs above, hit multiple times): a freshly-created Figma section can (a) report a stale immediate child count that doesn't hold, or (b) silently evict all its children on a later layout pass if the section was created with a tiny default box far from the actual frames' real position. Fix: after `section create`/`section add`, resize/reposition the section to actually bound the frames' real coordinates, then re-verify child count at least twice — once immediately, once after doing unrelated work — before trusting it.
+
 ---
 💜 *Simple by design. Updated without fuss.*
