@@ -121,5 +121,16 @@ Homelab box was unreachable this session (Tailscale timeout), so instead of scre
 
 **Security finding flagged, not fixed (out of scope for this task)**: `/staff/detail/{id}` (`routes/web.php`, route name `staffDetail`) has NO `auth`/`verified` middleware at all — unlike every other staff-related page route. Looks like a real oversight (payroll/staff PII reachable without login) rather than intentional. Worth a dedicated Reza security pass before this goes further into Phase 1+.
 
+### Task #19 — correction (Aug 16, 2026): actually resolved now, prior "DONE" note was premature
+The Aug 14 session ended mid-crisis, not actually resolved — after the 7 screens were individually verified clean, they got wrapped in a Figma section for organization, and the SECTION itself had a bug (wrong dark `rgb(0.267,0.267,0.267)` fill + bounding box 810px wider than its actual content on one side, 730px short on the other) that rendered as a solid black/blank box, which is what Hakim was actually seeing when he said "unfinished." Fix: removed the section wrapper entirely (`s.remove()` after reparenting children to the page) rather than keep fighting the section's fill/bounds — Figma auto-repositioned the 7 orphaned frames into a clean, evenly-spaced row (490px apart) on its own. Re-verified Aug 16: all 7 frames still individually clean (spot-checked Login + Salary Management fresh), Hakim's own viewport scrolled to them via `figma.viewport.scrollAndZoomIntoView()`. **This is now genuinely done** — no section wrapper, just 7 clean standalone frames on the ONDW canvas.
+
+**Lesson for any future figma-cli section use**: sections in this tool have proven unreliable across multiple rounds (wrong default fill, bounding-box/children mismatch, silent child-count eviction — see [[design-protocol]] for full details). Default to NOT using a section wrapper unless there's a specific reason to — loose frames on the canvas render more reliably than section-grouped ones.
+
+### Phase 1 schema completion — dispatched Aug 16, 2026 (Nadia + Reza, in progress)
+- Reza: fixing the flagged `/staff/detail/{id}` auth gap (and auditing sibling AJAX routes `getDetail`/`getPosition` for the same issue)
+- Nadia: adding `marital_status`, `disease_status`, `profile_photo` (nullable, storage backend deferred) columns to `staff`, plus a small `settings` key-value table; wiring the already-existing but currently-inert staff-create form fields (marital status dropdown, disease toggle) to actually persist
+- Both working on the local Mac clone (`/Users/hakim/holeeMonth/MyGaji`), which has normal push rights — homelab box's read-only deploy key issue only applies when working directly on the box
+- `position.base_salary` (flat RM1700 vs. real per-position rates) is still an open decision for Hakim — not touched by this dispatch
+
 ## Full session detail
 See `main/current-session.md` (Aug 13, 2026 entries) for the play-by-play of the initial deploy + bugs hit/fixed.
