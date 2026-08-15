@@ -126,11 +126,11 @@ The Aug 14 session ended mid-crisis, not actually resolved — after the 7 scree
 
 **Lesson for any future figma-cli section use**: sections in this tool have proven unreliable across multiple rounds (wrong default fill, bounding-box/children mismatch, silent child-count eviction — see [[design-protocol]] for full details). Default to NOT using a section wrapper unless there's a specific reason to — loose frames on the canvas render more reliably than section-grouped ones.
 
-### Phase 1 schema completion — dispatched Aug 16, 2026 (Nadia + Reza, in progress)
-- Reza: fixing the flagged `/staff/detail/{id}` auth gap (and auditing sibling AJAX routes `getDetail`/`getPosition` for the same issue)
-- Nadia: adding `marital_status`, `disease_status`, `profile_photo` (nullable, storage backend deferred) columns to `staff`, plus a small `settings` key-value table; wiring the already-existing but currently-inert staff-create form fields (marital status dropdown, disease toggle) to actually persist
-- Both working on the local Mac clone (`/Users/hakim/holeeMonth/MyGaji`), which has normal push rights — homelab box's read-only deploy key issue only applies when working directly on the box
-- `position.base_salary` (flat RM1700 vs. real per-position rates) is still an open decision for Hakim — not touched by this dispatch
+### Phase 1 schema completion — DONE and deployed live (Aug 16, 2026)
+- **Reza's security fix (`a03f3cf`)**: the gap was much bigger than originally flagged — the ENTIRE "Staff Related Routes" block in `routes/web.php` (9 routes) had zero auth middleware, not just `/staff/detail/{id}`. This included unauthenticated CREATE/UPDATE/DELETE on staff records (`createStaff`, `updateStaff`, `deleteData`) and full roster/PII read access (`getStaff`, `getdetail`) with no login required at all. Fixed by wrapping the whole block in `Route::middleware(['auth','verified'])->group(...)`. Verified independently by both Reza and Yappy (curl-checked all 9 endpoints return 302, not 200/data).
+- **Nadia's schema work (`e0f86b8`)**: caught that the original gap analysis was stale — `marital_status`/`disease_status` already existed on `staff` and were already fully wired (a commit after the gap analysis added them). Only real gaps were `profile_photo` (nullable string, storage backend still deferred) and a minimal `settings` key-value table — both added cleanly, migrations verified (`migrate` + `migrate:fresh` both clean).
+- **Deployed live** on the homelab box same session: `git reset --hard origin/main` via the container (root, bypasses the `www-data`-owned-files permission issue documented above) since host-user `git reset` still hits the same permission wall as Aug 13. Migrations ran clean live, caches cleared, verified `/staff/detail/STF001` now returns 302 (was previously fully open).
+- `position.base_salary` (flat RM1700 vs. real per-position rates) is still the one open decision for Hakim — nothing else touched it.
 
 ## Full session detail
 See `main/current-session.md` (Aug 13, 2026 entries) for the play-by-play of the initial deploy + bugs hit/fixed.
