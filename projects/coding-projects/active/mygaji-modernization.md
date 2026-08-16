@@ -153,7 +153,26 @@ Hakim gave full authority to finish the project to production-ready, explicitly 
 
 **Full integration test before deploy** (not just per-feature checks): fresh `migrate:fresh --seed` with ALL new migrations together, PHP syntax check on every touched file, then a real Playwright smoke test logging in and loading all 5 key pages (dashboard/staff-list/staff-create/salary-management/finance-settings) checking for JS errors and 5xx responses — zero found. Deployed live on the homelab box: migrations ran, `PositionSeeder`+`RatesSeeder` (now includes `part_time_hourly` @ 8.17) re-run, `storage:link` set up for photo uploads, caches cleared, login confirmed 200.
 
-**Still open**: Phase 2 real migration blocked on Firebase access from Hakim (need a service account key or an export — asking him). Phase 3.14 (port the old HR letter-generation feature?) still needs his yes/no — it was already dead/dormant in the old app before this project even started. Production-readiness security+QA pass (task #32) not yet run on the full combined feature set.
+**Resolved same session**: Hakim decided — hold Phase 2 (real Firebase migration) until access is sorted separately, don't build it blind; skip the letter-generation feature entirely (was already dead in the old app, not real lost functionality).
+
+### Production-readiness pass — DONE, deployed live (Aug 16, 2026)
+Full security audit (Reza) + full regression QA pass (Davai), run against the entire combined Wave 1 feature set.
+
+**Security audit — 7/9 clean, 1 fixed, 1 sensibly flagged:**
+- Clean: prod env correctly has `APP_DEBUG=false`, file upload validation is real content-based (not spoofable by renaming), no mass-assignment gaps (single-admin app, no role system to escalate into), Breeze's login rate-limiting intact, CSRF coverage complete (no routes outside the `web` middleware group), zero raw/concatenated SQL anywhere, no secrets ever committed to git history.
+- Fixed: delete-staff confirmation now explicitly warns that payroll/paycheck history is also permanently deleted (was silent about this real cascade before).
+- Flagged, left as-is (good judgment call, not a gap): session cookie `secure` flag is off — correct given the homelab deployment is plain HTTP behind Tailscale (which encrypts the transport itself); flipping it would just break login without adding real security. Revisit only if TLS termination (e.g. Caddy) is ever added in front of the container.
+
+**QA pass — found 2 real regressions + 1 latent landmine, all fixed same session:**
+1. Staff creation crashed with a raw leaked SQL error (`NOT NULL constraint failed`) if the optional "Relatives" section was left blank — DB schema was out of sync with UI/validation, which already correctly treated it as optional. Fixed via an additive migration making `relative_name`/`relative_phone_no` nullable.
+2. Update/Delete on the Staff Detail page silently left the UI stuck with no success feedback (backend succeeded, DB updated correctly, but the result modal never appeared) — a Bootstrap modal race: the code called `modal('hide')` then immediately `modal('show')` on the same element before the hide transition finished, and Bootstrap silently swallows the overlapping `show()`. Fixed properly with a `hidden.bs.modal` event listener instead of a timing hack.
+3. `staffController::getDetail()`'s unqualified `Staff::select('*')` joined against `position` silently returned the POSITION's `id` in `data.id` instead of the staff's real PK (both tables have an `id` column) — harmless today (nothing consumes `data.id` from this endpoint) but a real trap for future code. Fixed by qualifying the select.
+
+All 3 fixes verified with genuine before/after reproduction (not just "should work now") — reverted each fix, confirmed the exact failure mode reproduced, reapplied, confirmed it was gone.
+
+**Final integration verification before deploy** (Yappy, not delegated): fresh `migrate:fresh --seed` with the complete migration set, PHP syntax check, full Playwright smoke test across all 5 key pages — zero errors. Deployed live, migration ran clean on production, login confirmed 200.
+
+**Where things stand now**: everything built this project (Phase 0, Phase 1, Finance Settings, part-time staff, photo upload, session timeout, validation hardening, security audit, QA regression fixes) is live, verified, and production-ready. The only deliberately-deferred item is Phase 2's real Firebase data migration, on hold pending Hakim sorting out access — not a gap in the new app itself, a separate one-time data-import task for whenever he's ready to revisit it.
 
 ## Full session detail
 See `main/current-session.md` (Aug 13, 2026 entries) for the play-by-play of the initial deploy + bugs hit/fixed.
