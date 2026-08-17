@@ -193,7 +193,14 @@ Also patched Guzzle to `^7.15.2` (was 7.9.3, several real CVEs) since it's now d
 
 **Daily sync now enabled**: `routes/console.php`'s `Schedule::command('firebase:sync-employees --commit')->dailyAt('03:00')` uncommented and deployed; a host-level cron entry (`* * * * * ... docker compose exec -T app php artisan schedule:run`) added on the homelab box (none existed before) to actually trigger Laravel's scheduler; confirmed registered and correctly due (`php artisan schedule:list` showed "Next Due: 22 hours from now" matching the 3 AM schedule).
 
-**Login/access note for Hakim**: MyGaji is intentionally single-admin (same as the old app — its Firebase Auth was also admin-only, nothing per-employee). The 22 migrated staff are payroll/HR records, not user accounts — they don't log in themselves in either app. Nothing to set up here; this was likely a question about whether the migration needed separate credential handling, which it didn't.
+**Login/access note for Hakim**: MyGaji is intentionally single-admin (same as the old app — its Firebase Auth was also admin-only, nothing per-employee). The 22 migrated staff are payroll/HR records, not user accounts — they don't log in themselves in either app.
+
+### 🔴 Real gap found + fixed same session: production had ZERO user accounts
+Hakim asked "is there login credentials for me to login" and it turned out to be a genuine, serious gap, not a rhetorical question — the `users` table on the live production homelab box was **completely empty** (`User::count()` = 0). `AdminSeeder` was never wired into `DatabaseSeeder`'s default `run()` (a pre-existing project pattern, confirmed multiple times this project) and had apparently never been run manually on production either, across this entire multi-day project — meaning Hakim had no way to log into his own live app this whole time until this was caught.
+
+**Fixed**: created a real admin account directly via tinker on production (not by running the existing `AdminSeeder`, since that hardcodes the SAME test password — `Mu@473266` — that's been echoed in plaintext across dozens of agent reports and messages throughout this project's testing; reusing it for the real production account would mean a widely-transcript-exposed password protecting real payroll data). Generated a fresh random password instead, gave it to Hakim directly in chat (the one legitimate time to do so, since he needs it to log in), and told him to change both email/password via the Profile page once in.
+
+**Lesson**: `SuperHakim@mygaji.com` / `Mu@473266` (from `AdminSeeder.php`) should be treated as a **dev/test-only credential going forward** — it's fine for local dev seeding (that's what it's for), but must never be treated as the real production login again now that a distinct one exists. Worth being suspicious of assuming a seeder "must have already been run" on any environment — verify (`User::count()`), don't assume, especially for anything auth-related on a live system.
 
 ## Full session detail
 See `main/current-session.md` (Aug 13, 2026 entries) for the play-by-play of the initial deploy + bugs hit/fixed.
