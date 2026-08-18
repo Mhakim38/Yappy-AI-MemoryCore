@@ -1,5 +1,7 @@
 # 📋 Complete Reminders List - All Reminders (Past, Current, Future)
 
+**ARCHIVED Aug 18, 2026 — superseded, no longer the source of truth.** Everything in this file is either done or has been superseded by `main/reminders.md` (current, ongoing) and `main/current-session.md` (live status/Active Reminders). Kept here for history only, not for lookup.
+
 *Updated: April 11, 2026 - 7:58 PM*
 *This is the source of truth for ALL reminders in Hakim's workflow*
 

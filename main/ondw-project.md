@@ -1,5 +1,6 @@
 # 🍱 ONDW — Project Reference
-*Last updated: Jun 16, 2026 · 03:00 MYT*
+*Last updated: Aug 18, 2026 (checklist refreshed; stack/architecture sections below are unchanged since Jun 16, 2026, verify against real code if anything here seems old).*
+*This is a STATIC architecture/stack reference, not a live status tracker — for current status, always check `main/current-session.md` first.*
 
 ---
 
@@ -108,12 +109,12 @@ CHAT_ORDER_AI_MODEL=gpt-5.4-mini
 - [x] Add 3 env keys to preprod `.env` (`PAYMENT_GATEWAY_ENABLED=true`, `CHAT_ORDER_AI_ENABLED=false`, `OPENAI_API_KEY=`) ✅ Jun 16
 - [x] **Fix bill_url redirect**: `PaymentController::pending()` + `BillplzWebhookController` session flag ✅ Jun 20 (commit `40709c1`)
 - [x] **Fix rider history earnings**: `history.blade.php` lines 64+115 `total_amount` → `delivery_fee` ✅ Jun 20 (commit `40709c1`)
-- [ ] E2E test on preprod: checkout → BillPlz → webhook → `pending` → riders notified → `perkeso_deductions` populated
-- [ ] Clear test order data from PROD (overdue since Jun 5)
-- [ ] Email BillPlz for e-wallet activation (SSM + KYC docs)
+- [x] **Merge `feature/push-notification` → `main` (production deploy)** ✅ Aug 17, 2026 — clean fast-forward, 28 commits, 65 files. GitHub-side confirmed; real server deploy still needs Hakim's `git pull` (no SSH access).
+- [ ] E2E test on preprod: checkout → BillPlz → webhook → `pending` → riders notified → `perkeso_deductions` populated (still open as of Aug 18, 2026)
+- [ ] Clear test order data from PROD (overdue since Jun 5, still open as of Aug 18, 2026)
+- [ ] Email BillPlz for e-wallet activation (SSM + KYC docs) (still open as of Aug 18, 2026)
 - [ ] Enable all payment channels in admin
-- [ ] Legacy data migration on PROD at launch day
-- [ ] Merge `feature/push-notification` → `main` (production deploy)
+- [ ] Legacy data migration on PROD at launch day (prod has 1,319+ real users as of Aug 2026, so this is very likely done in practice — not explicitly re-confirmed, verify with Hakim if it matters)
 
 ## 🟡 Feature / Fix Backlog (added Jun 20, 2026)
 - [ ] **Payout** — vendor/rider payout flow (BillPlz V5 PO, review full cycle)
