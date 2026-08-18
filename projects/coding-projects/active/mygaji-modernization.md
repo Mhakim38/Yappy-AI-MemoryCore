@@ -206,7 +206,12 @@ Hakim asked for a real visual redesign via `/design` + `/ui-ux-pro-max` skills, 
 
 **2 real bugs caught by the mandatory screenshot-verify step** (not trusted from command output): `render-batch` left 5 orphaned debris frames outside any section after erroring on an unsupported `bg="transparent"` prop (found + deleted); login heading text rendered left-aligned instead of centered due to a CLI renderer quirk with `Text` nodes inside `w="fill"` flex containers (fixed by an explicit `align="center"`); Direction B's dashboard card grid wrapped to 1 column instead of 2×2 due to a width math error carried over from Direction A's card dimensions (fixed).
 
-**Status**: waiting on Hakim to pick a direction (or ask for changes) before any real Blade/CSS implementation begins — this was an explicit gate he requested, not skipped.
+**Round 2 (same day)**: Hakim found A/B "boring," asked for Neumorphism + Brutalism as additional directions, referencing his friend Wafiq's `BajetBro` (Svelte budgeting app, `/Users/hakim/holeeMonth/BajetBro`) as inspiration ONLY — explicit instruction not to copy its design. Mira found and read it (real UI, not backend-only), absorbed general quality bar without lifting any specific component/layout.
+- **Direction C "Neumorphism"**: single light blue-gray base (`#E8ECF1`) across the whole surface, dual soft shadows (light+dark) making cards/buttons look molded/extruded, gold/green kept as accent-only (a fully gold neumorphic surface wouldn't show the shadow contrast — real technique constraint, not just a style call).
+- **Direction D "Brutalism"**: thick black borders, flat hard-offset shadows (no blur), bold uppercase type, zero border-radius except 2 deliberate exceptions, stark gold/green color blocking on cream background.
+- Now 4 total directions (A/B/C/D), 12 frames, all in the same "MyGaji Redesign Options" section, all independently verified by Yappy via real screenshots.
+
+**Status**: still waiting on Hakim to pick a direction (or request further changes) before any real Blade/CSS implementation begins — explicit gate he requested, held both rounds.
 
 **Login/access note for Hakim**: MyGaji is intentionally single-admin (same as the old app — its Firebase Auth was also admin-only, nothing per-employee). The 22 migrated staff are payroll/HR records, not user accounts — they don't log in themselves in either app.
 
