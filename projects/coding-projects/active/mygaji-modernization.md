@@ -193,6 +193,21 @@ Also patched Guzzle to `^7.15.2` (was 7.9.3, several real CVEs) since it's now d
 
 **Daily sync now enabled**: `routes/console.php`'s `Schedule::command('firebase:sync-employees --commit')->dailyAt('03:00')` uncommented and deployed; a host-level cron entry (`* * * * * ... docker compose exec -T app php artisan schedule:run`) added on the homelab box (none existed before) to actually trigger Laravel's scheduler; confirmed registered and correctly due (`php artisan schedule:list` showed "Next Due: 22 hours from now" matching the 3 AM schedule).
 
+### Mobile-first visual redesign — design system + 2 Figma mockup directions ready for Hakim's pick (Aug 18, 2026)
+Hakim asked for a real visual redesign via `/design` + `/ui-ux-pro-max` skills, mobile-first (app is used almost entirely on phones). Full team dispatch (Mira), design work only — zero backend/route/JS changes, this whole pass is CSS/visual layer only.
+
+**Design system** (`/Users/hakim/holeeMonth/MyGaji/design-system/mygaji/MASTER.md`): Mira rejected the `ui-ux-pro-max` script's raw first pass (misclassified MyGaji as a marketing-landing-page product, wrong shape for a working payroll tool) and built a grounded spec instead — refined the EXISTING brand (gold `#FFCC09`/green `#2F5E2C`, kept) rather than replacing with generic SaaS colors, standardized on Poppins+Inter (fixing a real pre-existing bug where the login page silently force-overrides fonts via `* { font-family }` while every other screen loads a different one), consolidated 3 different reds into one danger token, and produced a full mobile-correctness checklist (16px input floor for iOS zoom, 44px touch targets, safe-area handling — with a flagged coupling constraint: top nav and bottom nav share CSS classes, so a naive safe-area fix would clip the top nav's logo). Includes a frozen list of every JS-queried selector that must never be renamed.
+
+**Figma mockups — 2 directions, 3 screens each** (Login/Dashboard/Staff List), in a new section "MyGaji Redesign Options" in the ONDW Figma file, separate from the existing 7 current-state frames (untouched):
+- **Direction A "Refined Brand"**: bold gold pill buttons, gold-filled icon badges, soft shadows — closest to today's app, professionalized.
+- **Direction B "Modern Minimal"**: dark-outline/ghost buttons (not gold-on-white — would fail the spec's own contrast rule), flat cards with hairline borders instead of shadows, status shown as a small dot instead of a filled pill, gold/green reserved for small accents only.
+
+**Tooling note**: the `figma-cli` scratchpad this whole project relied on had been garbage-collected by Aug 18 (4 days after Aug 14 setup) — genuinely gone, not a subagent access issue (confirmed by Yappy's own direct call failing identically). Re-cloned fresh in under 2 minutes, see [[design-protocol]] for the exact recipe. Figma Desktop's CDP connection itself survived independently — only the daemon needed restarting from the new clone.
+
+**2 real bugs caught by the mandatory screenshot-verify step** (not trusted from command output): `render-batch` left 5 orphaned debris frames outside any section after erroring on an unsupported `bg="transparent"` prop (found + deleted); login heading text rendered left-aligned instead of centered due to a CLI renderer quirk with `Text` nodes inside `w="fill"` flex containers (fixed by an explicit `align="center"`); Direction B's dashboard card grid wrapped to 1 column instead of 2×2 due to a width math error carried over from Direction A's card dimensions (fixed).
+
+**Status**: waiting on Hakim to pick a direction (or ask for changes) before any real Blade/CSS implementation begins — this was an explicit gate he requested, not skipped.
+
 **Login/access note for Hakim**: MyGaji is intentionally single-admin (same as the old app — its Firebase Auth was also admin-only, nothing per-employee). The 22 migrated staff are payroll/HR records, not user accounts — they don't log in themselves in either app.
 
 ### 🔴 Real gap found + fixed same session: production had ZERO user accounts
