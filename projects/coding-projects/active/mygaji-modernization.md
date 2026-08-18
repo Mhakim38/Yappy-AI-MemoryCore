@@ -211,7 +211,15 @@ Hakim asked for a real visual redesign via `/design` + `/ui-ux-pro-max` skills, 
 - **Direction D "Brutalism"**: thick black borders, flat hard-offset shadows (no blur), bold uppercase type, zero border-radius except 2 deliberate exceptions, stark gold/green color blocking on cream background.
 - Now 4 total directions (A/B/C/D), 12 frames, all in the same "MyGaji Redesign Options" section, all independently verified by Yappy via real screenshots.
 
-**Status**: still waiting on Hakim to pick a direction (or request further changes) before any real Blade/CSS implementation begins — explicit gate he requested, held both rounds.
+**Round 3 (same day) — Hakim picked Neumorphism, full 9-screen flow built**: chosen direction, nav bar explicitly modeled on ONDW's floating capsule pattern (studied 2 real ONDW frames, adapted geometry/structure but re-themed to neumorphic shadows + added a "pressed" inset chip on the active item, since color-only active-state would waste neumorphism's core visual language). All 9 REAL screens designed (not speculative new features — confirmed "full flow" meant the complete existing app: Login, Dashboard, Staff List, Staff Create, Staff Detail, Salary Management, Finance Settings, Monthly Report, Monthly Paycheck), each screen's nav-bar presence/active-state checked against the real Blade `activeTab` values rather than assumed (e.g. Staff Create correctly has no nav — matches the real page not using `x-app-layout`; Finance Settings/Monthly Report correctly show no active nav item — matches `activeTab` not mapping to any of the 5 tabs in the real templates).
+
+**Salary Management — the priority screen, done right**: idle staff cards stay in their normal raised state; the one being calculated renders in a distinctly recessed/inset state with inline OT/PH/UPL fields + Save button, no navigation away — visually communicates "flips in place, right on this page" (Mira even added that literal caption to the screen). This was independently verified by Yappy directly from the screenshot, matches what Hakim asked for exactly.
+
+New Figma section: "MyGaji Final Flow (Neumorphism)" (9 frames), separate from the 12-frame A/B/C/D comparison (untouched). `design-system/mygaji/MASTER.md` updated with a new §4A finalizing Neumorphism as the shipped direction, including the ONDW-nav adaptation spec.
+
+**One process note**: while verifying, Yappy caught that some of Mira's own local `/tmp` screenshots were stale WIP iterations (an old broken Staff List capture sitting next to the fixed final one, both named similarly) — always re-verify the actual current Figma node directly (`figma-cli verify <nodeId>`) rather than trusting whichever locally-saved PNG happens to be handed over, even from an otherwise-reliable report.
+
+**Status**: still waiting on Hakim's final sign-off before any real Blade/CSS implementation begins — explicit gate, held through 3 rounds now.
 
 **Login/access note for Hakim**: MyGaji is intentionally single-admin (same as the old app — its Firebase Auth was also admin-only, nothing per-employee). The 22 migrated staff are payroll/HR records, not user accounts — they don't log in themselves in either app.
 
