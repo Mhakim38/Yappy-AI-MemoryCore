@@ -11,24 +11,8 @@
 ## 🎯 **Week's Big Wins**
 
 ### **ONDW Production Fixes** ✅
-1. **DeliveryChatService Bug** (May 24, Afternoon)
-   - Fixed TypeError: missing User parameter in recordSystemMessageOnce()
-   - Updated 4 call sites across delivery chat system
-   - Commit: 09db5df
-   - Impact: Production bug eliminated, chat system now stable
 
-2. **Service Worker Caching** (May 24, Afternoon)
-   - Fixed NetworkError on Cache.put() when accessing rider docs
-   - SW now respects Cache-Control: private headers
-   - Graceful error handling implemented
-   - Commit: 9d52048
-   - Impact: No more console spam, proper caching behavior
-
-3. **Branch Synchronization** (May 24, Afternoon)
-   - Merged main → feature/push-notification (5 commits sync'd)
-   - Merged feature/push-notification → main (SW fix)
-   - Both branches now at 9d52048
-   - Result: Preprod and main fully synced, ready for deployment
+[Project content moved to secret_information — see projects/ondw/changelog.md (May 24, 2026 entry)]
 
 ### **Yappy Memory Enhancement** ✅
 - Loaded complete Yappy system into memory
@@ -42,17 +26,12 @@
 ## 📊 **Project Status Snapshot**
 
 ### **ONDW** (Food Delivery PWA)
-- **Status**: Production-ready ✅
-- **Latest Commit**: 9d52048
-- **Branches**: main & feature/push-notification synced
-- **Recent Fixes**: 2 critical bugs (Chat, SW caching)
-- **Next**: Testing on preprod, then production deployment
-- **Timeline**: May 24 (fixes done), ready for deployment
+
+[Project content moved to secret_information — see projects/ondw/overview.md]
 
 ### **Wedding Wall** (Photo Gallery + Gifts)
-- **Status**: Stable (not actively worked on this week)
-- **Last Update**: May 2 (WhatsApp integration, family panel fixes)
-- **Note**: Not blocking anything, can continue anytime
+
+[Project content moved to secret_information — see projects/wedding-wall/changelog.md (May 2, 2026 entry)]
 
 ### **Personal/Spiritual**
 - **Prayer Times**: Active reminders in place ✅

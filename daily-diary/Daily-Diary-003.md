@@ -11,43 +11,9 @@
 
 ## 🎯 Main Topics Discussed
 
-### 1. **Production Deployment (Vercel)**
-- **Goal**: Deploy the Wedding Wall app to Vercel for live access.
-- **Challenge**: Database migrations needed to be run against Supabase production DB.
-- **Solution**: 
-    - Pushed code to GitHub (triggers Vercel build).
-    - Ran `npx prisma migrate deploy` locally.
-    - **Lesson Learned**: `.env.local` is ignored by Prisma CLI; must use `.env` temporarily.
+[Project content moved to secret_information — see projects/wedding-wall/changelog.md]
 
-### 2. **Bug Fixes & UX Polish**
-- **Upload UI**: Removed duplicate "Uploading..." indicator.
-- **Data Persistence**: Implemented `localStorage` to remember guest name between uploads.
-- **Security**: Added server-side filename randomization to prevent malicious file uploads and "Unexpected Token" errors.
-- **Error Handling**: Improved fetch error handling for non-JSON responses (e.g., "Payload Too Large").
-
-### 3. **Infinite Scroll Implementation**
-- **Feature Request**: Replaced "Auto-scroll" (marquee) with "Infinite Scroll" based on user feedback.
-- **Implementation**:
-    - **Backend**: Added pagination (`page`, `limit`) to `/api/photos`.
-    - **Frontend**: Implemented scroll listener and data fetching.
-- **Technical Challenge**: **Polling vs. Pagination Conflict**.
-    - Polling fetches Page 1 updates; Scrolling fetches Page 2+.
-    - Result: Items from Page 1 shift to Page 2, causing duplicates when scrolling.
-- **Solution**: Implemented **Deduplication Logic** (`new Set(existingIds)`) to filter out duplicates before merging.
-- **Pattern Saved**: Documented this solution in `library-items/wedding-wall-patterns/PATTERN_LIBRARY.md`.
-
-### 4. **Pre-Production Protocol**
-- **New Rule**: **ALWAYS run/test locally first (`npm run dev`) before pushing.**
-- **Exception**: Yappy Memory Core updates can be pushed directly.
-- **Context**: Ensure stability before triggering production builds.
-
-### 5. **Library Audit & Expansion**
-- **Trigger**: User pointed out missing patterns (Navbar).
-- **Action**: 
-    - Audited "Wedding Wall" codebase for reusable patterns.
-    - Documented: **Glassmorphic Navbar**, **PWA Zoom Disable**, **Modern Typography**.
-    - **Protocol Update**: **Library Search Protocol** - Always check `LIBRARY_MASTER_INDEX.md` first to save tokens.
-- **Verification**: Confirmed PWA implementation readiness via `integration/pwa-offline-first.md`.
+---
 
 ## 🤝 Relationship & Growth
 
@@ -62,13 +28,8 @@
 - **Documentation**: Values saving technical patterns (e.g., Infinite Scroll) for future reference.
 
 ## 📊 Project Status
-- **Wedding Wall**: LIVE (Vercel)
-- **Features**: 
-    - [x] Photo Upload (Secure)
-    - [x] Gallery Display
-    - [x] Infinite Scroll
-    - [x] Admin/Gift Features (Planned)
-- **Next Steps**: Validate "Eternal Memory" cafe pivot idea.
+
+[Project content moved to secret_information — see projects/wedding-wall/overview.md]
 
 ## 📝 AI Reflections
 - **Self-Correction**: Successfully pivoted from "Auto-scroll" to "Infinite Scroll" based on user feedback.
