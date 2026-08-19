@@ -46,8 +46,10 @@ Fix: Two-flag pattern (`photoReady` + `locationReady`). Submit only enables when
 
 ---
 
-# 🌤️ Jun 12, 2026 (Friday) — FT mode · etams · full codebase analysis + bug investigation
-*💜 Hakim back. Deep-dived etams project (MOH attendance system). Analyzed full codebase + 2 support cases with exact bug locations.*
+# 🌤️ Jun 12, 2026 (Friday) — FT mode
+*💜 Hakim back.*
+
+[Project content moved to secret_information — see projects/etams/]
 
 ## 🔔 ACTIVE REMINDERS (updated Jun 16, 03:00 MYT)
 - **🔴 OVERDUE: Clear test order data from ONDW PROD** — still not done. Next PT session.
@@ -113,102 +115,12 @@ Root cause was `ksort(SORT_STRING)` vs BillPlz's official `uksort` comparator. `
 ---
 
 ## 📋 Jun 12 Session Notes
-- **efokus**: `iKes-Hakim` branch pushed to origin. MR → GitLab web UI at `https://gitlab.com/2QSC/efokus/-/merge_requests/new?merge_request[source_branch]=iKes-Hakim&merge_request[target_branch]=main`
+- [Project content moved to secret_information — see projects/efokus/]
 - **iPayment**: Jun 10 meeting had no useful output. Hakim needs to follow up directly with JANM PIC.
-- **etams**: Full codebase analysis done (see below). Hakim is NOT a maintainer — analysis is for teaching/understanding only.
+- [Project content moved to secret_information — see projects/etams/]
 [FT-mode JKSM/MPAJ detail removed Aug 19, 2026 — see private secret_information repo]
 
----
-
-## 🏛️ etams — PROJECT CONTEXT (analyzed Jun 12, 2026)
-
-**Full name**: ETAMS — Employee Time & Attendance Management System
-**Client**: Ministry of Health Malaysia (MOH) · `https://etams.moh.gov.my`
-**Repo**: `/Users/hakim/holeeMonth/2qa_projects/etams`
-**Stack**: Laravel + Livewire · Bootstrap 5 · MySQL + Firebird (external CAMS) · Spatie Permissions · Maatwebsite Excel · DomPDF/wkhtmltopdf
-**Role**: Hakim is NOT the maintainer — doing analysis for teaching purposes
-
-### 🔄 CAMS Data Flow (Attendance Sync)
-```
-Physical terminal (fingerprint/card scan)
-  → Firebird DB: 10.22.120.229:3050
-  → TRANS.FDB — table ST{YYYYMM} (dynamic monthly)
-  → Fields: STAFFNO, STAFFNAME, CARDNO, DEVNAME, TRDATE, TRTIME
-
-Step 1: app/Console/Commands/CamsLogsPuller.php (every 10 min, 4AM–11PM)
-  → reads ST{YYYYMM} from Firebird via CamsAttendances model
-  → upserts into MySQL: cams_logs (hash_key = md5 of TRDATE+TRTIME+CARDNO+STAFFNO)
-
-Step 2: app/Console/Commands/CamsToAttendance.php (every 15 min, 4AM–11PM)
-  → reads cams_logs, matches User via staff_no_cams + terminal arrays
-  → writes/updates attendance_record table
-  → after 6PM only
-
-Step 3: app/Console/Commands/TidakHadirRun.php (daily 21:30)
-  → marks users with no punch as "tidak hadir"
-
-Web punch (parallel path):
-  → app/Livewire/Dashboard.php:197–295 (punchIn/punchOut)
-  → creates AttendanceRecord with status='punch sistem', GPS coords
-  → on mount: calls migratePunchInByUser() in app/helper.php:1260 (prod only)
-    → direct ibase_connect() to Firebird, creates record from terminal if no punch today
-```
-
-**IMPORTANT — Jobs vs Commands:**
-- `app/Console/Commands/` — ACTIVE for CAMS attendance pulling
-- `app/Jobs/MigrasiData.php` — pulls COMPANY.FDB (staff profiles, NOT attendance) → users table, runs daily
-- `app/Jobs/ProcessPunchInData.php` + `ProcessPunchOutData.php` — OLD approach, Firebird code all commented out, DEAD
-- `app/Jobs/DispatchPunchIn.php` — commented out in Kernel.php, DEAD
-
-### 🐛 Support Case Bugs (Jun 12 analysis)
-
-**Case 1: MOHAMAD ABDULLAH (Pemandu Khas Pengarah, Bahagian Kawalan Penyakit)**
-- Issue: Web punch records (4–8 May, 11–14 May 2026) replaced by terminal data after some time
-
-Bug 1 — `app/Console/Commands/CamsToAttendance.php:200`
-```php
-->where('latitude_punch_out', 'LIKE', '%.%')  // guard checks for GPS decimal
-```
-DEVNAME (door name e.g. "DOOR UTAMA") never has a decimal → guard never triggers → record gets overwritten on every 15-min run
-
-Bug 2 — `app/Console/Commands/CamsToAttendance.php:218–219`
-```php
-'latitude_punch_out'  => $camsLogLatest->DEVNAME,  // door name in GPS field
-'longitude_punch_out' => $camsLogLatest->DEVNAME,  // same door name in both fields
-```
-DEVNAME stored in GPS coord fields — wrong data type, also breaks the guard above
-
-**Case 2: SITI NORLIZA BINTI AMAT RAMLAY (IC: 840514105806)**
-- Issue: Status merah Feb–May 2026 due to two unresolved sub-issues
-
-Bug 3 — `app/Console/Commands/CamsToAttendance.php:374–376`
-```php
-$data = $holiday->fromState("Kuala Lumpur", now()->year)->get(); // hardcoded
-```
-Thaipusam = KL holiday in library. No mechanism to override specific holidays as working days. 3 Feb 2026 (govt declared working day) treated as holiday.
-
-Bug 4 — `app/Livewire/Kehadiran/KelulusanIsuKehadiran/KelulusanIsuKehadiran.php:288–293`
-```php
-->update([
-    'kelulusan_lewat_supervisor' => $this->kelulusan,
-    'ulasan_lewat_supervisor'    => $this->ulasan
-    // alasan NEVER saved — silently dropped
-]);
-```
-`hantar()` save function never writes `alasan`/`sebab_lewat`/`alasan_tak_hadir`. User fills reason form, submits, nothing saves.
-
-### 📊 Architecture Summary (for teaching)
-| Layer | Pattern |
-|-------|---------|
-| Views | 58% Livewire, 42% Blade. Master: `layouts/app.blade.php` (slot-based) |
-| AJAX | Almost entirely `wire:model.live`, `wire:click`, `wire:poll` — no jQuery $.ajax |
-| Controllers | Minimal — `PdfController` (4500 lines), `HomeController`, auth controllers |
-| Auth | IC number (`no_kad_pengenalan`) as login, not email |
-| DB | MySQL (primary) + Firebird (CAMS external) + MySQL backup |
-| RBAC | Spatie Permissions — `@hasanyrole` in views |
-| Exports | Maatwebsite Excel — 3 export classes (monitoring, history, today) |
-| Scheduler | `app/Console/Kernel.php` — 5 active scheduled commands |
-| Security flag | `if ($request->password === 'akmal')` bypass in `LoginController.php:65` |
+[Project content moved to secret_information — see projects/etams/]
 
 [FT-mode JKSM/MPAJ detail removed Aug 19, 2026 — see private secret_information repo]
 
@@ -462,7 +374,7 @@ Algorithm: HMAC-SHA512 of concatenated values using **X Signature Key** (same ke
 
 ---
 
-# ☀️ Jun 5, 2026 (Friday morning) — FT mode · efokus · ikes Perbandingan tab next
+# ☀️ Jun 5, 2026 (Friday morning) — FT mode · ikes Perbandingan tab next
 *💜 Hakim reviewed ONDW state (PT mode) briefly, clarified memory architecture, now switching to FT mode.*
 
 ## 🔔 ACTIVE REMINDERS
