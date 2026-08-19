@@ -1,6 +1,8 @@
 # 💡 Project Ideas Pipeline
 *Emerging concepts and brainstorm backlog - managed with LRU-style ordering*
 
+> Detailed project docs (Wedding Wall, MyGaji, Personal Portfolio, Dr Kamsiah Dental, Eternal Memory Cafe, JKSM, MPAJ iComm, etc.) now live in `secret_information/projects/` — this file stays as the lightweight ideas index only.
+
 ## Trigger Commands
 ```
 "show ideas" → Display all project ideas
