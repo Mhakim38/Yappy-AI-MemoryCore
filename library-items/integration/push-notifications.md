@@ -356,8 +356,8 @@ export function PushNotificationTest() {
 
 **Local Development (.env.local):**
 ```env
-VAPID_PUBLIC_KEY=BC0k_B6fYUciuSD2h0fm6CKoLAoS3s8vrCDOeFYO39E9LMl0FiEy-eoPBplV35xCWpirQdahUVgKuWwj8pfrV94
-VAPID_PRIVATE_KEY=QBP0GW73ZpID1XGx_evEYvPiLr_Mrbb29Km1R4NwnXk
+VAPID_PUBLIC_KEY=BExample_PublicKeyPlaceholder_ReplaceWithYourOwnGeneratedKey123456789
+VAPID_PRIVATE_KEY=ExamplePrivateKeyPlaceholder_YourOwn
 ```
 
 **Generate New Keys:**

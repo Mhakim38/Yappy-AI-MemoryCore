@@ -56,6 +56,8 @@
 ### Rule
 Session memory must not exceed **500 lines**. This prevents context window overflow and keeps session memory lightweight.
 
+**Density clause (added Aug 18, 2026)**: line count alone isn't sufficient — a single bullet can balloon into a multi-KB paragraph and still "pass" the 500-line check while the file is actually huge. No single entry should exceed roughly **500-800 characters**; split denser updates into sub-bullets instead. Full budget definition and per-file limits live in `compaction/compaction-policy.md` — check that file, not just the raw line count, before deciding a file is under budget.
+
 ### When Limit is Reached
 The AI performs a **RAM-style reset**:
 

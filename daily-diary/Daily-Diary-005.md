@@ -14,25 +14,9 @@
 ## 🎯 Main Topics Discussed
 
 ### 1. **Icon Standardization for PWA - COMPLETE** ✅
-- **Issue**: Inconsistent icons across pages (favicon.ico, favicon-32x32.png, /pwa/icon-192.png mixed)
-- **Solution**: Unified all pages to single icon source `icon_PWA.png`
-- **Files Updated**:
-  - login.blade.php - Changed from favicon.ico/favicon-32x32.png → icon_PWA.png
-  - google-complete.blade.php - Changed all favicon references → icon_PWA.png
-  - register.blade.php - Already had icon_PWA.png (previous session)
-  - sw.js (Service Worker) - Notification icons now use icon_PWA.png
-- **Verification**: All pages confirmed using unified icon
-- **Commit**: `4d7e762` - "Fix: Standardize all icons to icon_PWA.png for consistency" 🚀
-- **Status**: PUSHED TO MAIN ✅
-
 ### 2. **PWA Library Documentation Enhanced** ✅
-- Added comprehensive "Icon Standardization for PWA" section
-- Clarified safe area implementation requires BOTH `viewport-fit=cover` AND `padding-top` padding
-- Documented checklist for icon consistency across manifest, pages, Service Worker
-- Added "Safe Area Implementation on Auth Pages" section
-- Library now serves as reusable reference for future projects
-- Commit: `619cc24` - "Docs: Add icon standardization and safe area sections" 🚀
-- **Status**: PUSHED TO MAIN ✅
+
+[Project content moved to secret_information — see projects/ondw/changelog.md]
 
 ### 3. **Critical Memory System Improvement** 🧠
 **Problem Identified**: Yappy was falling into "Claude mode" - losing personality and proper memory activation
@@ -91,32 +75,7 @@
 
 ## 📊 Project Status Update - ONDW
 
-### **Mobile UX Fixes - COMPLETE** ✅
-- [x] Footer link spacing (Legal vs About columns)
-- [x] Disable zoom on pre-login pages (welcome, login, register)
-- [x] Safe area padding on register pages (respects iPhone notch)
-- [x] Icon standardization (all pages unified)
-- [x] PWA library documentation
-- [ ] Mobile device testing (PENDING)
-
-### **Remaining Items**
-1. **Mobile Testing** (RECOMMENDED) - Verify all changes work on real device
-   - Safe area padding on notched devices
-   - Zoom disable functionality
-   - Footer link clickability
-   - Icon display on home screen
-   
-2. **Push Notification Auto-Subscribe** (OPTIONAL, LOW PRIORITY)
-   - For users who delete/re-add PWA
-   - Auto-subscribe when permission exists but no subscription
-   - Not critical (notifications reappeared in testing)
-
-### **Commits This Session**
-- `4d7e762` - Icon standardization (ONDW)
-- `619cc24` - PWA library documentation (Yappy)
-- `b44271b` - Session memory consolidation (Yappy)
-
----
+[Project content moved to secret_information — see projects/ondw/changelog.md and known-bugs.md]
 
 ## 🌟 Key Learnings
 
@@ -137,24 +96,14 @@
    - Must consciously maintain it during technical work
 
 ### **For ONDW Project**
-1. Icon consistency matters for PWA home screen appearance
-2. Safe area requires BOTH viewport AND padding (both necessary)
-3. Zoom disable on pre-login pages critical for mobile UX
 
----
+[Project content moved to secret_information — see projects/ondw/known-bugs.md]
 
 ## ⏭️ Next Session Priorities
 
 ### IMMEDIATE (Next time user works on ONDW)
-1. Mobile device testing of:
-   - Safe area padding (especially register page logo)
-   - Zoom disable on welcome/login/register
-   - Footer links clickability
-   - Icons on home screen
 
-### OPTIONAL
-- Push notification auto-subscribe implementation
-- (Only if user encounters deletion/re-add issues)
+[Project content moved to secret_information — see projects/ondw/known-bugs.md]
 
 ### FOR YAPPY MEMORY
 - Continue using consolidated memory approach

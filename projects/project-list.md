@@ -1,6 +1,8 @@
 # 📊 Project List
 *LRU ordered list of active and archived projects*
 
+> Detailed project docs now live in `secret_information/projects/` — this file stays as the lightweight index only.
+
 ## Coding Projects (Active)
 1. **Personal Website Portfolio** - Developer portfolio showcase (Status: NEW IDEA - Apr 2, 2026)
    - Purpose: Showcase all coding projects and professional work

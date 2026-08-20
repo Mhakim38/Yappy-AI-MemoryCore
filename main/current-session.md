@@ -2,7 +2,7 @@
 *Session memory with 500-line limit. Resets per session, keeps recap for continuity.*
 
 ## Session Memory Limit
-- **Maximum**: 500 lines
+- **Maximum**: 500 lines, PLUS no single entry over ~500-800 characters — see `compaction/compaction-policy.md`
 - **Reset Behavior**: RAM-style reset — preserve Session Recap only, clear working details
 - **On reset**: Rebuild from `main/session-format.md` template
 - **Format Reference**: `main/session-format.md`
@@ -11,31 +11,17 @@
 
 ## 📋 Session Recap (Continuity — survives reset)
 
-**Last session**: Thu Jul 16, 2026 · Evening · CLAUDE.md personality update + MemoryCore consolidation
+[Project content moved to secret_information — see projects/ondw/changelog.md (Aug 16-18, 2026 entry) and known-bugs.md]
 
-**Where we left off**:
-- ✅ CLAUDE.md updated to v1.2 — added Davai, prayer style, time modes, bedtime care, teaching mode, Hori context, end-of-session protocol, UI/UX aesthetic, critical work behaviors
-- ✅ MemoryCore consolidation in progress — pulled upstream Project-AI-MemoryCore, copied new Feature systems, created main-memory.md, compacted current-session.md
-
-**Miyamura's state**: Evening session, taking a break to pray Isyak (8:30 PM).
+**Miyamura's state**: Deep in a long, high-throughput technical stretch (Aug 16-18) — real bugs shipped and verified, not just theorized, but starting to reflect on process (memory hygiene, staff usage) rather than just pushing more features. Good moment for genuine partnership check-ins, not just task throughput.
 
 ---
 
 ## 🔴 Active Reminders
 
-### FT Mode — mpaj-icomm
-- ⬜ **PDF float cast fix** — Apply `(float)` casts on 5 lines in server's `bil-of-quantity.blade.php` (lines 321, 362, 403, 445, 486). Fix ready, not yet applied on server.
+*(Carried forward unresolved items only — see "Where we left off" above for the fuller list with context. This section is for anything with a hard trigger/deadline or that needs to surface on every load.)*
 
-### FT Mode — eFokus (JPNIN)
-- ⬜ **Row count discrepancy** — `spk__ikes`: synced 15,164 vs actual 16,867. Diagnosis pending.
-
-### PT Mode — ONDW
-- ⬜ **E2E test** — checkout → BillPlz → webhook → `pending` → riders notified → `perkeso_deductions` populated
-- ⬜ **Clear test order data** from PROD — overdue since Jun 5, 2026
-- ⬜ **Email BillPlz** for e-wallet activation (SSM + KYC docs)
-- ⬜ **Enable all payment channels** in admin
-- ⬜ **Merge** `feature/push-notification` → `main`
-- ⬜ **ONDW preprod migrate** — run `php artisan migrate` + `billplz:sync-fpx-banks` on preprod
+[Project content moved to secret_information — see projects/ondw/known-bugs.md]
 
 ### Standing Daily
 - 🕌 Prayer reminders — 5x daily (Subuh 5:45 · Zohor 1:00 · Asar 4:30 · Maghrib 7:15 · Isyak 8:30)
@@ -44,47 +30,30 @@
 
 ---
 
-## 📦 Compacted History (Sessions before Jul 16, 2026)
+## 📦 Compacted History
 
-### Jun 21, 2026 — PT mode · ONDW · GPS location bug fix
-- Fixed `pickup_lat`/`pickup_lng` never saved: fields missing from `Order.php` `$fillable` (commit `baeecf7`)
-- Fixed delivery proof GPS race condition: two-flag pattern (`photoReady` + `locationReady`) — submit only enables when both ready
-- GPS made REQUIRED: `pickup()` + `deliver()` changed from nullable → required
-- Library saved: `library-items/integration/geolocation-mobile-pattern.md`
+### Aug 16-18, 2026 — PT mode · ONDW · full skeleton-loading rollout + prod push + bug marathon
 
-### Jun 16, 2026 — PT mode · ONDW · AI integration merge
-- Merged `origin/AI-integration` into `feature/push-notification` (7 conflicts resolved, commit `caf06b2`)
-- PAYMENT_GATEWAY_ENABLED = master BillPlz on/off switch
-- PERKESO deduction: fires at BillPlz webhook, 1.25% of delivery_fee, annual cap RM 157.20/rider
+[Project content moved to secret_information — see projects/ondw/changelog.md (Aug 16-18, 2026 entry) and known-bugs.md]
 
-### Jun 12, 2026 — FT mode · etams (MOH attendance system)
-- Full etams codebase analysis + 2 support cases investigated
+### Aug 13, 2026 — FT mode · [client project] branch drift + homelab build-out
+- **[FT-mode client project] branch-drift investigation** — real gaps found between two production-adjacent branches, investigation only, no reconciliation yet. Full detail: see private `secret_information` repo.
+- **Homelab (DESKTOP-1DLDMR6, WSL2, Ubuntu 26.04 "resolute")**: Docker Engine installed, Apache (`httpd:2.4`, :8080), JellyFin (`jellyfin/jellyfin:10.11.11`, :8096, `user:1000:1000` not PUID/PGID), Immich (full stack, images pinned by digest, `.env` chmod 600), MyGaji (Laravel 12 payroll app, `php:8.2-apache`, SQLite, :8090) all brought up and verified reachable over Tailscale. Real gotchas hit: SQLite needs `chown www-data` on the `database/` dir specifically (separate from storage/bootstrap/cache); base `php:X-apache` images need an explicit `<Directory>` AllowOverride patch in the Dockerfile or Laravel's `.htaccess` rewrites get silently ignored (native 404 on any non-root route). Switched from tmux to herdr mid-build; established "Yappy Work" herdr space (staff planning) vs "Homelabbing SSH" (real execution) split.
 
-### Jun 8, 2026 — FT mode · ap_jksm · iPayment IDD V1.9.1 analysis
-- Analysed iPayment IDD V1.9.1 spec for JANM
+### Aug 1-12, 2026 — PT mode ONDW credit/delivery-fee work + FT mode SMS/TAC + Hebahan
+[FT-mode JKSM/MPAJ detail removed Aug 19, 2026 — see private secret_information repo]
 
-### Jun 5–7, 2026 — PT mode · ONDW
-- `create_chat_order_ai_usage_table` migration added
-- BillPlz FPX bank sync scheduled
+[Project content moved to secret_information — see projects/ondw/changelog.md (Jul 31 and Aug 1, 2026 entries)]
 
-### May 14–27, 2026 — PT mode · ONDW
-- Chat refactor + DeliveryChatService bug fixed (commit `09db5df`)
-- Order Notifications System complete (all 4 phases — customer/vendor/rider push)
-- Remove admin from user registration (committed `6e148e8`, shipped to PROD May 26)
-- UIUX Overhaul + legacy DB migration (88 riders + 440 docs) — merged + deployed
+### Jul 16 - Jul 31, 2026 — dark-mode audit, R2 migration, credit/unofficial-vendor system
 
-### May 2, 2026 — PT mode · Wedding Wall
-- Family panel gallery API mapping fix (commit `f360539`)
-- WhatsApp integration replacing SMTP for credential delivery
-- Wedding Wall: three-tier photo system (Public Gallery / Guest Panel / Family Panel) — production-ready
+[Project content moved to secret_information — see projects/ondw/changelog.md]
 
-### Apr 4–20, 2026 — PT mode · ONDW
-- Mobile UX fixes (footer spacing, zoom disable, safe area, icon standardization)
-- Chat photo bugs identified (unresolved as of Apr 20): remove button z-index, camera hasFile race, LiteSpeed attachment ERR_QUIC
+### Earlier (pre-Jul 16, 2026) — one-line facts still worth keeping
 
----
+[Project content moved to secret_information — see projects/ondw/changelog.md and projects/wedding-wall/changelog.md]
 
-*Sessions prior to Apr 2026: archived — see `daily-diary/archived/`*
+*Sessions prior to Apr 2026: archived — see `daily-diary/archived/`.*
 
 ---
 
@@ -103,10 +72,10 @@
 ### End of session
 - Update Session Recap with where we left off
 - Check prayer + Hori + rest (end-of-session protocol)
-- If file > 500 lines: compact — preserve recap + reminders, summarize details into Compacted History
+- Check against `compaction/compaction-policy.md`: if over the line budget, OR any single entry exceeds ~500-800 chars, OR it's been ~4+ weeks since the last compaction — compact (snapshot first, always)
 - Commit + push to origin/Yappy-core
 
 ---
 
-**Version**: Compacted Jul 16, 2026 (was 2,393 lines → compacted to session format)
-**500-line limit**: Active from this version forward
+**Version**: Compacted Aug 18, 2026 (was 304 lines, but many multi-KB dense single-line entries — over 5 weeks since the Jul 16 compaction). Full pre-compaction snapshot: `compaction/snapshots/session-2026-08-18-pre-compaction.md`.
+**500-line limit + density rule**: see `compaction/compaction-policy.md`
