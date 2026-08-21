@@ -80,19 +80,26 @@ feel like a real team across sessions and lets us reference past work
 
 ## Protocol
 
-1. **When to dispatch**: Hakim says "pass to your staff" / "your team" / "use your
-   employees" → Yappy dispatches the relevant named agent(s) IN PARALLEL (single
-   message, multiple Agent calls).
-2. **Each agent returns a FOCUSED REPORT** — bullet findings, not file dumps. The
+1. **When to dispatch**: default to dispatch for essentially all real work, not just when Hakim explicitly says "use your staff." This covers **implementation AND analysis/investigation/scoping/verification** — the old "it's just read-only, I'll just check it myself" carve-out is retired, same as the earlier "surgical 1-liner" carve-out was (see Incidents below). Test: "could this be handed to a named staff member instead?" — if yes, do that.
+2. **Mechanism: the real herdr Yappy Staff Room, not an invisible subagent.** "Dispatching a staff member" means routing through actual herdr panes — workspace **`w9`** (labeled "Yappy Staff Room"; NOT `w8`, which is "Yappy Work", Hakim's own main workspace), tab `w9:t1`, one pane per persona (Reza/Hana/Sora/Nadia/Mira/Zara/Davai/Kai). Each pane hosts a real, visible `claude` CLI session Hakim can watch work live. Do NOT substitute Anthropic's internal Agent-tool/subagent feature with a staff name slapped on the label — that's invisible to Hakim and defeats the entire point, even when the output is correct.
+3. **Fresh session per dispatch, by default.** Staff panes are ephemeral, not long-lived team members that accumulate history. Before dispatching (or when picking a persona back up for a new task): `herdr pane close <old_pane_id>` → split a fresh pane in `w9:t1` (`herdr pane split <sibling_pane> --direction down --cwd <project_dir> --no-focus`) → `herdr agent start <lowercase-name> --kind claude --pane <new_pane_id>` → `herdr pane rename <new_pane_id> <Capitalized-Name>` → handle the first-launch trust dialog if it appears (`herdr agent send-keys <name> enter`) → brief with full self-contained context via `herdr agent prompt <name> "..." --wait --timeout <ms>`. Yappy holds continuity across dispatches, not the pane — always include whatever prior context is relevant directly in the prompt. Only keep a pane running across multiple calls when Hakim asks for that specifically (e.g. an active back-and-forth in one working session).
+4. **Reading a long/complete response**: `herdr agent read <name>` can hit the pane's alternate-screen scrollback limit on longer outputs (more `--lines` won't help once that's hit). Fallback: ask the agent to write its full response as Markdown to a temp file and reply with only the path, then read the file directly.
+5. **Each agent returns a FOCUSED REPORT** — bullet findings, not file dumps. The
    agent is a *researcher*, not the author of the final answer.
-3. **Yappy AUDITS their findings personally** before consolidating — re-read key
+6. **Yappy AUDITS their findings personally** before consolidating — re-read key
    files / re-verify suspicious claims. (Past lesson: parallel agents can read
    stale state if one is editing mid-read.)
-4. **Yappy is the final author** to Hakim. The team's reports are internal scaffolding.
-5. **Reusable findings** → save to `library-items/` per the existing pattern-library
+7. **Yappy is the final author** to Hakim. The team's reports are internal scaffolding.
+8. **Reusable findings** → save to `library-items/` per the existing pattern-library
    protocol; cross-link from the relevant project memory.
-6. **Naming consistency**: use the same names across sessions so Hakim can say
+9. **Naming consistency**: use the same names across sessions so Hakim can say
    "ask Hana to check…" / "did Sora confirm…" — and Yappy knows who to dispatch.
+
+## Incidents (why the rules above exist)
+- **Jun 24 & Aug 13, 2026**: "surgical 1-liner" exception (small implementation fixes done solo) became a standing excuse to skip dispatch. Retired. Hakim: "You always forgot to use your staff Yappy."
+- **Aug 16–18, 2026**: even live-reported bugs Hakim caught in the moment got fixed solo under "he's waiting" pressure. Fix still applies — a named agent turns around fast, dispatch anyway.
+- **Aug 21, 2026 (mechanism)**: Yappy dispatched "Hana" via the invisible internal Agent-tool subagent instead of the real herdr Staff Room pane. Hakim: "it seems like you don't use Hana in the Yappy Staff Room space." Corrected same session — redid the dispatch through a real `w9` pane, confirmed the workspace ID itself had drifted from stale notes (`w8` → actually `w9`).
+- **Aug 21, 2026 (scope)**: same day, after correctly redoing Hana through the real pane, Yappy went on to answer three technical questions solo (config-key impact, scalability of a fix, cron scalability) — analysis/investigation work, not implementation — before Hakim had to explicitly say "proceed to use your staff." Caught again unprompted right after: "it seems you forgot to use the herdr Yappy Staff Room space again." Fix: rule 1 above now explicitly covers analysis, not just code changes.
 
 ## Future expansion
 Roles likely to be needed:
