@@ -107,14 +107,17 @@ feel like a real team across sessions and lets us reference past work
 
 **Trigger phrase**: Hakim saying "close our office" or anything similarly worded (e.g. "close the office", "shut down the office/staff for today") — treat this as a specific, distinct command from a generic "close panes" request.
 
-**What it means**: close every individual staff persona pane living inside workspace `w9` (the Yappy Staff Room) — but do **NOT** close/delete the `w9` workspace or its tabs themselves. The office (the space) stays standing; only the staff (the panes/sessions inside it) go home.
+**What it means**: close every individual staff persona pane living inside the Yappy Staff Room workspace — but do **NOT** close/delete the workspace or its tabs themselves. The office (the space) stays standing; only the staff (the panes/sessions inside it) go home.
+
+Current workspace id: `wA` (was `w9` until Aug 26, 2026 — see the cascade-close incident below for why it changed. Always confirm the live id via `herdr workspace list` rather than assuming it's still whatever's written here, since it can change again the same way.)
 
 **Procedure**:
-1. `herdr pane list` (or `herdr agent list`) to enumerate every current pane in workspace `w9`.
-2. `herdr pane close <pane_id>` for each staff persona pane found (Reza/Hana/Sora/Nadia/Mira/Zara/Davai/Kai, and any other named pane living in `w9`).
-3. Do **not** run any workspace-level close/delete command against `w9` itself — the tabs and the workspace structure remain intact for next time, only its pane occupants clear out.
-4. **If closing all of them isn't possible for some reason** (a pane refuses to close, is mid-task and closing would be disruptive, or some other blocker) — don't leave the full roster sitting open as a fallback. Get it down to whatever the minimum achievable is, capped at **1-2 panes** left open, rather than all 8. Partial closure to "office nearly empty" beats no closure at all.
-5. Report back what got closed and what (if anything) is still open and why, so Hakim knows the actual end state rather than assuming a full close-down happened silently.
+1. `herdr pane list --workspace <current id>` (or `herdr agent list`) to enumerate every current pane in the staff room.
+2. `herdr pane close <pane_id>` for each staff persona pane found (Reza/Hana/Sora/Nadia/Mira/Zara/Davai/Kai, and any other named pane living there).
+3. Do **not** run any workspace-level close/delete command against it directly — the tabs and the workspace structure are meant to remain intact for next time, only its pane occupants clear out.
+4. **Cascade-close gotcha (found Aug 26, 2026)**: closing every pane in every tab auto-closes those tabs, and closing the last tab auto-closes the workspace itself — even with no workspace-level close ever issued. This actually happened once: closing all 8 panes in `w9` (spread across 2 tabs) silently took the whole workspace down with them. If it happens again, immediately recreate it — `herdr workspace create --label "Yappy Staff Room" --no-focus` — and update the "current workspace id" note above to the new id it returns. Safer alternative that avoids the cascade entirely: leave one pane un-closed (a bare idle shell, not an agent) as the room's last occupant, so there's always at least one pane keeping the last tab (and thus the workspace) alive.
+5. **If closing all of them isn't possible for some reason** (a pane refuses to close, is mid-task and closing would be disruptive, or some other blocker) — don't leave the full roster sitting open as a fallback. Get it down to whatever the minimum achievable is, capped at **1-2 panes** left open, rather than all 8. Partial closure to "office nearly empty" beats no closure at all.
+6. Report back what got closed and what (if anything) is still open and why, so Hakim knows the actual end state rather than assuming a full close-down happened silently — and explicitly flag it if the workspace itself had to be recreated.
 
 ## Future expansion
 Roles likely to be needed:
