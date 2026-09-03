@@ -1,23 +1,24 @@
 # 📊 Project List
 *LRU ordered list of active and archived projects*
 
-> Detailed project docs now live in `secret_information/projects/` — this file stays as the lightweight index only.
+> Detailed project docs now live in `secret_information/projects/` — this file stays as the lightweight index only (pointer = name + secret_information link, NEVER content).
 
-## Coding Projects (Active)
-1. **Personal Website Portfolio** - Developer portfolio showcase (Status: NEW IDEA - Apr 2, 2026)
-   - Purpose: Showcase all coding projects and professional work
-2. **Wedding Wall** - Wedding image-story web app (Live on Vercel) (Last: Mar 25, 2026)
-   - Features: Infinite Scroll, Secure Uploads, Guest Persistence.
-   - Status: Production Live. Pre-production protocol active.
-3. **ONDEWEI-Laravel** - Laravel 10 food delivery platform (Last: Feb 14, 2026 7:35 PM)
-3. [Empty]
-4. [Empty]
-5. [Empty]
-6. [Empty]
-7. [Empty]
-8. [Empty]
-9. [Empty]
-10. [Empty]
+## Project Pointer Index
+
+| Mode | Project | secret_information path |
+|---|---|---|
+| FT | AP JKSM | `secret_information/projects/jksm/` (overview.md · changelog.md · known-bugs.md · ipayment-integration.md · deep-dive-notes.md) |
+| FT | MPAJ iComm | `secret_information/projects/mpaj-icomm/` (overview.md · known-bugs.md · eperolehan-sftp-migration.md · senangpay-integration.md · celcom-sms-troubleshooting.md) |
+| PT | ONDW (ONDEWEI) | `secret_information/projects/ondw/` (overview.md · changelog.md · known-bugs.md · features.md · infrastructure.md) |
+| PT | Wedding Wall | `secret_information/projects/wedding-wall/` |
+| PT | MyGaji | `secret_information/projects/mygaji/` |
+| PT | Dr Kamsiah Dental | `secret_information/projects/dr-kamsiah-dental/` |
+| PT | Eternal Memory Cafe | `secret_information/projects/eternal-memory-cafe/` |
+| PT | ETAMS | `secret_information/projects/etams/` |
+| PT | eFokus | `secret_information/projects/efokus/` |
+| PT | Personal Portfolio | `secret_information/projects/personal-portfolio/` |
+
+*Removed Sep 3, 2026: detailed per-project entries — they duplicated secret_information content in a public repo.*
 
 ## Business Projects (Active)
 1. [Empty]

@@ -21,94 +21,48 @@ Examples: "new coding project API-Dashboard", "new writing project Chapter-5"
 - [ ] Note any initial requirements or goals
 - [ ] Identify primary technologies/tools (if coding project)
 
-### Step 3: Create Project File
-- [ ] Load template from `projects/templates/[type]-template.md`
-- [ ] Fill in project details:
-  - [ ] Project name
-  - [ ] Description
-  - [ ] Created date
-  - [ ] Type
-  - [ ] Status: Active
-  - [ ] Last accessed: Now
-- [ ] Save to `projects/[type]-projects/active/[name].md`
+### Step 3: Create Project Files (in secret_information)
+- [ ] Create `secret_information/projects/[name]/` with:
+  - [ ] `overview.md` — what it is, type, description, tech stack, repo/branch, mode (FT/PT), status, created date
+  - [ ] `changelog.md` — empty, dated session history starts here
+  - [ ] `known-bugs.md` — empty
+  - [ ] Topic files as needed (features.md, infrastructure.md, integrations)
+- [ ] Record a **pointer only** in MemoryCore `projects/project-list.md` (`[name] → secret_information/projects/[name]/`)
+- [ ] Note in current-session.md: active project = pointer to secret_information (no content copy)
 
-### Step 4: Apply LRU Positioning
-- [ ] Move new project to position #1 in project list
-- [ ] Shift existing projects down by one position
-- [ ] If position #11 exists:
-  - [ ] Move to `projects/[type]-projects/archived/`
-  - [ ] Update status to "Archived (LRU)"
-  - [ ] Add archive date
-
-### Step 5: Update Project List
-- [ ] Load `projects/project-list.md`
-- [ ] Add new project at top of active section
-- [ ] Update project count
-- [ ] Reorder all positions (1-10)
-- [ ] Note any auto-archived project
-- [ ] Save updated list
-
-### Step 6: Update Session Memory
-- [ ] Add to current-session-memory.md:
-  ```markdown
-  ## Active Project
-  - Name: [project name]
-  - Type: [project type]
-  - Started: [date/time]
-  - Context: [description]
-  ```
-- [ ] Note project creation in session log
-
-### Step 7: Confirm Creation
+### Step 5: Confirm Creation
 - [ ] Display success message:
   ```markdown
   ✅ Project Created: [name]
   📁 Type: [type]
-  📍 Position: #1 (Most Recent)
+  📍 Location: secret_information/projects/[name]/
   📝 Description: [description]
 
-  Project is now active and ready for work!
+  Project files created — detail lives in secret_information, pointer added to MemoryCore.
   ```
 
 ## 📊 LRU Rules
-1. New projects always start at position #1
-2. Maximum 10 active projects per type
-3. Position #11 auto-archives to make room
-4. Archived projects can be reloaded anytime
-5. Each project maintains its complete history
+1. Project detail always lives in secret_information (never removed by LRU)
+2. MemoryCore pointer list is capped; archiving a pointer never deletes the project
+3. Archived projects can be reloaded anytime from secret_information
 
-## 🗂️ Project File Structure
-```markdown
-# [Project Name]
-*[Type] Project - Created [Date]*
+## 🗂️ Project File Structure (in secret_information)
+```text
+secret_information/projects/[name]/
+├── overview.md      what it is, stack, repo/branch, mode (FT/PT), status
+├── changelog.md     dated session history (all work log)
+├── known-bugs.md    open/fixed bugs
+└── <topic>.md       features, infrastructure, integrations (as needed)
 
-## Description
-[User provided description]
-
-## Details
-- Type: [coding/writing/research/business]
-- Status: Active
-- Created: [Date Time]
-- Last Accessed: [Date Time]
-- Position: #[1-10]
-
-## Progress Log
-### [Date]
-- [Initial creation note]
-
-## Notes
-[Any additional context or requirements]
-
-## Resources
-[Links, references, dependencies]
+MemoryCore pointer (only): [Project content moved to secret_information —
+                             see projects/[name]/overview.md]
 ```
 
 ## Error Handling
 - If project name exists: Suggest alternative or ask to load existing
 - If type invalid: Show available types and ask again
-- If archives full (>50): Suggest cleanup of old archives
 
 ---
 
-*New Project Protocol v1.0*
-*Part of LRU Project Management System*
+*New Project Protocol v1.1 (Sep 3, 2026 — project files created in secret_information; MemoryCore holds pointer only)*
+*Part of Project Management System*

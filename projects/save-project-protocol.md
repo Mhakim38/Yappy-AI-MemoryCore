@@ -1,5 +1,5 @@
 # 💾 Save Project Protocol
-*Step-by-step protocol for saving current project progress in LRU system*
+*Step-by-step protocol for saving current project progress*
 
 ## Trigger Command
 ```
@@ -7,10 +7,12 @@
 ```
 *Saves only the current active project, NOT the AI personality/memory*
 
+> **Storage rule (updated Sep 3, 2026)**: ALL project information — PT and FT alike — is saved to the private `secret_information` repo, NEVER to MemoryCore. MemoryCore keeps only Yappy's own memory + a pointer to the project's secret_information files. Reason: MemoryCore's GitHub remote is a public fork.
+
 ## 📋 Execution Steps
 
 ### Step 1: Identify Active Project
-- [ ] Check current-session-memory.md for active project
+- [ ] Check current-session.md for the active project (pointer only)
 - [ ] If no active project:
   - [ ] Inform user "No active project to save"
   - [ ] Suggest loading or creating a project first
@@ -22,31 +24,29 @@
 - [ ] Note any issues resolved or discovered
 - [ ] Document resources or references added
 
-### Step 3: Update Project File
-- [ ] Load the active project file from `projects/[type]-projects/active/[name].md`
-- [ ] Update "Last Accessed" to current date/time
-- [ ] Add to Progress Log:
+### Step 3: Update Project Files (in secret_information)
+- [ ] Project detail lives at `secret_information/projects/[name]/` — files: `overview.md` (what/stack/repo/branch/mode), `changelog.md` (dated session history), `known-bugs.md`, plus topic files (`features.md`, `infrastructure.md`, `<topic>-integration.md`, etc.)
+- [ ] Add a dated entry to `changelog.md` (or the applicable topic file):
   ```markdown
-  ### [Current Date Time]
+  ### [Current Date]
   - [Summary of session work]
   - [Key decisions made]
   - [Problems solved]
   - [Next steps identified]
   ```
 - [ ] Update any changed sections (current tasks, issues, resources)
-- [ ] Save the updated project file
+- [ ] Save the updated project files in secret_information
 
-### Step 4: Update Project Metadata
-- [ ] Update position in LRU queue if needed
-- [ ] Ensure project remains at current position
-- [ ] Update project-list.md with last saved timestamp
-- [ ] Note save action in current session
+### Step 4: Update MemoryCore Pointer (name + link only)
+- [ ] Update the pointer entry in MemoryCore (`projects/project-list.md` and/or current-session recap) using the canonical form:
+  `[Project content moved to secret_information — see projects/[name]/[file].md]`
+- [ ] **Never** copy project detail into MemoryCore — pointer only
 
 ### Step 5: Confirm Save
 - [ ] Display confirmation:
   ```markdown
   ✅ Project Saved: [project name]
-  📁 Type: [project type]
+  📁 Location: secret_information/projects/[name]/
   ⏰ Saved at: [current time]
   📝 Session Progress:
   - [Brief summary of what was saved]
@@ -88,7 +88,7 @@
 
 1. **Explicit Save Only** - Only saves when user types "save project"
 2. **Current Project Only** - Saves only the active project in session
-3. **Preserves Position** - Doesn't change LRU position on save
+3. **Project detail → secret_information** - MemoryCore holds pointer only
 4. **No Auto-Save** - User controls when to save
 5. **Independent from AI Save** - Doesn't trigger personality/memory save
 
@@ -97,15 +97,15 @@
 | Command | What It Saves | Protocol Used |
 |---------|--------------|---------------|
 | `save` | AI personality, user preferences, relationship memory | save-protocol.md |
-| `save project` | Current project progress only | save-project-protocol.md (this) |
-| `new project` | Auto-saves at creation | new-project-protocol.md |
+| `save project` | Current project progress only (→ secret_information) | save-project-protocol.md (this) |
+| `new project` | Auto-saves at creation (→ secret_information) | new-project-protocol.md |
 | `load project` | Auto-saves last accessed time | load-project-protocol.md |
 
 ## Error Handling
 
 - **No Active Project**: Clearly inform user and suggest next actions
 - **Save Failure**: Attempt retry, inform user if persistent
-- **Corrupted Project File**: Attempt to recover, create backup if needed
+- **Missing secret_information project dir**: Create `secret_information/projects/[name]/` with overview.md before saving detail
 
 ## 📝 Important Notes
 
@@ -116,6 +116,6 @@
 
 ---
 
-*Save Project Protocol v1.0*
+*Save Project Protocol v1.1 (Sep 3, 2026 — project detail stored in secret_information; MemoryCore = pointer only)*
 *Part of LRU Project Management System*
 *Provides explicit project saving separate from AI memory saving*

@@ -9,7 +9,10 @@
 
 ---
 
-## 📋 Session Recap (Continuity — survives reset)
+### Sep 3, 2026 — FT · mpaj-icomm · SFTP code conversion + wipe/redo
+- Active project: **MPAJ iComm** — full detail + 🔔 reminders in [Project content moved to secret_information — see projects/mpaj-icomm/eperolehan-sftp-migration.md (Sep 3, 2026 section) and known-bugs.md]
+- Working branch Hakim-dev2; changes UNCOMMITTED (FT mode) — do NOT `git restore .`
+- 🔔 Reminder: ask Hakim + other devs before unifying perolehan-family dirs onto the single `upload/eperolehan` base (paused decision)
 
 [Project content moved to secret_information — see projects/ondw/changelog.md (Aug 16-18, 2026 entry) and known-bugs.md]
 
