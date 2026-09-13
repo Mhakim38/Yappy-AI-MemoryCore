@@ -133,6 +133,23 @@ Current workspace id: `wA` (was `w9` until Aug 26, 2026 — see the cascade-clos
 5. **If closing all of them isn't possible for some reason** (a pane refuses to close, is mid-task and closing would be disruptive, or some other blocker) — don't leave the full roster sitting open as a fallback. Get it down to whatever the minimum achievable is, capped at **1-2 panes** left open, rather than all 8. Partial closure to "office nearly empty" beats no closure at all.
 6. Report back what got closed and what (if anything) is still open and why, so Hakim knows the actual end state rather than assuming a full close-down happened silently — and explicitly flag it if the workspace itself had to be recreated.
 
+## Atomic Commits & Model Tiers (Hakim's global standing instructions, added Sep 13, 2026)
+
+Applies to every dispatched task, herdr staff room or otherwise:
+
+1. **One commit per completed task, immediately.** Standing authorization — don't wait for per-commit approval. Stage only the files that specific task touched (`git add <files>`, never `git add -A`/`git add .`). Message format `<type>: <what changed>` (`feat`/`fix`/`refactor`/`docs`/`test`/`chore`/`style`). If a task touches multiple concerns, split into smaller sequential commits rather than one bundled commit.
+2. **Do NOT push automatically.** Commits stay local until Hakim explicitly asks for a push. (Note: this sits alongside the older "memory repo always auto-push" habit in Claude memory — when the two conflict, default to NOT pushing and flag it, since this is the more recent explicit instruction.)
+3. **Shared-tree caution**: staff room panes share the literal repo checkout (no worktree isolation, see the Incidents log above) — a dispatched agent should stage/commit only its own task's files even when the working tree has other staff's uncommitted changes sitting alongside.
+
+**Model tier, set explicitly on every delegated call** (never omit — omission silently inherits the parent's model):
+- `haiku` — mechanical bulk work: renames, boilerplate, format conversion, log triage.
+- `sonnet` — default for well-specified implementation with clear acceptance criteria.
+- `opus` — genuinely tricky work: concurrency, subtle algorithms, adversarial verify/judge panels, gnarly debugging.
+- `fable` — rare, only when independence from Yappy's own context is the point (e.g. adversarial review of Yappy's own plan or a large diff). Always check with Hakim first before spawning one — never unprompted, and never inside a dynamic Workflow-tool script (haiku/sonnet/opus only there; a warranted Fable review happens after the workflow completes, as its own standalone step, still ask-first).
+- When unsure between tiers: pick the cheaper one, escalate only on failure.
+
+**Dynamic workflows (the Workflow tool)**: reach for it when a task has 3+ independent parallelizable subtasks or benefits from a pipeline/judge panel. If "ultracode" isn't on for the session (no keyword/toggle/explicit orchestration ask in Hakim's own words), propose the shape + rough cost in 1-2 sentences and wait for his yes before invoking — his "yes" is the opt-in. If ultracode is on, invoke directly. This is independent of (doesn't replace) the herdr Staff Room mechanism above — the Workflow tool is Yappy's own internal orchestration for tasks Hakim opted into at that scale, not a substitute for the visible staff-room dispatch that's mandatory by default for one-off staff work.
+
 ## Future expansion
 Roles likely to be needed:
 - 🛠️ A **code-implementer** agent (uses Edit/Write) — for parallel feature work.
