@@ -53,6 +53,7 @@
 | Pattern | File | Level | Framework | Status |
 |---------|------|-------|-----------|--------|
 | **Floating Action Button (FAB)** | `ui-patterns/floating-action-button.md` | 2️⃣ Proven | Laravel, React | ✅ Active |
+| **iOS PWA Notch/Status-Bar Blur** | `ui-patterns/notch-status-bar-blur.md` | 2️⃣ Proven | CSS, PWA | ✅ Active |
 | **Form with Loading State** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | React, Next.js | ✅ Active |
 | **Masonry Gallery Layout** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | CSS, React | ✅ Active |
 | **Tailwind Bento Grid Layout** | `frontend-ui/tailwind-bento-grid.md` | 2️⃣ Proven | Tailwind, React | ✅ Active |
@@ -107,7 +108,7 @@
 
 ---
 
-## 📋 Complete Pattern List (16 Total)
+## 📋 Complete Pattern List (17 Total)
 
 ### From Wedding Wall Project (11)
 1. ✅ Backend File Upload to S3
@@ -129,10 +130,11 @@
 ### From UI Components (1)
 14. ✅ Floating Action Button (FAB)
 
-### From ONDW Integrations (3)
+### From ONDW Integrations (4)
 15. ✅ Push Notifications (Laravel) — incl. May-27 latency/reliability hardening
 16. ✅ PERKESO GIG Workers API — IP-whitelisted gov API + admin testing harness + non-blocking webhook pattern
 17. ✅ BillPlz Payment Gateway — V3 bills, V5 Payment Orders, X Signature fix (uksort bug)
+18. ✅ iOS PWA Notch/Status-Bar Blur — sticky-anchor + masked ::after + standalone-mode gate, plus the immutable-cache trap that masked whether 2 earlier fix attempts ever actually reached the device
 
 ---
 
@@ -166,7 +168,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Total Patterns | 16 |
+| Total Patterns | 17 |
 | Level 2 (Proven) | 14/14 ✅ |
 | Frameworks Covered | 7+ (Next.js, React, Laravel, Vue, Node.js, etc) |
 | Projects Sourced | 4 (Wedding Wall, Push Notifications, ONDW, MyGaji) |
@@ -186,6 +188,7 @@ All patterns are **Level 2: Proven** meaning:
 - ✅ Testing strategies documented
 
 ### Recent Additions
+- **iOS PWA Notch/Status-Bar Blur** (Sep 16, 2026) - sticky-anchor blur recipe for locked-scroll mobile shells + the immutable-cache gotcha that masked 2 earlier fix attempts (ONDW)
 - **PERKESO GIG Workers API** (May 27, 2026) - IP-whitelisted government API integration + admin testing harness (ONDW)
 - **Push Notifications (Laravel) — Latency & Reliability Hardening** (May 27, 2026) - Cron/queue tuning + dead-sub (410/404) pruning (ONDW)
 - **Floating Action Button (FAB)** (April 21, 2026 4:30 AM) - From MyGaji, integrated into ONDW
@@ -338,4 +341,4 @@ Planned pattern additions:
 **Last Updated**: June 9, 2026  
 **Curator**: Yappy (AI Memory System)  
 **Status**: 🟢 Growing library, actively maintained  
-**Total Patterns**: 17 (17 Proven)
+**Total Patterns**: 18 (18 Proven)
