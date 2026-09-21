@@ -156,7 +156,7 @@ Before assigning ANY task to a staff pane, do these in order and state the resul
 
 1. **Size/difficulty.** S = one file, mechanical, lookup, log triage, format conversion. M = well-specified feature or fix, multi-file, clear acceptance criteria. L = ambiguous or cross-cutting scope, money/auth/security, concurrency, subtle algorithms, gnarly debugging, adversarial verification of someone else's work.
 2. **Model.** S→`haiku`, M→`sonnet` (default), L→`opus`, `fable` only after explicitly asking Hakim. Unsure between two tiers → cheaper one; escalate only if it fails.
-3. **Staff.** Choose by role fit (roster above). Model tier is independent of persona — e.g. Reza on a quick config sanity-check can be sonnet, Reza on a payment-webhook audit is opus. Reza + Davai still pair on payments/auth/webhooks.
+3. **Staff** (and therefore their skills — see "Skill Ownership" below). Choose by role fit (roster above). Model tier is independent of persona — e.g. Reza on a quick config sanity-check can be sonnet, Reza on a payment-webhook audit is opus. Reza + Davai still pair on payments/auth/webhooks.
 4. **Start the pane with that model.** `herdr agent start <name> --kind claude --pane <id> -- --model <haiku|sonnet|opus>` — everything after `--` is passed straight to the `claude` CLI.
 
 **Verified Sep 21, 2026 (herdr 0.8.2, claude 2.1.278):**
@@ -164,6 +164,36 @@ Before assigning ANY task to a staff pane, do these in order and state the resul
 - In-pane `/model sonnet` works but (a) shows a "Switch model?" confirm dialog that must be answered (option 1 = Enter), and (b) prints "saved as your default for new sessions" — i.e. it WRITES the global default `model` in `~/.claude/settings.json`. A haiku pane switching itself would silently change Hakim's default for every future session. Avoid; if ever used, re-check `settings.json` afterwards.
 - Model names are typed WITHOUT brackets: `/model sonnet`, not `/model [sonnet]` (brackets → "Model not found"). Valid aliases: haiku, sonnet, opus, fable.
 - New `claude` panes in `/Users/hakim` show the folder-trust dialog every launch; cursor starts on "No, exit" — use `herdr agent send-keys <name> down enter`, NOT plain `enter`.
+
+## Skill Ownership per Staff (GLOBAL, every project — set Sep 21, 2026)
+
+The chain is always: **task → size → model → staff → that staff's own skills.** Skills are installed globally (`~/.claude/skills/`, user-scope plugins/MCP), so this applies to ONDW, FT work, and every future project. A skill is triggered *by the staff who owns it, inside that staff's pane*, according to their job scope — Yappy does not run other people's skills for them.
+
+**How a skill fires:** passive skills auto-trigger from their description in the staff's own session. Opt-in skills (`disable-model-invocation: true`) can NOT be auto-invoked by a model, so the brief gives the path and the staff **Reads that `SKILL.md` as a lens** (`~/.claude/skills/<name>/SKILL.md`). Every brief names the owned skills relevant to the task, plus the Library/notes paths below. Typical model is a default only — the S/M/L triage decides per task.
+
+| Staff | Typical model | Passive skills (auto-trigger) | Opt-in (read on brief) | Tools / MCP |
+|---|---|---|---|---|
+| 🎨 Mira | sonnet | ui-ux-pro-max, ui-styling, design, design-system, brand, banner-design, slides, frontend-design (plugin), emil-design-eng | antislop, antislop-ui, antislop-copywriting, antislop-layoutmobile, doodle-icons, appllama-app-design-skill (native only), animation-vocabulary | design-lottery.py |
+| ⚡🎛️ Zara | sonnet | gsap-framer-scroll-animation, mobile-native, emil-design-eng | review-animations, animation-vocabulary | - |
+| 🧪 Davai | sonnet (opus for adversarial) | antislop-human | review-animations | Playwright MCP (pinned 0.0.82, user scope), claude-in-chrome |
+| 🔐 Reza | opus | - | - | claude-security (`/claude-security`, user-invoked), security-review; read-only vetting flow |
+| 🏗️ Kai | sonnet (opus for infra incidents) | Cloudflare plugin skills (cloudflare, wrangler, workers-best-practices, durable-objects, web-perf) | - | Cloudflare docs MCP (other Cloudflare MCPs stay unauthenticated until a task needs them) |
+| 🌸 Hana | sonnet | code-review, simplify (built-in harness skills) | - | Library index |
+| 🌌 Sora | sonnet (haiku for lookups) | claude-api (Anthropic questions) | - | WebSearch / WebFetch |
+| 📊 Nadia | sonnet (opus for regulatory) | docx, xlsx, pdf (report deliverables) | ondewei-council (business decision stress-test) | WebSearch / WebFetch |
+
+**Future option, not installed — shadcn/ui** (official `shadcn` skill + `npx shadcn@latest mcp`, MIT, free, no account; Sora's research Sep 21, 2026): React-only (Tailwind v4 + React 19; Laravel means the Inertia-React starter kit on Laravel 12+), so zero value for Blade/Alpine work like ONDW. Adopt for Mira + Zara only when a real React+shadcn project starts: Reza reads the raw `SKILL.md` first, pin the `shadcn` CLI version (never `@latest`), review the diff on every `add`, never add an untrusted registry URL. Blade/Alpine ports (BlatUI, April UI) need Laravel 11+/Tailwind 4 and are small single-maintainer projects — evaluate only if ONDW upgrades, each with a Reza audit.
+
+Not assigned (deliberately): hookify (pending Hakim's approval + rule text), bang-motion, prototype, feature-dev (uses invisible built-in subagents, conflicts with the real-Staff-Room rule), commit-commands and the official code-review plugin (see `secret_information/projects/yappy-tooling/` audits). Adding any new skill still goes through the vetting flow below.
+
+## Design Concept Lottery — automatic random (Hakim, Sep 21, 2026)
+
+Design needs variety, so Yappy runs `python3 Feature/Yappy-Staff-Team/design-lottery.py` **automatically before briefing Mira (or Zara, for interaction design) on any design task**, without waiting to be asked, and quotes the draw (with its seed) to Hakim in the triage line. It draws from `ui-ux-pro-max`'s real data (84 styles, 192 palettes, 73 font pairings) plus one lens skill and one constraint card.
+
+- **`--mode explore`** — new project, new concept, landing/hero, or whenever Hakim wants options. `--variants 3` gives A/B/C, each a different style + palette + fonts + lens + constraint.
+- **`--mode locked`** — a project with an established identity (e.g. ONDW: Crystal White Glass, capsules, Playfair/Poppins). Only *craft* lenses are drawn (motion, mobile-native, accessibility, animation review); the look-and-feel stays put.
+- **Why the split:** fully random across a shipped product would make its screens inconsistent, so random applies where variety helps (concepts, craft angles), not to a live brand.
+- **Rules:** the draw is a starting hint, not a cage. Style/palette/fonts are drawn independently and can pair oddly, so Mira may swap ONE ingredient with a one-line reason. Her deliverable states the final direction and the seed so a good draw can be re-created. Hakim's overrides: "lock it" (force locked), "go wild" (explore), "reroll" (new seed), or give a seed to reproduce. Add `--platform native` only for Expo/React Native work.
 
 ## Library & Knowledge access (all staff)
 
