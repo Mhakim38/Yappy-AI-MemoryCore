@@ -9,6 +9,13 @@
 
 ---
 
+### Sep 27, 2026 — PT · NEW PROJECT: Portal Kakitangan IDUSP (client prototype)
+- **New client project**: **IDUSP (Institute Darul Uloom Southern Peninsula)** staff portal — explicitly NOT an HRMS. Hakim supplied 12 requirements: Bos/dashboards · departments (Admin/Account/Academic) · KPI benchmark · timetable generator · attendance 3x/day + ">14x datang without alasan" · leave (cuti) · invoice generator + storage · report cards (Nilai Murid avg % per subj, Nilai Guru derived from murid) · school licence (YINS) renew 1 month before · student visa 1 month before · tarbiah report (attitude <80%) · inventory/merchandise.
+- **Prototype BUILT + verified**: `/Users/hakim/holeeMonth/idusp-staff-portal` — Laravel 12.69.2 + Livewire 3.8 + Flux 2.20 (free; no Pro licence needed), Tailwind v4 + Chart.js, Poppins, the **eFokus/JPNIN Flux shell** (re-scaffolded off Laravel 13/Livewire 4 per Kai's parity finding). 13 screens, all HTTP 200, zero render errors. Deterministic `DemoPortalSeeder`: 28 staff, 120 murid, 11 kelas, 1,920 marks, 1,260 attendance rows (15 working days × 3 sessions), licence 28 days out, 5 visas inside 30 days, **16 unexcused lates** (>14 threshold fires), 29 murid <80% tarbiah. SQLite; demo serves on **port 8001** (ONDW's containers own 80/443/3306). No git repo initialised — treated as FT client work.
+- **Team dispatched** (Sora/Nadia/Hana/Mira/Kai). Full reports archived: `secret_information/projects/idusp-staff-portal/research/`. IA = 12 menus / 57 submenus; difficulty ranked (easiest Lesen Sekolah 1.25 → hardest Invois 3.50); effort 28 dev-days prototype / 98 production (Hana), 40–58 person-days demo depth (Kai).
+- **Pricing verdict (Sora)**: RM7,000–8,000 is **NOT a development budget** — it is the fair price of a ~2-week paid discovery. Working prototype RM45–70k, production RM100–300k. Recommended 3 phases: RM12–20k (credited) / RM45–70k / RM60–140k. Maintenance RM500/mo + RM1.5k/yr is **thin/loss-making** → minimum defensible RM9,600–12,000/yr with 3 support hours/month and change requests billed separately.
+- **Where we left off** — Hakim owes: (a) mode confirmation (FT assumed), (b) IDUSP facts (campus, what YINS is, payroll in/out, real counts), (c) pricing decision, then send the 25-question client sheet. Detail: `secret_information/projects/idusp-staff-portal/{overview,modules-and-difficulty,pricing-and-quote,open-questions}.md`
+
 ### Sep 3, 2026 — FT · mpaj-icomm · SFTP code conversion + wipe/redo
 - Active project: **MPAJ iComm** — full detail + 🔔 reminders in [Project content moved to secret_information — see projects/mpaj-icomm/eperolehan-sftp-migration.md (Sep 3, 2026 section) and known-bugs.md]
 - Working branch Hakim-dev2; changes UNCOMMITTED (FT mode) — do NOT `git restore .`
