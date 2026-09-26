@@ -2,10 +2,9 @@
 *Persistent reminders that survive session changes. Updated at session end.*
 
 ## Open
-- **IDUSP staff portal — confirm mode (FT vs PT)** — prototype assumed FT (no client-code commits). Flagged Sep 27, 2026.
-- **IDUSP — unverified client facts to ask**: campus location, what **YINS** stands for/which authority issues the licence, whether payroll (EPF/SOCSO/EIS/PCB) is in scope, student/staff counts, academic calendar, e-Invoice applicability. Web search was rate-limited when this was researched.
+- **IDUSP — unverified client facts to ask**: campus location, what **YINS** stands for/which authority issues the licence, whether payroll (EPF/SOCSO/EIS/PCB) is in scope, student/staff counts, academic calendar, e-Invoice applicability. Web search was rate-limited when this was researched — these are what the **prototype demo this Friday** is meant to draw out.
 - **IDUSP — pricing decision + send the 25-question sheet** (`secret_information/projects/idusp-staff-portal/open-questions.md`). RM7–8k = discovery price, not a build budget; see `pricing-and-quote.md`.
-- **eFokus (FT) — two defects found while reading it for parity, NOT fixed (unasked)**: `league/flysystem-aws-s3-v3` is not installed, so its `s3`/R2 disk would fail if used (may be intentionally unused — verify first); `APP_TIMEZONE=Asia/Kuala_Lumpur` in `.env` is a no-op because Laravel 12 hard-codes `'timezone' => 'UTC'` in `config/app.php`.
+- **eFokus (FT) — three defects found while reading it for parity, NOT fixed (unasked)**: `league/flysystem-aws-s3-v3` is not installed, so its `s3`/R2 disk would fail if used (may be intentionally unused — verify first); `APP_TIMEZONE=Asia/Kuala_Lumpur` in `.env` is a no-op because Laravel 12 hard-codes `'timezone' => 'UTC'` in `config/app.php`; `resources/css/app.css` is missing Flux's required `@custom-variant dark (&:where(.dark, .dark *))`, so its `dark:` utilities are media-query based and its theme toggle can't override the OS setting. Full detail: `secret_information/projects/efokus/known-bugs.md`.
 
 ## Completed
 - **Test Unofficial Vendor + Rider Credit system live** (completed 2026-07-29, originally flagged 2026-07-27): Hakim clicked through the full flow live end-to-end — full detail in `secret_information/projects/ondw/changelog.md` (Jul 29, 2026 entry).
