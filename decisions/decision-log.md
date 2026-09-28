@@ -37,3 +37,15 @@
 
 **Trade-off accepted**: Slightly higher PHP memory usage (file buffered through PHP). At rider document sizes (≤5MB), this is negligible.
 
+
+---
+
+## 2026-09-27 — PERKESO deduction confirmation: pull via our own auth, not a custom callback token
+
+**Context**: PERKESO's deduction callback (the thing meant to tell ONDW whether a submitted deduction was actually accepted) has no signature or auth defined in their API spec — anyone could POST a fake result. Yappy's first instinct was to ask PERKESO's PIC to adopt a custom `PERKESO_CALLBACK_TOKEN` scheme on their outbound callback.
+
+**Decision**: Hakim rejected this — "i cant just tell them what to do" — and pointed at PERKESO's own existing API instead. Correct call: a platform integrating with a government/institutional API doesn't get to dictate that institution's own outbound security scheme. The right pattern is to find an endpoint where **we hold the authentication** (our own Bearer token calling PERKESO), not one where we'd need them to adopt something new on their side.
+
+**What that led to**: the first candidate (§6.7 Get Contribution List) turned out unusable anyway — monthly aggregate, no per-transaction correlation field. But the right tool existed already: §6.14 Retrieve Callback, keyed by a `reference_id` we already receive and could just start storing. Built `perkeso:reconcile-callbacks` — polls PERKESO on our own schedule, no cooperation needed from them at all.
+
+**General lesson for future integrations**: when a bug involves "how do we trust an external partner's callback/webhook," check whether a **pull-based, self-authenticated endpoint** already exists on their side before proposing they change their own outbound security model. The pull direction is almost always the more realistic ask.
