@@ -9,6 +9,17 @@
 
 ---
 
+### Sep 28, 2026 — PT · IDUSP · brand theme, all modules emptied, prototype LOCKED
+- **Hakim locked the prototype**: `idusp-staff-portal` — the **original Blade + Flux app** — is the one going forward. Tagged **`locked-2026-09-28`** and pushed, so the baseline is a named point rather than a moment in conversation. The React/shadcn prototype (`idusp-portal-react`) is **parked intact**, not deleted (same 10-module IA, same brand theme, plus a `/design` sheet) in case he reverses the call.
+- **Brand theme applied to the Blade app** from his palette (#C3A475 gold / #CA9568 clay / #FFFFFF / #060606, plus #857353 derived from their site's own gradient stops). Key move: **Tailwind's `zinc` scale redefined to warm brand greys**, so ~1,100 lines of Blade warmed in one place instead of a rewrite. Light-only preserved (no `.dark` block, `@fluxAppearance` never emitted).
+- **Then two follow-up instructions, both applied**: **no gradients** (flat solids everywhere — verified 0 elements painting one, the rail is flat `#13110E`) and the **nav type ramp reverted** to Flux defaults (16px/400). I reverted only the font ramp, not the flat theme — they shared a commit, so I edited rather than `git revert`-ed.
+- **Navigation rebuilt to his own 10-module list** (Dashboard · Timetable[Generate, View] · KPI · Attendance[Student] · Teacher Leave · Finance[Invoice] · Report Card[Student, Teacher] · License[Student Visa, School YINS] · Tarbiah Report · Inventory) — 10 menus / 8 submenus / 13 routes, mirroring the React app's URLs exactly. `config/navigation.php` now drives **both** the sidebar and the route table.
+- **Every module is an intentionally EMPTY shell** so he can watch the build one module at a time. Migrations + `DemoPortalSeeder` kept so the data layer is ready; the 13 old data-filled screens are deleted but recoverable from git (`449a0a1^`).
+- **Internal design sheet at `/design`** in both apps — palette with measured contrast per pairing, ~15 live theme tokens read from the running stylesheet (cannot drift), type scale, and the non-negotiable AA rules. The Blade app has **no auth at all**, so `config('portal.design_page')` is a **switch, not a permission**.
+- **Real facts found on their public site** (answered an open question): campus is **Seremban**; it is an institute **for women** ("Raising Women Scholars"); opened 2017; programmes Alimah + English Cambridge. Their live brand accent is actually **`#C7AD7C`** and their font is **Poppins**.
+- **Where things stand**: locked, pushed, committed (`e78cb10`). Both apps verified server-side. **Next: the Timetable module UI.**
+
+
 ### Sep 27-28, 2026 — PT · ONDW · PERKESO deduction status bug, found → fixed → made self-verifying
 - Hakim spotted a real one: admin dashboard showed a PERKESO deduction as "submitted" even though PERKESO never actually confirmed it. Yappy read the code directly and found root cause herself: `202 Accepted` (PERKESO's "queued", not "yes") was being treated as final, and the real confirmation channel (a callback) was an unfinished stub that just logged and discarded PERKESO's answer.
 - Reza (opus) + Davai (opus) paired the whole arc, same rigor as any money/compliance work: built the real callback handling, Davai found a real race (admin Retry could double-count a rider's annual cap), fixed, re-verified clean. Hakim made 3 real product decisions (status naming, manual review not auto-retry, show both "submitted" and "confirmed" numbers to rider+admin) — built exactly as decided.

@@ -49,3 +49,18 @@
 **What that led to**: the first candidate (§6.7 Get Contribution List) turned out unusable anyway — monthly aggregate, no per-transaction correlation field. But the right tool existed already: §6.14 Retrieve Callback, keyed by a `reference_id` we already receive and could just start storing. Built `perkeso:reconcile-callbacks` — polls PERKESO on our own schedule, no cooperation needed from them at all.
 
 **General lesson for future integrations**: when a bug involves "how do we trust an external partner's callback/webhook," check whether a **pull-based, self-authenticated endpoint** already exists on their side before proposing they change their own outbound security model. The pull direction is almost always the more realistic ask.
+
+
+---
+
+## 2026-09-28 — IDUSP: the original Blade prototype wins, and the reason matters more than the verdict
+
+**Context**: Two prototypes were built for the same client. The original `idusp-staff-portal` (Laravel 12 + Livewire 3 + Flux 2.20, Poppins, 13 data-backed screens at the time), and a later `idusp-portal-react` (Laravel 13 + Inertia + React + shadcn, dark mode) — the React one existed because Hakim asked on Sep 27 for the UI to move to a shadcn preset. Then on Sep 28 he reversed it: *"i think im choosing the original repo instead. Lock it please."*
+
+**Decision**: `idusp-staff-portal` is the one going forward. Tagged **`locked-2026-09-28`** and pushed, so the baseline is a named, fixed point rather than a moment in a conversation. The React prototype is **parked intact rather than deleted** — same 10-module IA, same brand theme, plus a `/design` sheet — so reversing again costs a decision, not a rebuild.
+
+**Rationale**: The Blade app was deliberately built at **parity with the client's other JPNIN/eFokus tooling** (Laravel 12 / Livewire 3 / Flux 2.20 free tier) — and the earlier re-scaffold *off* Laravel 13 + Livewire 4 was flagged as a deviation at the time. Reversing to the original keeps IDUSP inside the client's existing ecosystem instead of making it the odd one out. For a portal the institute's own staff will maintain long after handover, consistency with what they already run should outweigh the React stack's nicer authoring story.
+
+**Trade-off accepted**: The React app's work (restructure to the 10-module IA, brand theme, design sheet) was **not carried over automatically** — the Blade app got the same IA and theme rebuilt natively instead. Paid twice, once, on purpose, to avoid maintaining two stacks.
+
+**Generalisable lesson**: when a client asks to move a project onto a newer/better-liked stack mid-build, check whether it **breaks parity with the client's own other systems** before building it. The stack Yappy likes best is rarely the one that survives handover.
