@@ -9,6 +9,15 @@
 
 ---
 
+### Sep 29, 2026 — PT · IDUSP · Timetable module BUILT (the first module on the locked prototype)
+- **Hakim reversed the two-screen split**: Timetable is now **one** menu entry at `/timetable`, with Generate opening its rules in a **modal**. `/timetable/view` and `/timetable/generate` deleted (404, no redirect shims). Nav is now 10 menus / 6 submenus.
+- **Mechanism worth keeping**: `PortalController::module()` resolves a view named after the nav key and **falls back to the intentionally empty shell when it is missing** — so building a module is now *adding a view file*. The other eight modules are untouched, which is what makes "one module at a time" real.
+- **What was built**: weekly grid from the seeded 330 slots; a cascading **Form → Class** filter (class select locked until a form is chosen; the disabled look is CSS `:has()`, not script); **colour-coded cells** via six subject families with a legend; dark near-black header band; a Time column with clock times; Break/Lunch bands spanning the week; Print with real print CSS.
+- **Modal backdrop** darkened + blurred, CSS only — Flux's modal is a native `<dialog>`, so the backdrop is `::backdrop`. **Real bug caught**: declaring unprefixed `backdrop-filter` first made lightningcss collapse the pair and drop it entirely, leaving only `-webkit-` and **no blur at all in Chromium**. Prefixed first, standard second.
+- ⚠️ **The data gap that blocks this feature as imagined**: every form/year has **exactly one class** (11 levels → 11 classes), so the cascade offers one option per form. The data also **mixes `Year 1-5` with `Form 1-6`**. Yappy offered to re-seed with Form 1A/1B/1C — Hakim's call, still open.
+- Full detail: `secret_information/projects/idusp-staff-portal/changelog.md`.
+
+
 ### Sep 28, 2026 — PT · IDUSP · brand theme, all modules emptied, prototype LOCKED
 - **Hakim locked the prototype**: `idusp-staff-portal` — the **original Blade + Flux app** — is the one going forward. Tagged **`locked-2026-09-28`** and pushed, so the baseline is a named point rather than a moment in conversation. The React/shadcn prototype (`idusp-portal-react`) is **parked intact**, not deleted (same 10-module IA, same brand theme, plus a `/design` sheet) in case he reverses the call.
 - **Brand theme applied to the Blade app** from his palette (#C3A475 gold / #CA9568 clay / #FFFFFF / #060606, plus #857353 derived from their site's own gradient stops). Key move: **Tailwind's `zinc` scale redefined to warm brand greys**, so ~1,100 lines of Blade warmed in one place instead of a rewrite. Light-only preserved (no `.dark` block, `@fluxAppearance` never emitted).

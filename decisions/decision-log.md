@@ -64,3 +64,20 @@
 **Trade-off accepted**: The React app's work (restructure to the 10-module IA, brand theme, design sheet) was **not carried over automatically** — the Blade app got the same IA and theme rebuilt natively instead. Paid twice, once, on purpose, to avoid maintaining two stacks.
 
 **Generalisable lesson**: when a client asks to move a project onto a newer/better-liked stack mid-build, check whether it **breaks parity with the client's own other systems** before building it. The stack Yappy likes best is rarely the one that survives handover.
+
+
+---
+
+## 2026-09-29 — IDUSP timetable: colour by subject *family*, not by subject
+
+**Context**: The first timetable build was functionally right and visually dead — thirty cells of identical styling, so the grid told you nothing at a glance except by reading every line. Hakim flagged it: *"it is kinda blend where there is no colors to differentiate things."* The seeded data has **18 subjects**.
+
+**Decision**: Group subjects into **six families** that mean something at this institute — Quran & Hadith, Arabic sciences, Islamic sciences, Languages, Academic, Enrichment — plus an Other fallback, and colour each cell by family (tint + accent bar + label in the family colour). Mapped by subject **code** first, with a keyword match on the name for subjects that have no code yet.
+
+**Rationale**: Eighteen distinct hues is past the point where anyone can tell them apart reliably, and an arbitrary hue-per-subject assignment asks the reader to memorise a key with no inherent meaning. Six families is within reliable discrimination and each one carries meaning in this domain, so the colours *teach* the structure of the week instead of just decorating it. It also survives new subjects: a new subject lands in a family by its code, not by someone remembering which of eighteen colours was free.
+
+**Trade-off accepted**: Two subjects in the same family share a colour, so the grid cannot distinguish Al-Quran from Hadith by colour alone. Judged worth it — the family reading is the one people actually want from a timetable.
+
+**Constraint applied**: every family colour is verified AA **both** as text on white and as text on its own 8% tint, which is what lets one value drive label, bar and fill. The natural brand choice `#857353` failed that bar at 4.17:1 on its tint and was corrected to `#6F5C3A` (5.74:1) rather than shipped with a caveat.
+
+**Unrelated lesson from the same session, worth keeping**: a minifier can *silently delete* a declaration rather than error. Writing unprefixed `backdrop-filter` before `-webkit-backdrop-filter` made lightningcss drop the unprefixed one entirely, so the blur simply never appeared — and reading the source CSS would never have revealed it. Checking the **compiled** output is what caught it.
