@@ -9,6 +9,9 @@
 
 ---
 
+### Oct 1, 2026 — PT · ONDW · prod-push decision paused, office closing
+Hakim asked "are we good to push to prod" for `feature/push-notification` (56 commits ahead of `main`, clean fast-forward, carries the PERKESO reconcile fix + cancel-flow/error-page/R2-prefix-command batch). Yappy's read: yes for the code, pending Hakim's choice of A/ship-all, B/quick preprod sweep first, or C/cherry-pick PERKESO alone. Not yet decided — session paused here, Hakim closing the office. Full detail + exact next steps: `secret_information/projects/ondw/known-bugs.md` ("REMINDER for Hakim — open as of Oct 1, 2026").
+
 ### Sep 29, 2026 — PT · IDUSP · Timetable module BUILT (the first module on the locked prototype)
 - **Hakim reversed the two-screen split**: Timetable is now **one** menu entry at `/timetable`, with Generate opening its rules in a **modal**. `/timetable/view` and `/timetable/generate` deleted (404, no redirect shims). Nav is now 10 menus / 6 submenus.
 - **Mechanism worth keeping**: `PortalController::module()` resolves a view named after the nav key and **falls back to the intentionally empty shell when it is missing** — so building a module is now *adding a view file*. The other eight modules are untouched, which is what makes "one module at a time" real.
