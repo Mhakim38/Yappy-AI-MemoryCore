@@ -13,6 +13,7 @@
 | **PWA Offline-First Setup** | `integration/pwa-offline-first.md` | 2️⃣ Proven | Universal | ✅ Active |
 | **PWA Push Notifications** | `integration/push-notifications.md` | 2️⃣ Proven | Next.js, Node.js | ✅ Active |
 | **Push Notifications (Laravel)** | `push-notifications-library.md` | 2️⃣ Proven | Laravel | ✅ Active |
+| **Web Push: verify, debug, targeted-push pitfalls** | `integration/web-push-verify-and-debug.md` | 2️⃣ Proven | Laravel PWA | ✅ Active |
 | **BillPlz Payment Gateway** | `integration/billplz-integration.md` | 2️⃣ Proven | Laravel | ✅ Active |
 | **PERKESO GIG Workers API** | `integration/perkeso-gig-api.md` | 2️⃣ Proven | Laravel | ✅ Active |
 
