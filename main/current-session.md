@@ -65,7 +65,7 @@
 - 📋 Trim toenails — Monthly (1st of each month)
 
 ### Needs surfacing
-- **ONDW (PT)**: prod is v1.1.0 (main d930f85, deployed Oct 15 ~01:10 by Hakim); rain fee ON at RM1.00 all to rider; error log + rider push ON. 🔴 FIUU follow-up due Thu Oct 15 (dashboard check, refunds for orders 828/833/834) — see `main/reminders.md`. Not yet done: notification deep-links, Google username clash, second-payment gap.
+- **ONDW (PT)**: prod is v1.1.0 (main d930f85, deployed Oct 15 ~01:10 by Hakim); rain fee ON at RM1.00 all to rider; error log + rider push ON. 🔴 FIUU follow-up due Thu Oct 15 (dashboard check, possible refunds) — see `main/reminders.md`. Not yet done: notification deep-links, Google username clash, second-payment gap.
 - **IDUSP**: PHP's 2M upload limit on the Pi; one thumbnail to confirm publicly; `/design` visibility; 8 of 13 screens still shells.
 - ⚠️ Two pieces of text were found **UNSENT** in staff panes on Oct 12 ("Go with the ledger approach", "Items come from the seed; Low includes at-reorder") — never acted on, never confirmed by Hakim.
 
