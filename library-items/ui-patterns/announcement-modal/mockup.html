@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Broadcast — Mockup</title>
+<link rel="preconnect" href="https://fonts.bunny.net">
+<link href="https://fonts.bunny.net/css?family=outfit:500,700,800|figtree:400,500,600,700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.1"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+<style>
+  /* ONE accent: Brand blue #2167AD. Everything else is ink / grey / cream (neutral surface). */
+  :root{ --ink:#102A43; --muted:#5B6B7C; --line:#d8e8f4; --cream:#FFF4E0; --accent:#2167AD; --page:#F4F9FE; }
+  [x-cloak]{display:none!important}
+  html{-webkit-tap-highlight-color:transparent}
+  body{font-family:'Figtree',system-ui,sans-serif;color:var(--ink);background:var(--page);overscroll-behavior-y:none}
+  .ow-display{font-family:'Outfit','Figtree',sans-serif}
+  button,.btn,label.pick{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+  :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+  /* buttons: 44px tap target, press feedback via :active, hover only on real hover devices */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:44px;padding:0 1.25rem;border-radius:9999px;font-weight:700;font-size:14px;transition:transform .12s,background-color .15s}
+  .btn:active{transform:scale(.97)}
+  .btn-primary{background:var(--accent);color:#fff;box-shadow:0 12px 28px rgba(33,103,173,.24)}
+  .btn-ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn-ghost:disabled,.btn-primary:disabled{opacity:.5}
+  @media (hover:hover) and (pointer:fine){ .btn-primary:hover{background:#1b5794} .btn-ghost:hover{background:#EAF5FF} }
+
+  /* ---------- the modal (shared by user tab + admin preview) ---------- */
+  .scrim{position:absolute;inset:0;background:rgba(16,42,67,.5);backdrop-filter:blur(2px)}
+  .wrap{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center}
+  .sheet{position:relative;display:flex;flex-direction:column;width:100%;max-height:92%;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -12px 40px rgba(16,42,67,.22);overflow:hidden;animation:rise .24s cubic-bezier(.22,1,.36,1) both}
+  @keyframes rise{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+  .media{position:relative;flex:none;aspect-ratio:3/2;max-height:260px;background:var(--cream);overflow:hidden}
+  .media img,.media svg{width:100%;height:100%;display:block}
+  .media img{object-fit:cover}          /* admin upload: centre-crop to 3:2 frame */
+  .media svg{object-fit:contain}        /* default illustration: never cropped */
+  @media (max-height:640px){.media{max-height:130px}}
+  .close{position:absolute;top:10px;right:10px;width:44px;height:44px;display:grid;place-items:center;border-radius:9999px;background:rgba(255,255,255,.92);color:var(--ink);transition:transform .12s}
+  .close:active{transform:scale(.92)}
+  .body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:18px 22px 8px;text-align:center}
+  .date{font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--muted)}
+  .title{font-family:'Outfit','Figtree',sans-serif;font-weight:700;font-size:22px;line-height:1.25;margin-top:4px;overflow-wrap:anywhere}
+  .msg{margin-top:10px;font-size:15px;line-height:1.6;white-space:pre-line;overflow-wrap:anywhere;text-align:left}
+  .foot{position:relative;flex:none;padding:12px 22px calc(16px + env(safe-area-inset-bottom));background:#fff}
+  .foot::before{content:"";position:absolute;left:0;right:0;top:-18px;height:18px;background:linear-gradient(to top,#fff,rgba(255,255,255,0));pointer-events:none}
+  .foot .btn{width:100%;min-height:48px;font-size:15px}
+  .noanim .sheet{animation:none}
+  @media (prefers-reduced-motion:reduce){.sheet{animation:none}.btn,.close{transition:none}}
+
+  /* phone frame (mockup only; production modal is position:fixed inset-0, z-[80]) */
+  .phone{position:relative;overflow:hidden;background:#fff;width:390px;height:844px;border-radius:40px;border:8px solid var(--ink)}
+  @media (max-width:430px){ .phone.real{width:100%;height:100dvh;border:0;border-radius:0} }
+
+  /* toggle */
+  .tgl{position:relative;width:52px;height:32px;border-radius:9999px;background:#C9D3DD;transition:background .15s;flex:none}
+  .tgl::after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:9999px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
+  .tgl[aria-checked=true]{background:var(--accent)}
+  .tgl[aria-checked=true]::after{transform:translateX(20px)}
+  /* pick cards */
+  label.pick{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1.5px solid var(--line);border-radius:16px;background:#fff;min-height:56px}
+  label.pick:has(input:checked){border-color:var(--ink);background:#fff;box-shadow:inset 0 0 0 1px var(--ink)}
+  label.pick:has(input:focus-visible){outline:2px solid var(--ink);outline-offset:2px}
+  .dot{width:20px;height:20px;border-radius:9999px;border:2px solid #9AA9B8;flex:none;margin-top:1px;display:grid;place-items:center}
+  label.pick:has(input:checked) .dot{border-color:var(--ink)}
+  label.pick:has(input:checked) .dot::after{content:"";width:10px;height:10px;border-radius:9999px;background:var(--ink)}
+  .field{width:100%;border:1.5px solid var(--line);border-radius:14px;background:#fff;padding:12px 14px;font-size:16px;line-height:1.5}
+  .field:focus{outline:2px solid var(--ink);outline-offset:1px;border-color:var(--ink)}
+  .field.bad{border-color:#B42318}
+  .err{color:#B42318;font-size:13px;font-weight:600;margin-top:6px;display:flex;gap:6px;align-items:flex-start}
+  .card{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:0 12px 30px rgba(16,42,67,.06)}
+  .dz{border:2px dashed #9AA9B8;border-radius:16px;background:#fff;text-align:center;padding:20px 14px;transition:background .15s,border-color .15s}
+  .dz.over{background:var(--cream);border-color:var(--ink)}
+</style>
+</head>
+<body class="antialiased" x-data="app()">
+
+<!-- ======= MOCKUP CHROME (not part of the design) ======= -->
+<div class="sticky top-0 z-[100] border-b border-[#d8e8f4] bg-white/95 px-3 py-2 backdrop-blur">
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center gap-2 text-sm">
+    <span class="mr-2 font-bold ow-display">Broadcast mockup</span>
+    <button class="btn btn-ghost !min-h-[40px]" :class="tab==='user' && '!border-[#102A43] !border-2'" @click="tab='user'">1 · User modal</button>
+    <button class="btn btn-ghost !min-h-[40px]" :class="tab==='admin' && '!border-[#102A43] !border-2'" @click="tab='admin'">2 · Admin page</button>
+    <span class="ml-auto hidden text-xs text-[#5B6B7C] sm:inline">Seed 439275 · locked · mobile-native · 1 accent</span>
+  </div>
+</div>
+
+<!-- ============================ TAB 1: USER MODAL ============================ -->
+<section x-show="tab==='user'" x-cloak class="mx-auto max-w-6xl px-3 py-5">
+  <div class="mb-4 flex flex-wrap items-center gap-2">
+    <span class="text-sm font-semibold">Open as:</span>
+    <button class="btn btn-ghost !min-h-[40px]" @click="openUser('default')">Default illustration</button>
+    <button class="btn btn-ghost !min-h-[40px]" @click="openUser('custom')">Admin image (3:2)</button>
+    <button class="btn btn-ghost !min-h-[40px]" @click="openUser('wide')">Admin image (wrong ratio, cropped)</button>
+    <button class="btn btn-ghost !min-h-[40px]" @click="openUser('long')">Long message (scrolls)</button>
+  </div>
+  <div class="phone real mx-auto">
+    <!-- fake app behind the modal -->
+    <div class="absolute inset-0 bg-[#F8F6F1]">
+      <div class="px-4 pt-14">
+        <p class="text-xs font-bold uppercase tracking-[.16em] text-[#5B6B7C]">Browse cafes</p>
+        <div class="mt-3 space-y-3">
+          <div class="h-24 rounded-2xl bg-white shadow-sm"></div><div class="h-24 rounded-2xl bg-white shadow-sm"></div><div class="h-24 rounded-2xl bg-white shadow-sm"></div>
+        </div>
+      </div>
+    </div>
+    <div x-show="u.open" x-cloak class="wrap" style="z-index:5" @keydown.escape.window="u.open=false">
+      <div class="scrim" @click="u.open=false" aria-hidden="true"></div>
+      <div style="display:contents" x-html="card(u.d)" @click="if($event.target.closest('[data-close]')) u.open=false"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ TAB 2: ADMIN PAGE ============================ -->
+<section x-show="tab==='admin'" x-cloak class="mx-auto max-w-6xl px-3 pb-32 pt-5 lg:pb-10">
+
+  <!-- demo switches -->
+  <div class="mb-4 flex flex-wrap items-center gap-2 rounded-2xl bg-[#FFF4E0] p-3 text-sm">
+    <span class="font-semibold">Mockup states:</span>
+    <button class="btn btn-ghost !min-h-[36px] !text-xs" @click="list=[...sample]">List with items</button>
+    <button class="btn btn-ghost !min-h-[36px] !text-xs" @click="list=[]">List empty</button>
+    <button class="btn btn-ghost !min-h-[36px] !text-xs" @click="reset();publish()">Show validation errors</button>
+    <button class="btn btn-ghost !min-h-[36px] !text-xs" @click="fileError='We can’t use “poster.pdf”. Please choose a JPG, PNG or WebP image.'">Show upload error</button>
+  </div>
+
+  <header class="mb-4">
+    <h1 class="ow-display text-2xl font-extrabold leading-tight">Broadcast</h1>
+    <p class="mt-1 text-sm text-[#5B6B7C]">A pop-up announcement shown once to every customer, vendor and rider.</p>
+  </header>
+
+  <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-start">
+
+    <!-- LEFT: form + history -->
+    <div class="space-y-5">
+      <form class="card space-y-6 p-4 sm:p-6" @submit.prevent="publish()" novalidate>
+        <div class="flex items-center justify-between gap-3">
+          <h2 class="text-base font-bold" x-text="editing ? 'Edit broadcast' : 'New broadcast'"></h2>
+          <button type="button" class="btn btn-ghost !min-h-[40px] !text-xs" x-show="editing" x-cloak @click="reset()">Cancel edit</button>
+        </div>
+
+        <!-- Title -->
+        <div>
+          <label for="t" class="text-sm font-bold">Title</label>
+          <input id="t" class="field mt-2" :class="errors.title && 'bad'" maxlength="80" x-model="title" placeholder="e.g. Monthly update" :aria-invalid="!!errors.title" aria-describedby="t-help">
+          <div class="mt-1 flex justify-between gap-3 text-xs text-[#5B6B7C]"><span id="t-help"></span><span x-text="title.length+' / 80'"></span></div>
+          <p class="err" x-show="errors.title" x-cloak role="alert"><span x-text="errors.title"></span></p>
+        </div>
+
+        <!-- Message -->
+        <div>
+          <label for="m" class="text-sm font-bold">Message</label>
+          <textarea id="m" rows="5" class="field mt-2" :class="errors.message && 'bad'" maxlength="1000" x-model="message" placeholder="What do people need to know? Plain text. A new line stays a new line." :aria-invalid="!!errors.message"></textarea>
+          <div class="mt-1 flex justify-between gap-3 text-xs text-[#5B6B7C]"><span>Plain text only. Long messages scroll inside the pop-up.</span><span x-text="message.length+' / 1000'"></span></div>
+          <p class="err" x-show="errors.message" x-cloak role="alert"><span x-text="errors.message"></span></p>
+        </div>
+
+        <!-- Image choice -->
+        <fieldset>
+          <legend class="text-sm font-bold">Picture</legend>
+          <div class="mt-2 grid gap-3 sm:grid-cols-2">
+            <label class="pick"><input type="radio" name="img" value="default" class="sr-only" x-model="imgMode">
+              <span class="dot"></span>
+              <span><span class="block text-sm font-bold">Default illustration</span><span class="mt-0.5 block text-xs text-[#5B6B7C]">The Brand rider. Nothing to upload.</span>
+                <span class="mt-2 block w-24 overflow-hidden rounded-lg bg-[#FFF4E0]" x-html="art()"></span></span></label>
+            <label class="pick"><input type="radio" name="img" value="custom" class="sr-only" x-model="imgMode">
+              <span class="dot"></span>
+              <span><span class="block text-sm font-bold">Upload my own</span><span class="mt-0.5 block text-xs text-[#5B6B7C]">A poster or photo for this announcement.</span></span></label>
+          </div>
+        </fieldset>
+
+        <!-- Upload (only when custom) -->
+        <div x-show="imgMode==='custom'" x-cloak class="space-y-3">
+          <!-- Recommended-size callout: cream surface + ink text, NOT the accent; the strongest block in this section -->
+          <div class="flex gap-3 rounded-2xl border border-[#F1D9AE] bg-[#FFF4E0] p-4" role="note">
+            <svg class="mt-0.5 h-6 w-6 flex-none" viewBox="0 0 24 24" fill="none" stroke="#102A43" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 15l5-4 4 3 3-2 6 4"/><circle cx="16" cy="9.5" r="1.3"/></svg>
+            <div class="text-sm leading-6">
+              <p class="font-extrabold">Recommended: 1200 × 800 px <span class="font-bold text-[#5B6B7C]">(3:2, landscape)</span></p>
+              <p>JPG, PNG or WebP · up to 2 MB · keep the important part in the middle.</p>
+              <p class="text-xs text-[#5B6B7C]">Just a guide. Any picture works; we centre-crop it to 3:2 so it fits the pop-up. Small or very wide images may look soft or cut off.</p>
+            </div>
+          </div>
+
+          <div class="dz" :class="over && 'over'" @dragover.prevent="over=true" @dragleave="over=false" @drop.prevent="over=false;pickFile($event.dataTransfer.files[0])" x-show="!file">
+            <svg class="mx-auto h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="#102A43" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0l-4 4m4-4l4 4"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+            <p class="mt-2 text-sm font-bold"><span class="hidden sm:inline">Drag a picture here, or </span>choose a file</p>
+            <div class="mt-3 flex flex-wrap justify-center gap-2">
+              <button type="button" class="btn btn-ghost" @click="$refs.file.click()">Choose picture</button>
+              <button type="button" class="btn btn-ghost" @click="useSample()">Use a sample (mockup)</button>
+            </div>
+            <input x-ref="file" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only" @change="pickFile($event.target.files[0]);$event.target.value=''">
+          </div>
+
+          <!-- error (hard: type / size) -->
+          <p class="err" x-show="fileError" x-cloak role="alert"><svg class="mt-0.5 h-4 w-4 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg><span x-text="fileError"></span></p>
+          <p class="err" x-show="errors.file" x-cloak role="alert"><span x-text="errors.file"></span></p>
+
+          <!-- chosen file -->
+          <div x-show="file" x-cloak class="flex items-center gap-3 rounded-2xl border border-[#d8e8f4] bg-white p-3">
+            <img :src="file?.url" alt="" class="h-14 w-20 flex-none rounded-lg object-cover">
+            <div class="min-w-0 flex-1 text-sm"><p class="truncate font-bold" x-text="file?.name"></p><p class="text-xs text-[#5B6B7C]" x-text="file ? file.w+' × '+file.h+' px · '+file.kb+' KB' : ''"></p></div>
+            <button type="button" class="btn btn-ghost !px-4" @click="file=null;warn=''">Replace</button>
+          </div>
+          <!-- soft warning (never blocks) -->
+          <div x-show="warn" x-cloak class="flex gap-2 rounded-xl bg-[#F3F6F9] px-3 py-2 text-[13px] leading-5" role="status">
+            <svg class="mt-0.5 h-4 w-4 flex-none" viewBox="0 0 24 24" fill="none" stroke="#102A43" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.01"/></svg><span><strong>Heads up, not a problem:</strong> <span x-text="warn"></span> You can still publish.</span>
+          </div>
+        </div>
+
+        <!-- Active -->
+        <div class="flex items-center justify-between gap-4 rounded-2xl bg-[#F3F6F9] p-4">
+          <div><p class="text-sm font-bold" id="act-l">Show to everyone</p><p class="text-xs text-[#5B6B7C]" x-text="active ? 'People see it the next time they open Brand. Replaces the current broadcast.' : 'Saved as a draft. Nobody sees it yet.'"></p></div>
+          <button type="button" role="switch" class="tgl" :aria-checked="active" aria-labelledby="act-l" @click="active=!active" style="min-width:52px"></button>
+        </div>
+
+        <label class="flex items-start gap-3 text-sm" x-show="editing" x-cloak>
+          <input type="checkbox" x-model="reshow" class="mt-0.5 h-5 w-5 rounded border-[#64748B] accent-[#102A43]"> <span><strong>Show again</strong> to people who already closed it</span>
+        </label>
+
+        <!-- desktop actions -->
+        <div class="hidden flex-wrap items-center justify-end gap-2 lg:flex">
+          <button type="submit" class="btn btn-primary" x-text="active ? 'Publish' : 'Save draft'"></button>
+        </div>
+      </form>
+
+      <!-- History -->
+      <section class="card p-4 sm:p-6" aria-labelledby="hist">
+        <h2 id="hist" class="text-base font-bold">Past broadcasts</h2>
+        <!-- empty -->
+        <div x-show="list.length===0" x-cloak class="mt-4 rounded-2xl border border-dashed border-[#9AA9B8] px-4 py-8 text-center">
+          <div class="mx-auto w-28 overflow-hidden rounded-xl bg-[#FFF4E0]" x-html="art()"></div>
+          <p class="mt-3 text-sm font-bold">No broadcasts yet</p>
+          <p class="mx-auto mt-1 max-w-xs text-xs text-[#5B6B7C]">When you publish one, it shows up here so you can edit it, turn it off or reuse it.</p>
+        </div>
+        <ul class="mt-3 divide-y divide-[#e6eef6]" x-show="list.length>0" x-cloak>
+          <template x-for="b in list" :key="b.id">
+            <li class="flex items-center gap-3 py-3">
+              <div class="h-12 w-[72px] flex-none overflow-hidden rounded-lg bg-[#FFF4E0]" x-html="b.img ? '<img src=&quot;'+b.img+'&quot; alt=&quot;&quot; style=&quot;width:100%;height:100%;object-fit:cover&quot;>' : art()"></div>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-bold" x-text="b.title"></p>
+                <p class="mt-0.5 flex items-center gap-2 text-xs text-[#5B6B7C]"><span x-text="b.date"></span>
+                  <span class="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold" :class="b.status==='Active' ? 'bg-[#FFF4E0] text-[#102A43]' : 'bg-[#EEF2F6] text-[#5B6B7C]'"><span class="h-1.5 w-1.5 rounded-full" :class="b.status==='Active' ? 'bg-[#102A43]' : 'bg-[#9AA9B8]'"></span><span x-text="b.status"></span></span></p>
+              </div>
+              <button class="btn btn-ghost !min-h-[44px] !px-4" @click="edit(b)">Edit</button>
+            </li>
+          </template>
+        </ul>
+      </section>
+    </div>
+
+    <!-- RIGHT (desktop): live preview. Same component as the real modal. -->
+    <aside class="hidden lg:sticky lg:top-16 lg:block" aria-label="Live preview">
+      <p class="mb-2 text-sm font-bold">Live preview <span class="font-medium text-[#5B6B7C]">· what people will see</span></p>
+      <div class="phone mx-auto origin-top" style="transform:scale(.88);margin-bottom:-100px" x-html="frame(pv())"></div>
+    </aside>
+  </div>
+
+  <!-- MOBILE sticky action bar: Preview + Publish (clears bottom nav / home indicator) -->
+  <div class="fixed inset-x-0 bottom-0 z-[60] border-t border-[#d8e8f4] bg-white/95 px-3 pt-2 backdrop-blur lg:hidden" style="padding-bottom:max(.75rem,env(safe-area-inset-bottom))">
+    <div class="mx-auto flex max-w-xl gap-2">
+      <button type="button" class="btn btn-ghost flex-1" @click="prev=true">Preview</button>
+      <button type="button" class="btn btn-primary flex-[1.4]" @click="publish()" x-text="active ? 'Publish' : 'Save draft'"></button>
+    </div>
+  </div>
+
+  <!-- MOBILE full-screen preview (the real modal, with a banner) -->
+  <div x-show="prev" x-cloak class="fixed inset-0 z-[90] lg:hidden" @keydown.escape.window="prev=false">
+    <div class="absolute inset-0" x-html="frame(pv(),true)" @click="if($event.target.closest('[data-close]')) prev=false"></div>
+    <div class="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-2 bg-[#102A43] px-4 text-sm font-semibold text-white" style="padding-top:max(.5rem,env(safe-area-inset-top));padding-bottom:.5rem">
+      <span>Preview. Nothing is sent.</span><button class="btn !min-h-[36px] bg-white !px-4 !text-xs text-[#102A43]" @click="prev=false">Back to edit</button>
+    </div>
+  </div>
+
+  <!-- toast -->
+  <div x-show="toast" x-cloak x-transition.opacity class="fixed inset-x-3 bottom-24 z-[95] mx-auto max-w-sm rounded-2xl bg-[#102A43] px-4 py-3 text-center text-sm font-semibold text-white shadow-lg lg:bottom-6" role="status" x-text="toast"></div>
+</section>
+
+<script>
+const ART = `<svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="" preserveAspectRatio="xMidYMid meet">
+  <rect width="300" height="200" fill="#FFF4E0"/>
+  <circle cx="150" cy="104" r="78" fill="#FFE6BD"/>
+  <g stroke="#102A43" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M24 168H276" stroke-dasharray="2 9" opacity=".45"/>
+    <path d="M40 124h28M30 136h40M46 148h22" opacity=".25"/>
+    <!-- scooter -->
+    <circle cx="96" cy="150" r="15" fill="#fff"/><circle cx="198" cy="150" r="15" fill="#fff"/>
+    <path d="M112 146h56l-6-22H116c-12 0-18 10-14 22" fill="#fff"/>
+    <path d="M170 146l14-40M178 104h18"/>
+    <!-- delivery box: the single accent -->
+    <rect x="76" y="88" width="46" height="34" rx="7" fill="#2167AD"/>
+    <path d="M88 105h22M99 98v14" stroke="#fff" stroke-width="2.5"/>
+    <!-- rider -->
+    <path d="M140 122l12-32" stroke-width="14"/>
+    <path d="M152 94l30 10" stroke-width="5"/>
+    <path d="M140 124l10 22" stroke-width="6"/>
+    <circle cx="156" cy="76" r="10" fill="#fff"/>
+    <path d="M145 74a11 11 0 0122 0z" fill="#102A43"/>
+    <!-- announcement bubble -->
+    <rect x="196" y="26" width="84" height="52" rx="13" fill="#fff"/>
+    <path d="M212 78l-6 16 22-16" fill="#fff"/>
+    <path d="M210 44h56M210 54h44M210 64h30" stroke-width="4" opacity=".35"/>
+    <path d="M286 22v10M281 27h10" stroke-width="2.5" opacity=".5"/>
+  </g></svg>`;
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// 1200x800 sample "poster" for the mockup (stands in for an admin upload)
+const SAMPLE = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE6BD"/><stop offset="1" stop-color="#EAF5FF"/></linearGradient></defs><rect width="1200" height="800" fill="url(#g)"/><circle cx="880" cy="330" r="230" fill="#fff" opacity=".7"/><text x="90" y="360" font-family="Arial" font-weight="700" font-size="110" fill="#102A43">Free delivery</text><text x="90" y="480" font-family="Arial" font-weight="700" font-size="110" fill="#102A43">this Friday</text><rect x="90" y="560" width="260" height="22" rx="11" fill="#102A43" opacity=".25"/></svg>`);
+const WIDE = 'data:image/svg+xml;utf8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="500" viewBox="0 0 1600 500"><rect width="1600" height="500" fill="#EAF5FF"/><text x="40" y="270" font-family="Arial" font-weight="700" font-size="120" fill="#102A43">Left edge text gets cut off here</text></svg>`);
+const LONG = "Hi everyone!\n\nThis month we are making a few changes so ordering is faster and fairer for riders and cafes.\n\n• Orders close 15 minutes before the cafe does.\n• A small rain fee applies when it rains at UM.\n• Pickup orders now show an estimated ready time.\n• Riders may take up to 3 orders at once.\n\nIf something looks wrong, message us from Profile > Help and we will sort it out the same day. Thank you for supporting your local cafes.\n\nOne more thing: please check the new terms before your next order. They explain how refunds, rain fees and pickup windows work, in plain language. It takes about two minutes to read, and you only need to do it once.\n\nSee you at the next lunch rush!";
+
+function app(){ return {
+  tab:'user',
+  u:{open:false,d:{}},
+  // admin form
+  title:'', message:'', imgMode:'default', file:null, fileError:'', warn:'', active:true, reshow:false, editing:null,
+  errors:{}, over:false, prev:false, toast:'',
+  list:[
+    {id:3,title:'Monthly update',date:'1 Oct 2026',status:'Active',img:null},
+    {id:2,title:'Free delivery Friday',date:'12 Sep 2026',status:'Ended',img:SAMPLE},
+    {id:1,title:'Welcome to Brand',date:'20 Aug 2026',status:'Ended',img:null}],
+  sample:null,
+  init(){ this.sample=[...this.list]; },
+  art(){ return ART; },
+  today(){ return '23 Oct 2026'; },
+
+  // ----- the modal card (identical for users and previews) -----
+  card(d){
+    const media = d.img
+      ? `<img src="${esc(d.img)}" alt="">`
+      : ART;
+    return `<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="bt">
+      <div class="media">${media}
+        <button type="button" class="close" data-close aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+      </div>
+      <div class="body" tabindex="0">
+        <p class="date">${esc(d.date)}</p>
+        <h2 class="title" id="bt">${esc(d.title)}</h2>
+        <div class="msg">${esc(d.message)}</div>
+      </div>
+      <div class="foot"><button type="button" class="btn btn-primary" data-close>Continue</button></div>
+    </div>`;
+  },
+  frame(d,full){
+    // admin preview: modal inside a stand-in app screen
+    return `<div style="position:absolute;inset:0;background:#F8F6F1"></div><div class="wrap" style="z-index:5"><div class="scrim"></div><div class="noanim" style="display:contents">${this.card(d)}</div></div>`;
+  },
+  pv(){
+    return { title:this.title.trim()||'Your title appears here', message:this.message.trim()||'Your message appears here. Keep it short and kind; people read this on their phone.',
+             img:(this.imgMode==='custom' && this.file)? this.file.url : null, date:this.today() };
+  },
+  openUser(kind){
+    const d={date:this.today(),img:null,title:'Monthly update',message:'We have made ordering a little smoother this month. Thank you for supporting your local cafes.'};
+    if(kind==='custom') d.img=SAMPLE;
+    if(kind==='wide'){ d.img=WIDE; d.title='Wide banner uploaded'; d.message='A 16:5 banner is centre-cropped into the 3:2 frame, so the left and right edges are lost. The admin preview shows this before publishing.'; }
+    if(kind==='long'){ d.title='What is new at Brand this month'; d.message=LONG; }
+    this.u={open:true,d};
+  },
+
+  // ----- admin behaviour -----
+  pickFile(f){
+    this.fileError=''; this.warn=''; if(!f) return;
+    if(!/^image\/(jpeg|png|webp)$/.test(f.type)){ this.fileError='We can’t use “'+f.name+'”. Please choose a JPG, PNG or WebP image.'; return; }
+    if(f.size>2*1024*1024){ this.fileError='“'+f.name+'” is '+(f.size/1048576).toFixed(1)+' MB. The limit is 2 MB. Try saving it as JPG or WebP.'; return; }
+    const url=URL.createObjectURL(f), im=new Image();
+    im.onload=()=>{ this.setFile({name:f.name,url,w:im.naturalWidth,h:im.naturalHeight,kb:Math.round(f.size/1024)}); };
+    im.src=url;
+  },
+  useSample(){ this.fileError=''; this.setFile({name:'friday-poster.png',url:SAMPLE,w:1200,h:800,kb:184}); },
+  setFile(f){
+    this.file=f; this.errors.file='';
+    const ratio=f.w/f.h, off=Math.abs(ratio-1.5)/1.5, msgs=[];
+    if(f.w<900) msgs.push('This picture is small ('+f.w+' px wide) and may look soft on sharp screens.');
+    if(off>0.08) msgs.push('Its shape is '+(ratio>1.5?'wider':'taller')+' than 3:2, so the edges will be cropped. Check the preview.');
+    this.warn=msgs.join(' ');
+  },
+  validate(){
+    const e={};
+    if(!this.title.trim()) e.title='Add a title so people know what this is about.';
+    if(!this.message.trim()) e.message='Write a short message. This is the part people read.';
+    if(this.imgMode==='custom' && !this.file) e.file='Choose a picture, or switch back to the default illustration.';
+    this.errors=e; return Object.keys(e).length===0;
+  },
+  publish(){
+    if(!this.validate()){ this.$nextTick(()=>document.querySelector('.err:not([style*="none"]) , .field.bad')?.scrollIntoView({block:'center',behavior:'smooth'})); return; }
+    const row={id:Date.now(),title:this.title.trim(),date:this.today(),status:this.active?'Active':'Draft',img:(this.imgMode==='custom'&&this.file)?this.file.url:null};
+    if(this.active) this.list=this.list.map(b=>b.status==='Active'?{...b,status:'Ended'}:b);
+    if(this.editing) this.list=this.list.filter(b=>b.id!==this.editing);
+    this.list=[row,...this.list];
+    this.say(this.active?'Published. People see it next time they open the app.':'Saved as a draft.');
+    this.reset();
+  },
+  edit(b){ this.reset(); this.editing=b.id; this.title=b.title; this.message='(message loads here)'; this.imgMode=b.img?'custom':'default'; if(b.img) this.file={name:'current-image',url:b.img,w:1200,h:800,kb:184}; this.active=b.status==='Active'; window.scrollTo({top:0,behavior:'smooth'}); },
+  reset(){ this.title='';this.message='';this.imgMode='default';this.file=null;this.fileError='';this.warn='';this.active=true;this.reshow=false;this.editing=null;this.errors={}; },
+  say(t){ this.toast=t; setTimeout(()=>this.toast='',2800); }
+}}
+</script>
+</body>
+</html>
