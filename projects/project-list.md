@@ -17,6 +17,7 @@
 | PT | ETAMS | `secret_information/projects/etams/` |
 | PT | eFokus | `secret_information/projects/efokus/` |
 | PT | Personal Portfolio | `secret_information/projects/personal-portfolio/` |
+| PT | Tulip Damai Spa & Sauna (friend's site, showcase) | `secret_information/projects/tulip/` |
 
 *Removed Sep 3, 2026: detailed per-project entries — they duplicated secret_information content in a public repo.*
 
