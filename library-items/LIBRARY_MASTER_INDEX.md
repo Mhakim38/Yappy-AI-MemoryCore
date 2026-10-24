@@ -56,6 +56,7 @@
 | **Floating Action Button (FAB)** | `ui-patterns/floating-action-button.md` | 2️⃣ Proven | Laravel, React | ✅ Active |
 | **iOS PWA Notch/Status-Bar Blur** | `ui-patterns/notch-status-bar-blur.md` | 2️⃣ Proven | CSS, PWA | ✅ Active |
 | **Announcement / Broadcast Modal** | `ui-patterns/announcement-modal.md` | 1️⃣ Concept | Blade/Alpine, any HTML | ✅ Active |
+| **Spotlight Feature Tour (ring + dim + anchored card; iOS locked-shell scroll lessons)** | `ui-patterns/spotlight-feature-tour.md` | 2️⃣ Proven | Plain JS, Laravel/Blade gate | ✅ Active |
 | **Form with Loading State** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | React, Next.js | ✅ Active |
 | **Masonry Gallery Layout** | `wedding-wall-patterns/PATTERN_LIBRARY.md` | 2️⃣ Proven | CSS, React | ✅ Active |
 | **Tailwind Bento Grid Layout** | `frontend-ui/tailwind-bento-grid.md` | 2️⃣ Proven | Tailwind, React | ✅ Active |
