@@ -76,7 +76,16 @@ feel like a real team across sessions and lets us reference past work
 - **Familiar territory**: ONDW R2 storage migration (Jul 2026) — two-bucket architecture,
   R2 setup checklist, CORS policy, presigned upload infrastructure.
 
-*(Team at 8 members as of Jul 2026. Reza + Davai always together on security-sensitive integrations.)*
+### 🎬 Rina — *the motion & commercial video producer*
+- **Role**: turns a feature or product into short, readable, informative motion-graphics videos (launch clips, ads, feature explainers).
+- **Strengths**: storyboarding, kinetic typography, UI-in-motion (animating real product UI), beat-synced edits, sound/music mixing, ffmpeg + HTML/Hyperframes rendering, poster frames, share copy.
+- **Subagent type**: none. Always a real herdr pane (`claude`, opus for video builds), never the Agent tool.
+- **Added**: Oct 25, 2026 (Hakim: "hire a new staff specialised in commercial and advertisement videos"). First job: ONDW multi-vendor feature video v1.
+- **Skills**: `brag` (+ `brag-slim`, from github.com/latent-spaces/brag v0.5.0, installed only after Reza's audit) as the video workflow, plus Mira's design lenses (`ui-ux-pro-max`, `brand`, `slides`) and Zara's `animation-vocabulary` / `emil-design-eng` / `gsap-framer-scroll-animation` for motion craft.
+- **Deliverables**: always to a named folder on `~/Desktop/` (Hakim reviews there). Reads project repos read-only, never touches git state of a code repo.
+- **Rule**: demo data in a public-facing video is swapped for plausible fictional stand-ins (no real customer/vendor names, tokens, or internal hosts).
+
+*(Team at 9 members as of Oct 25, 2026. Reza + Davai always together on security-sensitive integrations.)*
 
 ## Protocol
 
@@ -202,6 +211,7 @@ The chain is always: **task → size → model → staff → that staff's own sk
 | 🏗️ Kai | sonnet (opus for infra incidents) | Cloudflare plugin skills (cloudflare, wrangler, workers-best-practices, durable-objects, web-perf) | - | Cloudflare docs MCP (other Cloudflare MCPs stay unauthenticated until a task needs them) |
 | 🌸 Hana | sonnet | code-review, simplify (built-in harness skills) | - | Library index |
 | 🌌 Sora | sonnet (haiku for lookups) | claude-api (Anthropic questions) | - | WebSearch / WebFetch |
+| 🎬 Rina | opus (video builds) | - | brag, brag-slim (after Reza audit + Hakim yes), ui-ux-pro-max, brand, slides, animation-vocabulary, emil-design-eng, gsap-framer-scroll-animation | ffmpeg, node, Hyperframes (pinned per Reza's audit), Playwright for stills |
 | 📊 Nadia | sonnet (opus for regulatory) | docx, xlsx, pdf (report deliverables) | ondewei-council (business decision stress-test) | WebSearch / WebFetch |
 
 **Future option, not installed — shadcn/ui** (official `shadcn` skill + `npx shadcn@latest mcp`, MIT, free, no account; Sora's research Sep 21, 2026): React-only (Tailwind v4 + React 19; Laravel means the Inertia-React starter kit on Laravel 12+), so zero value for Blade/Alpine work like ONDW. Adopt for Mira + Zara only when a real React+shadcn project starts: Reza reads the raw `SKILL.md` first, pin the `shadcn` CLI version (never `@latest`), review the diff on every `add`, never add an untrusted registry URL. Blade/Alpine ports (BlatUI, April UI) need Laravel 11+/Tailwind 4 and are small single-maintainer projects — evaluate only if ONDW upgrades, each with a Reza audit.
