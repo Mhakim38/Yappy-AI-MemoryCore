@@ -40,6 +40,28 @@
 - **03:3x — download still failed on his phone**, so headers got another pass: the response was **chunked (no Content-Length)**, which iOS's download manager rejects. Now `content-length` is set (verified 317,912 on the live file) and the fallback block also offers **Save my card image (PNG)** — canvas-generated, no Wallet, no MIME negotiation, always saveable. If Safari still refuses the `.pkpass` download, the honest answer is that iOS won't save that UTI: the guaranteed artifacts are the PNG card (QR) and the live code.
 - **Blocked on Hakim**: retest after hard reload (download + PNG); then flow choice (self-add vs upload vs signed), $99 decision, APNs push.
 
+### Oct 28–29, 2026 (21:1x–03:2x) — PT · TapKad: from an idea to a demo-ready loyalty prototype
+
+**What it is now, in one line:** a customer joins by scanning a counter QR with just a name; staff stamp their card by scanning a 90-second single-use code (or their Wallet pass); the admin makes the Wallet card on an iPhone, uploads it, and sends one link.
+
+**Shipped and proven** (repo `~/holeeMonth/tapkad`, Pi `/home/orangepi/tapkad`, systemd `tapkad` on :8790, public `https://orangepi3-lts.tail931966.ts.net:10000/` via funnel :10000; IDUSP :443 and Tulip :8443 untouched):
+- Security model: opaque 128-bit handles stored as SHA-256, single-use live codes, staff-key gate (constant-time, rate-limited, trimmed), scan never mutates, no ids/hashes client-side, CSP/no-store.
+- PWA staff console: camera QR (BarcodeDetector + jsQR), Web NFC on Android, loud status for every failure, per-member **QR button** (fullscreen 620px + copy link) for the iPhone Wallet Add Code step, counter join QR (fullscreen), pending-pass queue.
+- Customer card: rotating code + one wallet action + **visible "Can't add the pass?" link** with share-link / copy-link / share-file / download / PNG fallback.
+- Apple Wallet: pass builder with pure-Node zip + openssl PKCS#7 path, web service (register/latest/log), upload validation (zip, barcode→member), **replace-on-upload** (one active pass per member), `/w/<id>` for Wallet and `/w/<id>?dl=1` for saving.
+- **73-assertion proof** (`node scripts/demo.mjs <base> <staffKey> <joinKey>`) green locally and on the Pi.
+
+**Key facts learned (do not re-litigate):**
+1. Web NFC is Android-Chrome only; iPhone needs the tag written as a URL.
+2. **Unsigned `.pkpass` exported from iOS 27 DOES install** on newer iPhones (Hakim proved it); older iOS shows a blank page — Wallet's stricter check, not our server. Pass2U accepts unsigned.
+3. Pass2U only appears for the **file** share, not URL shares (the sheet matches payload type).
+4. One URL can't both install and download: `apple.pkpass` = install, `octet-stream + attachment + Content-Length` = save. Chunked responses are why Safari said "cannot download".
+5. iOS gives no callback for pass-install success/failure — any "did it work?" logic is a guess; hence the permanent manual link.
+
+**Demo state:** DB holds only **Oreo** (2 stamps, 1 pass) and **Hanah** (0 stamps, 1 pass). Staff key + join key in `/etc/systemd/system/tapkad.service`.
+
+**Open:** retest the download on his old iPhone after the Content-Length fix; decide flow (customer self-add vs admin upload vs $99 signed); APNs push on stamp; Google Wallet twin; branding.
+
 ### Oct 25, 2026 (01:36–02:4x) — PT · NEW PROJECT: Tulip Damai Spa & Sauna — from an empty export to a gated 932 KB build
 - Hakim's friend built a spa/sauna site on a hosted platform and exported it; he wants it **public as a showcase only**, on the Orange Pi. Recorded as PT project `tulip`; detail in `secret_information/projects/tulip/overview.md`.
 - **The whole session turned on one fact**: the folder contains **no source files**. `tulip-damai-spa-&-sauna.zip` is 612 bytes and its listing is six zero-length *directories* (`src/`, `components/`, `data/`, `types/`, `assets/`, `assets/images/`); the on-disk `src/` matches — 4 dirs, 0 files. Searched `~` (depth 4), Downloads/Desktop/Documents, Trash, plus a text grep across `holeeMonth` → no second copy. So: nothing to analyze, nothing to deploy, and **no design invented to fill the gap** — that was the discipline call of the night.
