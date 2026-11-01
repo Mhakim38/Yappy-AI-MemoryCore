@@ -263,6 +263,10 @@ For any new feature in an existing project, use that project's EXISTING design: 
 
 Hakim flagged usage at 62% mid-day with three teams running. Rules: (1) managers start on `sonnet` by default; `opus` only for real L work (security review, money/concurrency design, adversarial review) and only for the duration of that task; (2) at most 2 teams actively building at once, the third waits or does read-only planning inline by the manager; (3) Yappy does small read-only checks inline instead of spawning agents; (4) verify the model of every running agent with `ps -axo args | grep "claude --model"` when asked; (5) report any opus pane that is not on an L task; (6) finished panes are closed only after their report is read.
 
+## No tests pushed to GitHub (Hakim, Nov 1, 2026)
+
+GitGuardian flags fake passwords and secret-looking literals in test files. From now on, **do not `git add`/commit/push test files** (tests/, *Test.php, fixtures) to any remote. Keep them local (add to `.git/info/exclude`, not `.gitignore`), run them locally, and report results in the progress notes. Tests already pushed earlier stay until Hakim decides on a cleanup. Never put credential-looking literals in committed files anywhere.
+
 ## Future expansion
 Roles likely to be needed:
 - 🛠️ A **code-implementer** agent (uses Edit/Write) — for parallel feature work.
