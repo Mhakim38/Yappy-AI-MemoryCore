@@ -259,6 +259,10 @@ For any new feature in an existing project, use that project's EXISTING design: 
 
 **No emoji in any UI/design** (Hakim, Nov 1, 2026): use the project's existing icon set (e.g. Font Awesome / lucide / Flux icons) or SVG, never emoji characters, in mockups, screenshots and shipped code.
 
+## Token budget with multiple teams (Hakim, Nov 1, 2026)
+
+Hakim flagged usage at 62% mid-day with three teams running. Rules: (1) managers start on `sonnet` by default; `opus` only for real L work (security review, money/concurrency design, adversarial review) and only for the duration of that task; (2) at most 2 teams actively building at once, the third waits or does read-only planning inline by the manager; (3) Yappy does small read-only checks inline instead of spawning agents; (4) verify the model of every running agent with `ps -axo args | grep "claude --model"` when asked; (5) report any opus pane that is not on an L task; (6) finished panes are closed only after their report is read.
+
 ## Future expansion
 Roles likely to be needed:
 - 🛠️ A **code-implementer** agent (uses Edit/Write) — for parallel feature work.
