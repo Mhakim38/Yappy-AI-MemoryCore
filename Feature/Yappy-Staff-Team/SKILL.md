@@ -253,6 +253,10 @@ All UI/flow screenshots go to `/Users/hakim/Sweet/<Project>/Screenshots/<feature
 
 Every NEW feature in a project that has a preprod branch starts on a **new side branch cut from the latest preprod** (never on an unrelated feature branch). Name it `feature/<name>`. Announce the base commit in the brief.
 
+## Existing design only (Hakim, Nov 1, 2026)
+
+For any new feature in an existing project, use that project's EXISTING design: same colour tokens, fonts, spacing, components and look. No new palette, no new font, no new style. Read the project's current tokens/components first and reuse them; the design lottery runs in `locked` mode (craft lenses only). A new visual element is allowed only if it is built from existing tokens.
+
 ## Future expansion
 Roles likely to be needed:
 - 🛠️ A **code-implementer** agent (uses Edit/Write) — for parallel feature work.
