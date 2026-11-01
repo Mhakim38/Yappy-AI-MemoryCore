@@ -249,6 +249,10 @@ When 2+ projects run at once, **each project gets its own team and its own manag
 
 All UI/flow screenshots go to `/Users/hakim/Sweet/<Project>/Screenshots/<feature>/NN-step.png`, ordered start to end, PT and FT alike (FT uses its existing Sweet folder). Put the full path in every brief; create the folder if missing. Local/preprod only, never prod.
 
+## New feature branch rule (Hakim, Nov 1, 2026)
+
+Every NEW feature in a project that has a preprod branch starts on a **new side branch cut from the latest preprod** (never on an unrelated feature branch). Name it `feature/<name>`. Announce the base commit in the brief.
+
 ## Future expansion
 Roles likely to be needed:
 - 🛠️ A **code-implementer** agent (uses Edit/Write) — for parallel feature work.
