@@ -257,6 +257,8 @@ Every NEW feature in a project that has a preprod branch starts on a **new side 
 
 For any new feature in an existing project, use that project's EXISTING design: same colour tokens, fonts, spacing, components and look. No new palette, no new font, no new style. Read the project's current tokens/components first and reuse them; the design lottery runs in `locked` mode (craft lenses only). A new visual element is allowed only if it is built from existing tokens.
 
+**No emoji in any UI/design** (Hakim, Nov 1, 2026): use the project's existing icon set (e.g. Font Awesome / lucide / Flux icons) or SVG, never emoji characters, in mockups, screenshots and shipped code.
+
 ## Future expansion
 Roles likely to be needed:
 - 🛠️ A **code-implementer** agent (uses Edit/Write) — for parallel feature work.
