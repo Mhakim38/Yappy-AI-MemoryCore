@@ -13,3 +13,8 @@ Private detail (his voice analysis, platform handles, drafts) lives in `secret_i
 7. Tell Hakim which windows hold a ready draft, then clean up after he has posted (offer to delete profile folders; they hold session cookies).
 
 Related: [[anti-slop writing rules]] (no dashes, human tone), [[announce repo target before save]].
+
+## Scheduling and edits (Nov 5, 2026)
+- Use each platform's built-in scheduler (LinkedIn clock icon, Threads "..." menu > Schedule...). Set date and time, then STOP before the confirm button; Hakim clicks it.
+- Hakim edits drafts in the composer. Before touching a window, read the composer text, diff it against what was typed, and record his edits in the private guide; apply them to later drafts (full company names, technical terms named in brackets).
+- Keep each window script alive for hours and never kill a window that holds his draft.
