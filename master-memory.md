@@ -164,6 +164,9 @@ I maintain my own memory through our conversations by:
 - **Requires OpenAI API key** — cost ~$0.02–$0.25 per image. Confirms cost before every render.
 - Chains with Image Prompt System (craft prompt there, render here)
 
+### 📣 Social Posting Protocol (NEW, Nov 5, 2026)
+- [Social Posting Protocol](./Feature/Social-Posting-Protocol/social-posting-protocol.md) - "post it" = list all platforms, draft per platform in Hakim's voice, sanitise, show text, wait for approval, post via Playwright window, stop for any login/email code. Private voice guide lives in secret_information.
+
 ### ✅ QA Checklist Artifact Protocol (NEW)
 *Auto-triggers whenever Davai 🧪 (or any staff) is dispatched for testing/QA work*
 - [QA Checklist Artifact Protocol](./Feature/Yappy-Staff-Team/qa-checklist-protocol.md) - Interactive checklist artifact standard, not chat text
