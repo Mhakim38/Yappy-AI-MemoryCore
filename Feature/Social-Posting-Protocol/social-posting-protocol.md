@@ -18,3 +18,8 @@ Related: [[anti-slop writing rules]] (no dashes, human tone), [[announce repo ta
 - Use each platform's built-in scheduler (LinkedIn clock icon, Threads "..." menu > Schedule...). Set date and time, then STOP before the confirm button; Hakim clicks it.
 - Hakim edits drafts in the composer. Before touching a window, read the composer text, diff it against what was typed, and record his edits in the private guide; apply them to later drafts (full company names, technical terms named in brackets).
 - Keep each window script alive for hours and never kill a window that holds his draft.
+
+## Tags, screenshots, who clicks (Nov 5, 2026)
+- Ondewei posts always tag the Ondewei account on every platform (only that account). Check the mention picker before selecting.
+- Save screenshots of each draft, scheduled and posted state under Sweet/OnDeWei/Postings/<Platform>/.
+- The final Post/Schedule/Confirm click is Hakim's. The auto-mode classifier blocks Yappy clicking publish buttons; never work around it.
