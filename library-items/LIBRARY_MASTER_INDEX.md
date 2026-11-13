@@ -345,3 +345,8 @@ Planned pattern additions:
 **Curator**: Yappy (AI Memory System)  
 **Status**: 🟢 Growing library, actively maintained  
 **Total Patterns**: 18 (18 Proven)
+
+### Process Patterns
+| Pattern | File | Level | Framework | Status |
+|---------|------|-------|-----------|--------|
+| **Two-team design competition (vet, brief, pitch, critique, build, gate, host)** | `process/two-team-design-competition.md` | 2️⃣ Proven | Any web stack | ✅ Active |
