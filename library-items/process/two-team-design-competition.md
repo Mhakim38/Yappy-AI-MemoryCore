@@ -18,3 +18,11 @@ A signature interaction nobody expects, every element animating on scroll, measu
 
 ## Gotchas
 Small tap targets, 768px tablet layouts, off-screen elements widening the page on phones, decorative elements crossing text, pinned scroll stages resetting on mobile toolbar resize. Watch the agents continuously with a background file watcher, and re-arm it.
+
+## Creative layer that wins (add-on)
+- One signature interaction per site that expresses the subject (a joke mechanic or a metaphor you can play), derived from a public-info dossier with claims tagged verified/estimated/unknown.
+- Pinned scrollytelling stages (sticky stage, scrubbed beats), kept out of sensitive sections, with a plain-list reduced-motion path.
+- An ASCII footer that spans the full width, fades into the page ground, and holds the footer text and links inside the scene.
+- Credits behind one button that opens a themed cinematic roll (pausable, skippable, list fallback); legal disclaimer stays visible outside it.
+- A labelled progress rail whose marker doubles as the keyboard slider; a bottom bar on phones.
+- Placeholders (dotted, transparent) for any picture or fact that is not verified.
