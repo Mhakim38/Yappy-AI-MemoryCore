@@ -26,3 +26,6 @@ Small tap targets, 768px tablet layouts, off-screen elements widening the page o
 - Credits behind one button that opens a themed cinematic roll (pausable, skippable, list fallback); legal disclaimer stays visible outside it.
 - A labelled progress rail whose marker doubles as the keyboard slider; a bottom bar on phones.
 - Placeholders (dotted, transparent) for any picture or fact that is not verified.
+
+## Scan test (add-on)
+Professional sites must pass a 30-second scan: one short headline, 3 to 5 chips or numbers, detail on demand. Paragraph walls fail even when the interaction is good.
