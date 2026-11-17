@@ -16,6 +16,7 @@
 | **Web Push: verify, debug, targeted-push pitfalls** | `integration/web-push-verify-and-debug.md` | 2️⃣ Proven | Laravel PWA | ✅ Active |
 | **BillPlz Payment Gateway** | `integration/billplz-integration.md` | 2️⃣ Proven | Laravel | ✅ Active |
 | **PERKESO GIG Workers API** | `integration/perkeso-gig-api.md` | 2️⃣ Proven | Laravel | ✅ Active |
+| **Procedural 3D showcase site (build + host)** | `process/procedural-3d-showcase-site.md` | 2️⃣ Proven | Three.js, GSAP, Apache | ✅ Active |
 
 ### Database & Backend Patterns
 | Pattern | File | Level | Framework | Status |
